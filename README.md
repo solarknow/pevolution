@@ -4,23 +4,48 @@ pevolution
 This is a pipeline to find, align, and find trees for putatively related proteins.
 
 ----------
-To install pre-reqs, 
+To install pre-reqs,
+--------------------
 Debian/Ubuntu:
-sudo apt-get install python-psutil python-biopython mrbayes mrbayes-doc 
+sudo apt-get install python-pip mrbayes mrbayes-doc wget
 wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
 tar zxvf prank.linux64.140110.tgz prank
 wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
 unzip PhyML-3.1.zip phyml
 
+python setup.py install
+
+------------------
+
+
 RHEL/Fedora/CentOS:
-sudo yum install python-psutil python-biopython libbeagle-dev
+sudo yum install python-pip java-1.7.0-openjdk-devel wget autoconf automake svn
+sudo yum groupinstall "Development Tools"
+
+Install libhmsbeagle for mrbayes
+--------------------------------
+svn checkout http://beagle-lib.googlecode.com/svn/trunk/ beagle-lib
+cd beagle-lib
+./autogen.sh
+./configure
+make
+sudo make install
+
+Install MrBayes
+---------------
+wget http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/mrbayes-3.2.2.tar.gz
+tar zxvf mrbayes-3.2.2.tar.gz
+cd mrbayes_3.2.2
+autoconf
+./configure
+make
+sudo make install
+
 wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
 tar zxvf prank.linux64.140110.tgz prank
 wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
 unzip PhyML-3.1.zip phyml
-wget http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/mrbayes-3.2.2.tar.gz
-tar zxvf mrbayes-3.2.2.tar.gz
-cd mrbayes_3.2.2
+
 
 
 Mac OS X:
