@@ -9,7 +9,7 @@ To install pre-reqs,
 Debian/Ubuntu:
 ```shell
 
-sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev
+sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip
 wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
 tar zxvf prank.linux64.140110.tgz prank
 wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
@@ -21,7 +21,7 @@ python setup.py install
 RHEL/Fedora/CentOS:
 ```shell
 
-sudo yum install python-pip java-1.7.0-openjdk-devel wget autoconf automake svn
+sudo yum install python-pip java-1.7.0-openjdk-devel wget autoconf automake svn unzip
 sudo yum groupinstall "Development Tools"
 ```
 Install libhmsbeagle for mrbayes
