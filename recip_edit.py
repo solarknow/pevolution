@@ -29,7 +29,7 @@ def bestrecipblast(orgs, seed, thresh):
                 for hsp in align.hsps:
                     if (hsp.positives/float(hsp.align_length))>=.4 and (float(hsp.align_length)/len(hsp.query))>=.25:
                         ac.append(align.title.split('|')[1])
-        print ac
+        print "Done. Number of sequences found: "+repr(len(ac))
 
         for o in ac:
             print o
@@ -49,8 +49,8 @@ def bestrecipblast(orgs, seed, thresh):
                         else:
                             continue
 
-            print acc
-
+            print "Done. Number of sequences found: "+repr(len(acc))
+            
             if seed in acc:
                 print 'it\'s twue!'
                 name=Fetchutil.orgfetch(o)[0]
