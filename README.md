@@ -70,8 +70,7 @@ dmg
 Install pip: https://pip.pypa.io/en/latest/installing.html
 Install MrBayes: http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/MrBayes-3.2.2_installer_MACx64.pkg
 
-To install dependencies, run sudo python setup.py install in this directory
-ory.
+To install dependencies, run sudo python setup.py install in this directory.
 -------
 ##Windows:
 
