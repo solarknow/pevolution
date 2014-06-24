@@ -6,10 +6,11 @@ This is a pipeline to find, align, and find trees for putatively related protein
 ----------
 To install pre-reqs,
 --------------------
-Debian/Ubuntu:
+##Debian/Ubuntu:
+
 ```shell
 
-sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip
+sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+
 wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
 tar zxvf prank.linux64.140110.tgz prank
 wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
@@ -18,15 +19,15 @@ mv Phyml-3.1 phyml
 python setup.py install
 ```
 ------------------
+##RHEL/Fedora/CentOS:
 
-RHEL/Fedora/CentOS:
 ```shell
 
-sudo yum install python-pip java-1.7.0-openjdk-devel wget autoconf automake svn unzip
+sudo yum install python-pip java-1.7.0-openjdk-devel wget autoconf automake svn unzip ncbi-blast+
 sudo yum groupinstall "Development Tools"
 ```
-Install libhmsbeagle for mrbayes
---------------------------------
+###Install libhmsbeagle for mrbayes
+
 ```shell
 
 svn checkout http://beagle-lib.googlecode.com/svn/trunk/ beagle-lib
@@ -36,8 +37,8 @@ cd beagle-lib
 make
 sudo make install
 ```
-Install MrBayes
----------------
+###Install MrBayes
+
 ```shell
 
 wget http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/mrbayes-3.2.2.tar.gz
@@ -49,8 +50,8 @@ make
 sudo make install
 ```
 ---------
-Other Deps (no compilation necessary)
----------
+###Other Deps (no compilation necessary)
+
 ```shell
 
 wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
@@ -60,7 +61,9 @@ unzip PhyML-3.1.zip
 mv Phyml-3.1 phyml
 sudo python setup.py install
 ```
-Mac OS X:
+--------
+##Mac OS X:
+
 If you don't have python installed,
 Install python: https://www.python.org/ftp/python/2.7.6/python-2.7.6-macosx10.6.
 dmg
@@ -69,8 +72,9 @@ Install MrBayes: http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/
 
 To install dependencies, run sudo python setup.py install in this directory
 ory.
+-------
+##Windows:
 
-Windows:
 If you don't have python installed,
 Install python: https://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
 Make sure the directory you installed Python in (usually C:\Python27) is in the 
