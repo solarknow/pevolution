@@ -1,15 +1,13 @@
 import os, sys
 import SeqUtil
 
+
 out=sys.argv[1]
 
 SeqUtil.rename('all-'+out+'.fas')
-os.system('./prank -d=all-'+out+' -o=aligns/all-'+out+' -f=nexus -quiet')
+os.system('prank/bin/prank -d=all-'+out+' -o=aligns/all-'+out+' -f=nexus -quiet')
 SeqUtil.splicealign('aligns/all-'+out+'.2.nex','Bayes/all-'+out+'-mod.nxs')
-os.system('java -jar prottest3.3.jar -i aligns/all-'+out+'.3.nex -o Prot/all-'+out+
-            '-ori.pro -all-distributions -all T -S 1 -threads 6 -BIC')
-os.system('java -jar prottest3.3.jar -i Bayes/all-'+out+'-mod.nxs -o Prot/all-'+out+
-            '-mod.pro -all-distributions -all T -S 1 -threads 6 -BIC')
+
 models_ori=SeqUtil.bestmod('aligns/all-'+out+'.2.nex')
 models=SeqUtil.bestmod('Bayes/all-'+out+'-mod.nxs')
 print models_ori, models

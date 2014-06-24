@@ -1,4 +1,5 @@
 from Bio import Entrez
+import subprocess,os
 Entrez.email='mihir.sarwade@effem.com'
 
 def seqfetch(acc):
@@ -12,6 +13,8 @@ def seqfetch(acc):
         inpout=hand.readline()
         string+=inpout
         if inpout=='':
+            if not os.path.exists('Orthos'):
+              subprocess.call(['mkdir','Orthos'])
             open('Orthos/'+acc+'.fasta','w').write(string)
             return 'Orthos/'+acc+'.fasta'
 
@@ -68,24 +71,31 @@ def orgfetch(acc):
     i=0
     ret=[]
     retu=['']
+    #print recun
+    mutisp=False
     while i<len(recun):
         j=0
         if recun[i]=='DEFINITION':
-            tab=recun[i+1].strip().split()
-            if not recun[i+2]=='ACCESSION':
-                tab+=recun[i+2].strip().split()
-            for k in range(len(tab)):
-                if tab[k].startswith('[') and len(tab[k])>5:
-                    retu=[tab[k][1:]]
-                    while k<len(tab):
-                        k+=1
-                        if tab[k].endswith('].'):
-                            retu[0]+=' '+tab[k][0:tab[k].index(']')]
-                            retu.append('Unknown.')
-                            break
-                        else:
-                            retu[0]+=' '+tab[k]
-
+            multisp=recun[i+1].startswith("MULTISPECIES:")
+            if not multisp:
+              tab=recun[i+1].strip().split()
+              if not recun[i+2]=='ACCESSION':
+                  tab+=recun[i+2].strip().split()
+              for k in range(len(tab)):
+                  if tab[k].startswith('[') and len(tab[k])>5:
+                      retu=[tab[k][1:]]
+                      while k<len(tab):
+                          k+=1
+                          if tab[k].endswith('].'):
+                              retu[0]+=' '+tab[k][0:tab[k].index(']')]
+                              retu.append('Unknown.')
+                              break
+                          else:
+                              retu[0]+=' '+tab[k]
+            else:
+              return [recun[i+11]+' multispecies',recun[i+14].split(';')[0]]
+#        elif recun[i+1].startswith("MULTISPECIES:"):
+#          ret=
         if recun[i]=='ORGANISM':
             try:
                 ret=[recun[i+1].split()[0]+' '+recun[i+1].split()[1]]

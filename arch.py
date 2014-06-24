@@ -2,7 +2,7 @@ import os, sys
 import SeqUtil
 out= sys.argv[1]
 SeqUtil.rename('arch-'+out+'.fas')
-os.system('./prank -d=arch-'+out+' -o=aligns/arch-'+out+' -f=nexus -quiet')
+os.system('prank/bin/prank -d=arch-'+out+' -o=aligns/arch-'+out+' -f=nexus -quiet')
 SeqUtil.splicealign('aligns/arch-'+out+'.2.nex','Bayes/arch-'+out+'-mod.nxs')
 models=SeqUtil.bestmod('Bayes/arch-'+out+'-mod.nxs')
 models_ori=SeqUtil.bestmod('aligns/arch-'+out+'.2.nex')

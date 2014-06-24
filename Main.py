@@ -9,19 +9,14 @@ try:
 except IndexError:
     query=raw_input('Query accession no: ')
     out=raw_input('Output file: ')
-    dom=raw_input('Organism Domain to be explored: pick from euk, bac, arch, or all ').lower()
-#try:
+    dom=raw_input('Organism Domain to be explored: euk,bac,arch, or all ').lower()
+try:
     open(dom+'-'+out+'.fasta').read()
-#except IOError:
-    arch_list=['Haloferax volcanii','Sulfolobus tokodaii','Methanococcus aeolicus','Methanobrevibacter smithii',
-               'Thermococcus sibiricus','Archaeoglobus fulgidus','Nanoarchaeum equitans','Thermoplasma acidophilum']
-    bac_list= ['Gemmata obscuriglobus', 'Prosthecobacter dejongeii', 'Verrucomicrobium spinosum',
-               'Rickettsia prowazekii', 'Agrobacterium tumefaciens','Escherichia coli',
-               'Bacillus subtilis','Anabaena variabilis', 'Thermotoga maritima']
-    euk_list= ['Drosophila melanogaster','Homo sapiens','Oryza sativa',
-               'Trypanosoma brucei','Plasmodium falciparum','Saccharomyces cerevisiae',
-               'Neurospora crassa','Arabidopsis thaliana']#subject to change
-    #setting threshold values: thresh1- vs. arch ;thresh2- vs. bac; 
+except IOError:
+    arch_list=['Haloferax volcanii','Sulfolobus tokodaii','Methanococcus aeolicus','Methanobrevibacter smithii', 'Thermococcus sibiricus','Archaeoglobus fulgidus','Nanoarchaeum equitans','Thermoplasma acidophilum']
+    bac_list= ['Gemmata obscuriglobus', 'Prosthecobacter dejongeii', 'Verrucomicrobium spinosum','Rickettsia prowazekii', 'Agrobacterium tumefaciens','Escherichia coli', 'Bacillus subtilis','Anabaena variabilis', 'Thermotoga maritima']
+    euk_list= ['Drosophila melanogaster','Homo sapiens','Oryza sativa', 'Trypanosoma brucei','Plasmodium falciparum','Saccharomyces cerevisiae', 'Neurospora crassa','Arabidopsis thaliana']#subject to change
+    #setting threshold values: thresh1-w/ arch ;thresh2-w/ bac; 
     dom_query=Fetchutil.orgfetch(query)[1]
     if dom_query=='Archaea':
         thresh1=1e-10
@@ -122,4 +117,4 @@ try:
 except:
     pass
 os.system('python '+dom+'.py '+out)
-Report.generateReport(out,query,models)
+Report.generateReport(out,query,models,dom)

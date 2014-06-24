@@ -1,4 +1,4 @@
-import os, Fetchutil, random
+import os, Fetchutil, random, psutil
 
 def clusttofasta(clust,out):
     "converts a clustal alignment file to a fasta file out"
@@ -340,15 +340,16 @@ def splicealign(inalign,outalign):
     han.write(';\nend;\n')
     han.close()
     print '.edit written. aligning'
-    os.system('prank -d='+inalign+'.edit -o='+inalign+'.ed -f=nexus -quiet')
+    os.system('clustalw -align -infile='+inalign+'.edit -outfile='+inalign+'.ed -output=nexus -quiet')
     print '.ed written splice aligning'
-    splicealign(inalign+'.ed.2.nex',outalign)
+    splicealign(inalign+'.ed',outalign)
 
 def bestmod(infile):
     "Takes in alignment file runs protTest, and extracts best model(s)"
+    procs=round(psutil.NUM_CPUS/2.0)
     out=infile.split('/')[1].split('.')[0]
-    os.system('java -jar prottest3.3.jar -i '+infile+' -o Prot/'+out+
-            '.pro -all-distributions -all T -S 1 -threads 6 -BIC')
+    os.system('java -jar prottest/prottest-3.4.jar -i '+infile+' -o Prot/'+out+
+            '.pro -all-distributions -all T -S 1 -threads '+repr(procs)+' -BIC')
     bayesmodels=['poisson','jtt','mtrev','mtmam','wag','rtrev','cprev','vt','blosum62']
     prot_hand=open(Prot/'+out+'.pro)
     models={}

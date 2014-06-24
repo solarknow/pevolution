@@ -1,6 +1,11 @@
 from Bio.Blast import NCBIXML
 import Fetchutil, random
-import os
+import os, subprocess
+
+if not os.path.exists('XML'):
+  subprocess.call(['mkdir','XML'])
+if not os.path.exists('dicts'):
+  subprocess.call(['mkdir','dicts'])
 
 def bestrecipblast(orgs, seed, thresh):
     "Returns the best pairwise reciprocal BLAST using seed accession no. from seedorg organism against orgs list of organisms"
@@ -12,15 +17,17 @@ def bestrecipblast(orgs, seed, thresh):
         ac=[]
         Fetchutil.seqfetch(seed)
         dum=str(int(int(seed)*random.random()))
+        
         os.system('blastp -db nr -query Orthos/'+seed+'.fasta -evalue '+str(thresh)+
                   ' -out XML/'+dum+'.xml -outfmt 5 -entrez_query \"'+i+'[ORGN]\" -use_sw_tback'+
-                  ' -soft_masking True -remote')
+                  ' -remote')
         qoutput=open('XML/'+dum+'.xml')
+        
         parser=NCBIXML.parse(qoutput)
         for lin in parser:
             for align in lin.alignments:
                 for hsp in align.hsps:
-                    if (hsp.positives/float(hsp.align_length))>=.3 and (float(hsp.align_length)/len(hsp.query))>=.25:
+                    if (hsp.positives/float(hsp.align_length))>=.4 and (float(hsp.align_length)/len(hsp.query))>=.25:
                         ac.append(align.title.split('|')[1])
         print ac
 
@@ -29,7 +36,7 @@ def bestrecipblast(orgs, seed, thresh):
             Fetchutil.seqfetch(o)
             os.system('blastp -db nr -query Orthos/'+o+'.fasta -evalue '+str(thresh)+
                   ' -out XML/'+dum+'.xml -outfmt 5 -entrez_query \"'+seedorg[0]+'[ORGN]\" -use_sw_tback'+
-                  ' -soft_masking True -remote')
+                  ' -remote')
             q1output=open('XML/'+dum+'.xml')
             parse=NCBIXML.parse(q1output)
             acc=[]
@@ -37,7 +44,7 @@ def bestrecipblast(orgs, seed, thresh):
             for lin in parse:
                 for align in lin.alignments:
                     for hsp in align.hsps:
-                        if (hsp.positives/float(hsp.align_length))>=.3 and (float(hsp.align_length)/len(hsp.query))>.25:
+                        if (hsp.positives/float(hsp.align_length))>=.4 and (float(hsp.align_length)/len(hsp.query))>.25:
                             acc.append(align.title.split('|')[1])
                         else:
                             continue
@@ -51,6 +58,7 @@ def bestrecipblast(orgs, seed, thresh):
                     acclist[name]=[o,str(ac.index(o)+1)+'/'+str(len(ac)),str(acc.index(seed)+1)+'/'+str(len(acc))]
                 except KeyError:
                     acclist.update({name:[o,str(ac.index(o)+1)+'/'+str(len(ac)),str(acc.index(seed)+1)+'/'+str(len(acc))]})
+                
                 open('dicts/'+seed,'a').write(str(acclist)+'\n')
                 break
     return acclist

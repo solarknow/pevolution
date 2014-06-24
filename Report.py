@@ -1,6 +1,6 @@
 import Fetchutil, SeqUtil, os
 
-def generateReport(name,quer,models):
+def generateReport(name,quer,models,dom):
     "Generates a report summarizing the analysis done"
     ret=open('Report-'+name+'.txt','w')
     ret.write('Orthologous sequence Search and Alignment\n'+
@@ -12,9 +12,9 @@ def generateReport(name,quer,models):
     ret.write('Query sequence Accension number: '+quer+' Query sequence organism: '+
                 Fetchutil.orgfetch(quer)[0]+'\n')
     ret.write('BLASTs are performed using expected value (E-value) thresholds based on the kingdom (Bacteria, Archaea, and Eukaryota).\n'+
-    ' These lists are then refined by picking only those sequences that are at least 40% similar and\n'+
+    ' These lists are then refined by picking only those sequences that are at least 50% similar and\n'+
     ' whose aligned portion is at least 25% that of the query, as recommended by Moreno-Hagelsieb and Latimer (2008).\n')
-    all_file=open('all-'+name+'.fas')
+    all_file=open(dom+'-'+name+'.fas')
     info={}
     while all_file:
         lin=all_file.readline()
@@ -72,7 +72,7 @@ def generateReport(name,quer,models):
     ##Draw initial alignment +length, final alignment +length
     ret.write('\nAlignments:\n'+
               'Original alignment: Length: ')
-    alig=open('aligns/all-'+name+'.2.nex')
+    alig=open('aligns/'+dom+'-'+name+'.2.nex')
     length=''
     while alig:
         lin=alig.readline()
@@ -81,7 +81,7 @@ def generateReport(name,quer,models):
             break
     ret.write(length+'\n'+
                 'Final alignment: Length: ')
-    alig=open('Bayes/all-'+name+'-mod.nxs')
+    alig=open('Bayes/'+dom+'-'+name+'-mod.nxs')
     length=''
     print 'alignment printing'
     while alig:
@@ -104,7 +104,7 @@ def generateReport(name,quer,models):
     ret.write('\nShowing the original alignment and the final alignment may not give enough information.\n'+
               'How much of each sequence was conserved in the final alignment:\n')
     oriseqs={}
-    fil=open('all-'+name)
+    fil=open(dom+'-'+name)
     while fil:
         lin=fil.readline().strip()
         #print len(oriseqs)
@@ -121,7 +121,7 @@ def generateReport(name,quer,models):
                     break
                 seq+=lan
     print 'modding'
-    moddedseqs=SeqUtil.modseqs('Bayes/all-'+name+'-mod.nxs')
+    moddedseqs=SeqUtil.modseqs('Bayes/'+dom+'-'+name+'-mod.nxs')
     print len(oriseqs),len(moddedseqs)
     for m in moddedseqs:
         lenmod=len(moddedseqs[m])
@@ -129,7 +129,7 @@ def generateReport(name,quer,models):
         ret.write(m+' : '+str(lenmod)+' residues from the original '+str(lenori)+' residues. About %.2f percent.\n' % ((lenmod+0.0)/lenori*100))
     print 'all alignment stats written'
     ##Best model(s)+ respective parameters and BIC values(?)
-    prot_hand=open('prot/all-'+name+'-mod.pro')
+    prot_hand=open('prot/'+dom+'-'+name+'-mod.pro')
     while prot_hand:
         prot=prot_hand.readline()
         #print prot
@@ -151,21 +151,21 @@ def generateReport(name,quer,models):
     ## print trees: ProtTest best tree
     trees=''
     ret.write('\nTree found by ProtTest using the best model:\n')
-    tree=open('prot/all-'+name+'-mod.pro.tre').readline()
+    tree=open('prot/'+dom+'-'+name+'-mod.pro.tre').readline()
     trees+=tree
     ret.write(tree+'\n')
     ##              PhyML1 + (PhyML2)
     try:
         for i in models:
             ret.write('\nTree found by PhyML using the '+i.split('+')[0]+' model:\n')
-            tree=consense('ML/all-'+name+i.split('+')[0]+'_phyml_boot_trees.txt')
+            tree=consense('ML/+'+dom+'-'+name+i.split('+')[0]+'_phyml_boot_trees.txt')
             trees+=tree+'\n'
             ret.write(tree+'\n')
     except:
         ret.write('Tree not found')
     ##              Bayesian selected tree
     ret.write('\nTree found by MrBayes using the best model:\n')
-    read=open('Bayes/all-'+name+'-bayes.nxs.con')
+    read=open('Bayes/'+dom+'-'+name+'-bayes.nxs.con')
     while read:
         lin=read.readline()
         #print lin
