@@ -27,6 +27,7 @@ runs=[]
 for e in init_acc:
     if e=={}:
         continue
+    print "Pass 2"
     res=recip_edit.bestrecipblast(['Homo sapiens','Escherichia coli','Haloferax volcanii'], e.values()[0][0], 5)
     acs=[]
     for l in res:
