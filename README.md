@@ -23,7 +23,7 @@ python setup.py install
 
 ```shell
 
-sudo yum install python-pip java-1.7.0-openjdk-devel wget autoconf automake svn unzip ncbi-blast+
+sudo yum install python-pip python-devel java-1.7.0-openjdk-devel wget autoconf automake svn unzip ncbi-blast+
 sudo yum groupinstall "Development Tools"
 ```
 ###Install libhmsbeagle for mrbayes
