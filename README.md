@@ -17,7 +17,6 @@ python setup.py install
 
 ------------------
 
-
 RHEL/Fedora/CentOS:
 sudo yum install python-pip java-1.7.0-openjdk-devel wget autoconf automake svn
 sudo yum groupinstall "Development Tools"
