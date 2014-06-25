@@ -2,6 +2,9 @@ import sys,os
 import Fetchutil, recip_edit, Report
 
 #Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
+phyml=''
+if '-y' in sys.argv:
+	phyml='-y'
 try:
     query= sys.argv[1]
     out=sys.argv[2]
@@ -10,6 +13,9 @@ except IndexError:
     query=raw_input('Query accession no: ')
     out=raw_input('Output file: ')
     dom=raw_input('Organism Domain to be explored: euk,bac,arch, or all ').lower()
+    phy=raw_input("Should we use PhyML to find trees, in addition to MrBayes? [y/N]'
+if phy.lower()=='y':
+	phyml='-y'
 try:
     open(dom+'-'+out+'.fasta').read()
 except IOError:
@@ -38,6 +44,7 @@ except IOError:
     arch_accs={}
     bac_accs={}
     euk_accs={}
+    print "Blasting"
     if dom=='arch' or dom=='all':
       arch_accs=recip_edit.bestrecipblast(arch_list,query,thresh1)
     if dom=='bac' or dom=='all':
@@ -48,9 +55,12 @@ except IOError:
     all_accs.update(arch_accs)
     all_accs.update(bac_accs)
     all_accs.update(euk_accs)
-
-    print all_accs
+    num_seqs=0
+    for j in all_accs:
+    	num_seqs+=len(all_accs[j])
+    print "Dictionary generated with "+repr(len(all_accs.keys()))+" keys and "+repr(num_seqs)+" sequences."
 ##Fetching the sequences and writing them to file
+    print "Writing seqs to file."
     for a in arch_accs.keys():
         Fetchutil.seqfetch(arch_accs[a][0])
         fil=open('Orthos/'+arch_accs[a][0]+'.fasta')
@@ -116,5 +126,5 @@ try:
     os.mkdir('Prot')
 except:
     pass
-os.system('python '+dom+'.py '+out)
+os.system('python '+dom+'.py '+out+' '+phyml)
 Report.generateReport(out,query,models,dom)
