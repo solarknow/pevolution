@@ -13,7 +13,7 @@ except IndexError:
     query=raw_input('Query accession no: ')
     out=raw_input('Output file: ')
     dom=raw_input('Organism Domain to be explored: euk,bac,arch, or all ').lower()
-    phy=raw_input("Should we use PhyML to find trees, in addition to MrBayes? [y/N]'
+    phy=raw_input("Should we use PhyML to find trees, in addition to MrBayes? [y/N]")
 if phy.lower()=='y':
 	phyml='-y'
 try:
