@@ -1,5 +1,5 @@
 import sys,os
-import Fetchutil, recip_edit, Report
+import Fetchutil, Reciprocal, Report
 
 #Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
 phyml=''
@@ -46,11 +46,11 @@ except IOError:
     euk_accs={}
     print "Blasting"
     if dom=='arch' or dom=='all':
-      arch_accs=recip_edit.bestrecipblast(arch_list,query,thresh1)
+      arch_accs=Reciprocal.bestrecipblast(arch_list,query,thresh1)
     if dom=='bac' or dom=='all':
-      bac_accs=recip_edit.bestrecipblast(bac_list,query,thresh2)
+      bac_accs=Reciprocal.bestrecipblast(bac_list,query,thresh2)
     if dom=='euk' or dom=='all':
-      euk_accs=recip_edit.bestrecipblast(euk_list,query,thresh3)
+      euk_accs=Reciprocal.bestrecipblast(euk_list,query,thresh3)
     all_accs={}
     all_accs.update(arch_accs)
     all_accs.update(bac_accs)

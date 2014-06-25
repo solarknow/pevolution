@@ -1,4 +1,4 @@
-import recip_edit, Fetchutil
+import Reciprocal, Fetchutil
 import sys
 
 try:
@@ -20,9 +20,9 @@ else:
     thresh3=5
 
 init_acc=[]
-init_acc.append(recip_edit.bestrecipblast(['Homo sapiens'], query, thresh3))
-init_acc.append(recip_edit.bestrecipblast(['Escherichia coli'], query, thresh2))
-init_acc.append(recip_edit.bestrecipblast(['Haloferax volcanii'], query, thresh1))
+init_acc.append(Reciprocal.bestrecipblast(['Homo sapiens'], query, thresh3))
+init_acc.append(Reciprocal.bestrecipblast(['Escherichia coli'], query, thresh2))
+init_acc.append(Reciprocal.bestrecipblast(['Haloferax volcanii'], query, thresh1))
 runs=[]
 count=0
 for e in init_acc:
@@ -30,7 +30,7 @@ for e in init_acc:
     if e=={}:
         continue
     print "Pass "+repr(count)
-    res=recip_edit.bestrecipblast(['Homo sapiens','Escherichia coli','Haloferax volcanii'], e.values()[0][0], 5)
+    res=Reciprocal.bestrecipblast(['Homo sapiens','Escherichia coli','Haloferax volcanii'], e.values()[0][0], 5)
     acs=[]
     for l in res:
         acs.append(res[l][0])
