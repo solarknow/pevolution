@@ -24,10 +24,12 @@ init_acc.append(recip_edit.bestrecipblast(['Homo sapiens'], query, thresh3))
 init_acc.append(recip_edit.bestrecipblast(['Escherichia coli'], query, thresh2))
 init_acc.append(recip_edit.bestrecipblast(['Haloferax volcanii'], query, thresh1))
 runs=[]
+count=0
 for e in init_acc:
+    count+=1
     if e=={}:
         continue
-    print "Pass 2"
+    print "Pass "+repr(count)
     res=recip_edit.bestrecipblast(['Homo sapiens','Escherichia coli','Haloferax volcanii'], e.values()[0][0], 5)
     acs=[]
     for l in res:
