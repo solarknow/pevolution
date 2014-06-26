@@ -1,9 +1,9 @@
 import os, sys
-import SeqUtil
-
+import SeqUtil, Report
 
 out=sys.argv[1]
-paml=sys.argv[2]
+query=sys.argv[2]
+paml=sys.argv[3]
 paml= paml=='-y'
 print "Beginning alignment"
 SeqUtil.rename('all-'+out+'.fas')
@@ -54,4 +54,5 @@ SeqUtil.bayesfile('Bayes/all-'+out+'-mod.nxs',models,'Bayes/all-'+out+'-bayes.nx
 os.system('mb Bayes/all-'+out+'-bayes.nxs')
 SeqUtil.bayesfile('aligns/all-'+out+'.2.nex',models_ori,'Bayes/all-'+out+'-ori-bayes.nxs')
 os.system('mb Bayes/all-'+out+'-ori-bayes.nxs')
+Report.generateReport(out,query,models_ori,'all')
 

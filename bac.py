@@ -1,6 +1,7 @@
 import os, sys
-import SeqUtil
+import SeqUtil, Report
 out= sys.argv[1]
+query= sys.argv[2]
 SeqUtil.rename('bac-'+out+'.fas')
 os.system('clustalw -align -infile=bac-'+out+' -outfile=aligns/bac-'+out+' -output=nexus -quiet')
 SeqUtil.splicealign('aligns/bac-'+out,'Bayes/bac-'+out+'-mod.nxs')
@@ -14,3 +15,4 @@ os.system('mb Bayes/bac-'+out+'-bayes.nxs')
 #    SeqUtil.pamlinput('ML/bac-'+out,'ML/bac-'+out+'.out','ML/bac-'+out+'.ctl',{models.keys()[mod].split('+')[0]:models[models.keys()[mod]][1]})
 #    os.system('codeml ML/bac-'+out+'.ctl')
 #    SeqUtil.extractMLtree('ML/bac-'+out+'.out')
+Report.generateReport(out,query,models_ori,'bac')

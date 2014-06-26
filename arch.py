@@ -1,7 +1,8 @@
 import os, sys
-import SeqUtil
+import SeqUtil, Report
 out= sys.argv[1]
-paml=sys.argv[2]
+query=sys.argv[2]
+paml=sys.argv[3]
 paml= paml=='-y'
 SeqUtil.rename('arch-'+out+'.fas')
 os.system('prank/bin/prank -d=arch-'+out+' -o=aligns/arch-'+out+' -f=nexus -quiet')
@@ -23,4 +24,4 @@ if paml:
 
 SeqUtil.bayesfile('Bayes/arch-'+out+'-mod.nxs',models,'Bayes/arch-'+out+'-bayes.nxs')
 os.system('mb Bayes/arch-'+out+'-bayes.nxs')
-
+Report.generateReport(out,query,models_ori,'arch')

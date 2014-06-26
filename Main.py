@@ -1,5 +1,5 @@
 import sys,os
-import Fetchutil, Reciprocal, Report
+import Fetchutil, Reciprocal
 
 #Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
 phyml=''
@@ -126,5 +126,4 @@ try:
     os.mkdir('Prot')
 except:
     pass
-os.system('python '+dom+'.py '+out+' '+phyml)
-Report.generateReport(out,query,models,dom)
+os.system('python '+dom+'.py '+out+' '+query+' '+phyml)
