@@ -351,7 +351,7 @@ def bestmod(infile):
     os.system('java -jar prottest/prottest-3.4.jar -i '+infile+' -o Prot/'+out+
             '.pro -all-distributions -all T -S 1 -threads '+repr(procs)+' -BIC')
     bayesmodels=['poisson','jtt','mtrev','mtmam','wag','rtrev','cprev','vt','blosum62']
-    prot_hand=open('Prot/'+out+'.pro)
+    prot_hand=open('Prot/'+out+'.pro')
     models={}
     ret={}
     while prot_hand:
