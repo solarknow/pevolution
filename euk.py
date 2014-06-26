@@ -2,7 +2,7 @@ import os, sys
 import SeqUtil
 out= sys.argv[1]
 SeqUtil.rename('euk-'+out+'.fas')
-os.system('./prank -d=euk-'+out+' -o=aligns/euk-'+out+' -f=nexus -quiet')
+os.system('prank/bin/prank -d=euk-'+out+' -o=aligns/euk-'+out+' -f=nexus -quiet')
 SeqUtil.splicealign('aligns/euk-'+out+'.2.nex','Bayes/euk-'+out+'-mod.nxs')
 models=SeqUtil.bestmod('Bayes/euk-'+out+'-mod.nxs')
 models_ori=SeqUtil.bestmod('aligns/euk-'+out+'.2.nex')

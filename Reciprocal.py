@@ -63,5 +63,5 @@ def bestrecipblast(orgs, seed, thresh):
                 open('dicts/'+seed,'a').write(str(acclist)+'\n')
                 break
 	elapsed=time.time()-start
-	print repr(round(elapsed/60))+':'+repr(elapsed%60)
+	print "Time elapsed: "+time.strftime('%M:%S',elapsed)
     return acclist
