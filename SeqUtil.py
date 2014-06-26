@@ -346,11 +346,12 @@ def splicealign(inalign,outalign):
 
 def bestmod(infile):
     "Takes in alignment file runs protTest, and extracts best model(s)"
-    procs=round(psutil.NUM_CPUS/2.0)
-    print procs
+    procs=int(round(psutil.NUM_CPUS/2.0))
+    #print procs
     out=infile.split('/')[1].split('.')[0]
-    os.system('java -jar prottest/prottest-3.4.jar -i '+infile+' -o Prot/'+out+
-            '.pro -all-distributions -all -S 1 -threads '+repr(procs)+' -BIC')
+    protCmd='java -jar prottest/prottest-3.4.jar -i '+infile+' -o Prot/'+out+'.pro -all-distributions -all -S 1 -threads '+repr(procs)+' -BIC'
+    #print protCmd
+    os.system(protCmd)
     bayesmodels=['poisson','jtt','mtrev','mtmam','wag','rtrev','cprev','vt','blosum62']
     prot_hand=open('Prot/'+out+'.pro')
     models={}
@@ -366,36 +367,36 @@ def bestmod(infile):
                 if 'G' in modmod:
                     while 1:
                         lin=prot_hand.readline()
-                        #print lin,'g'
+                        print lin,'g'
                         if lin.split()[0]=='gamma':
                             para[0]= lin.split()[6]
                             break
                 if 'I' in modmod:
                     while 1:
                         lin=prot_hand.readline()
-                        #print lin.split(),'i'
+                        print lin.split(),'i'
                         if lin.split()[0]=='proportion':
                             para[1]= lin.split()[5]
                             break
             models.update({mod:para})
-            #print models
+            print models
             continue
         elif lin.startswith('Best model'):
             lsplit=lin.split()
             mod = lsplit[5]
             ret.update({mod:models[mod]})
-            #print ret
+            print ret
             if mod.lower().split('+')[0] not in bayesmodels:
                 while 1:
                     lin=prot_hand.readline()
-                    #print lin,1
+                    print lin,1
                     if lin.endswith('-\n'):
                         while 2:
                             lin=prot_hand.readline().split()
-                            #print lin,2
+                            print lin,2
                             if lin[0].split('+')[0].lower() in bayesmodels:
                                 ret.update({lin[0]:models[lin[0]]})
-                                #print ret
+                                print ret
                                 break
                         break
         elif lin.startswith('Tree'):
