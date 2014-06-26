@@ -10,7 +10,7 @@ if not os.path.exists('dicts'):
 def bestrecipblast(orgs, seed, thresh):
     "Returns the best pairwise reciprocal BLAST using seed accession no. from seedorg organism against orgs list of organisms"
     start=time.time()
-	seedorg=Fetchutil.orgfetch(seed)
+    seedorg=Fetchutil.orgfetch(seed)
     acclist={}
     seed=Fetchutil.toGI(seed)
     for i in orgs:
