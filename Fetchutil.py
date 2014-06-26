@@ -1,6 +1,6 @@
 from Bio import Entrez
 import subprocess,os
-Entrez.email='mihir.sarwade@effem.com'
+Entrez.email=os.environ['ENTREZ_EMAIL']
 
 def seqfetch(acc):
     "prints the sequence in fasta format to file"
