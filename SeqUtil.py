@@ -349,7 +349,7 @@ def bestmod(infile):
     procs=round(psutil.NUM_CPUS/2.0)
     out=infile.split('/')[1].split('.')[0]
     os.system('java -jar prottest/prottest-3.4.jar -i '+infile+' -o Prot/'+out+
-            '.pro -all-distributions -all T -S 1 -threads '+repr(procs)+' -BIC')
+            '.pro -all-distributions -all -S 1 -threads '+repr(procs)+' -BIC')
     bayesmodels=['poisson','jtt','mtrev','mtmam','wag','rtrev','cprev','vt','blosum62']
     prot_hand=open('Prot/'+out+'.pro')
     models={}
