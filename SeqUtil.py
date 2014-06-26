@@ -342,7 +342,7 @@ def splicealign(inalign,outalign):
     print '.edit written. aligning'
     os.system('clustalw -align -infile='+inalign+'.edit -outfile='+inalign+'.ed -output=nexus -quiet')
     print '.ed written splice aligning'
-    splicealign(inalign+'.ed',outalign)
+    #splicealign(inalign+'.ed',outalign)
 
 def bestmod(infile):
     "Takes in alignment file runs protTest, and extracts best model(s)"
