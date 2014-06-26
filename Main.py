@@ -17,7 +17,7 @@ except IndexError:
 if phy.lower()=='y':
 	phyml='-y'
 try:
-    open(dom+'-'+out+'.fasta').read()
+    open(dom+'-'+out+'.fas').read()
 except IOError:
     arch_list=['Haloferax volcanii','Sulfolobus tokodaii','Methanococcus aeolicus','Methanobrevibacter smithii', 'Thermococcus sibiricus','Archaeoglobus fulgidus','Nanoarchaeum equitans','Thermoplasma acidophilum']
     bac_list= ['Gemmata obscuriglobus', 'Prosthecobacter dejongeii', 'Verrucomicrobium spinosum','Rickettsia prowazekii', 'Agrobacterium tumefaciens','Escherichia coli', 'Bacillus subtilis','Anabaena variabilis', 'Thermotoga maritima']
