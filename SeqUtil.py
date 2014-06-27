@@ -1,4 +1,5 @@
-import os, Fetchutil, random, psutil
+import os, Fetchutil, random, psutil, subprocess
+bayesmodels=['poisson','jtt','mtrev','mtmam','wag','rtrev','cprev','vt','blosum','dayhoff']
 
 def clusttofasta(clust,out):
     "converts a clustal alignment file to a fasta file out"
@@ -160,10 +161,24 @@ def pamlseqnex(seqs,inpath):
         for i in range(30-len(k)):
             out.write(' ')
         out.write(dicto[k]+'\n')
+def bayesinNex(infile):
+    "Modifies a PRANK alignment file to be compatible with MrBayes"
+    lines=open(infile).readlines()
 
+    for i in range(len(lines)):
+        if 'trees' in lines[i]:
+            lines=lines[:i]
+            break
+        else:
+            lines[i]=lines[i].replace('\'','')
+    fil=open(infile,'w')
+    for j in lines:
+        fil.write(j)
+    fil.close()
 def bayesfile(infile,model,outfile):
     "Writes a Nexus file for use as a MrBayes batch file"
-    bayesmodels=['poisson','jones','mtrev','mtmam','wag','rtrev','cprev','vt','blosum']
+    if not os.path.exists('Bayes'):
+      subprocess.call(['mkdir','Bayes'])
     for k in model.keys():
         extra=k.split('+')
         if extra[0].lower()=='jtt':
@@ -174,7 +189,7 @@ def bayesfile(infile,model,outfile):
             han=open(outfile,'w')
             han.write('#NEXUS\n'+
                       'begin mrbayes;\n'+
-                      '\texe '+infile+';\n'+
+                      '\texe '+outfile+';\n'+
                       '\tprset aamodelpr=fixed('+extra[0]+');\n')
             if len(extra)>1:
                 if 'I' in extra and 'G' in extra:
@@ -186,7 +201,7 @@ def bayesfile(infile,model,outfile):
                     han.write('\tlset rates=Gamma;\n')
                     han.write('\tprset shapepr=fixed('+model[k][0]+');\n')
 
-            han.write('\tmcmc ngen=50000 samplefreq=50 file='+outfile+';\n'+
+            han.write('\tmcmc ngen=50000 samplefreq=50 file='+infile+';\n'+
                       '\tsumt burnin=250;\n'+
                       'end;\n\n')
             han.close()
@@ -352,10 +367,10 @@ def bestmod(infile):
     protCmd='java -jar prottest/prottest-3.4.jar -i '+infile+' -o Prot/'+out+'.pro -all-distributions -all -S 1 -threads '+repr(procs)+' -BIC'
     #print protCmd
     os.system(protCmd)
-    bayesmodels=['poisson','jtt','mtrev','mtmam','wag','rtrev','cprev','vt','blosum62']
     prot_hand=open('Prot/'+out+'.pro')
     models={}
     ret={}
+#reading and processing prottest output
     while prot_hand:
         lin=prot_hand.readline()
         if lin.startswith('Model.'):
@@ -367,44 +382,46 @@ def bestmod(infile):
                 if 'G' in modmod:
                     while 1:
                         lin=prot_hand.readline()
-                        print lin,'g'
+                        #print lin,'g'
                         if lin.split()[0]=='gamma':
                             para[0]= lin.split()[6]
                             break
                 if 'I' in modmod:
                     while 1:
                         lin=prot_hand.readline()
-                        print lin.split(),'i'
+                        #print lin.split(),'i'
                         if lin.split()[0]=='proportion':
                             para[1]= lin.split()[5]
                             break
             models.update({mod:para})
-            print models
+            #print models
             continue
         elif lin.startswith('Best model'):
             lsplit=lin.split()
             mod = lsplit[5]
             ret.update({mod:models[mod]})
-            print ret
+            #print ret
             if mod.lower().split('+')[0] not in bayesmodels:
                 while 1:
                     lin=prot_hand.readline()
-                    print lin,1
+                    #print lin,1
                     if lin.endswith('-\n'):
                         while 2:
                             lin=prot_hand.readline().split()
-                            print lin,2
+                            #print lin,2
                             if lin[0].split('+')[0].lower() in bayesmodels:
                                 ret.update({lin[0]:models[lin[0]]})
-                                print ret
+                                #print ret
                                 break
                         break
-        elif lin.startswith('Tree'):
-            tree=''
-            while 9:
-                lin=prot_hand.readline().strip()
-                tree+=lin
-                if lin.endswith(';'):
-                    break
-            open('Prot/'+out+'.tre','w').write(tree)
+        
+       # elif lin.startswith('*') and :
+        #    print "Saving Tree"
+        #    tree=''
+         #   while 9:
+         #       lin=prot_hand.readline().strip()
+          #      tree+=lin
+          #      if lin.endswith(';'):
+           #         break
+           # open('Prot/'+out+'.tre','w').write(tree)
             return ret

@@ -17,6 +17,10 @@ tar zxvf prank.linux64.140110.tgz prank
 wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
 unzip PhyML-3.1.zip
 mv Phyml-3.1 phyml
+wget http://evolution.gs.washington.edu/phylip/download/phylip-3.695.tar.gz
+tar zxvf phylip-3.695.tar.gz
+mv phylip-3.695 phylip
+
 python setup.py install
 ```
 ------------------

@@ -72,7 +72,7 @@ def generateReport(name,quer,models,dom):
     ##Draw initial alignment +length, final alignment +length
     ret.write('\nAlignments:\n'+
               'Original alignment: Length: ')
-    alig=open('aligns/'+dom+'-'+name+'.2.nex')
+    alig=open('aligns/'+dom+'-'+name+'.best.nex')
     length=''
     while alig:
         lin=alig.readline()
@@ -81,7 +81,7 @@ def generateReport(name,quer,models,dom):
             break
     ret.write(length+'\n'+
                 'Final alignment: Length: ')
-    alig=open('Bayes/'+dom+'-'+name+'-mod.nxs')
+    alig=open('aligns/'+dom+'-'+name+'.best.nex')
     length=''
     print 'alignment printing'
     while alig:
@@ -101,39 +101,40 @@ def generateReport(name,quer,models,dom):
             break
     print 'alignment printing done'
     ##How much was taken out of original seqs, i.e. that is left
-    ret.write('\nShowing the original alignment and the final alignment may not give enough information.\n'+
-              'How much of each sequence was conserved in the final alignment:\n')
-    oriseqs={}
-    fil=open(dom+'-'+name)
-    while fil:
-        lin=fil.readline().strip()
-        #print len(oriseqs)
-        if lin=='':
-            break
-        if lin.startswith('>'):
-            title=lin[1:]
-            seq=''
-            while fil:
-                #print 'blah...'
-                lan=fil.readline().strip()
-                if lan=='':
-                    oriseqs.update({title:seq})
-                    break
-                seq+=lan
-    print 'modding'
-    moddedseqs=SeqUtil.modseqs('Bayes/'+dom+'-'+name+'-mod.nxs')
-    print len(oriseqs),len(moddedseqs)
-    for m in moddedseqs:
-        lenmod=len(moddedseqs[m])
-        lenori=len(oriseqs[m])
-        ret.write(m+' : '+str(lenmod)+' residues from the original '+str(lenori)+' residues. About %.2f percent.\n' % ((lenmod+0.0)/lenori*100))
-    print 'all alignment stats written'
+#    ret.write('\nShowing the original alignment and the final alignment may not give enough information.\n'+
+#              'How much of each sequence was conserved in the final alignment:\n')
+#    oriseqs={}
+#    fil=open(dom+'-'+name)
+#    while fil:
+#        lin=fil.readline().strip()
+#        #print len(oriseqs)
+#        if lin=='':
+#            break
+#        if lin.startswith('>'):
+#            title=lin[1:]
+#            seq=''
+#            while fil:
+#                #print 'blah...'
+#                lan=fil.readline().strip()
+#                if lan=='':
+#                    oriseqs.update({title:seq})
+#                    break
+#                seq+=lan
+#    print 'modding'
+#    moddedseqs=SeqUtil.modseqs('Bayes/'+dom+'-'+name+'-mod.nxs')
+#    print len(oriseqs),len(moddedseqs)
+#    for m in moddedseqs:
+#        lenmod=len(moddedseqs[m])
+#        lenori=len(oriseqs[m])
+#        ret.write(m+' : '+str(lenmod)+' residues from the original '+str(lenori)+' residues. About %.2f percent.\n' % ((lenmod+0.0)/lenori*100))
+#    print 'all alignment stats written'
     ##Best model(s)+ respective parameters and BIC values(?)
-    prot_hand=open('prot/'+dom+'-'+name+'-mod.pro')
+    prot_hand=open('Prot/'+dom+'-'+name+'.pro')
     while prot_hand:
         prot=prot_hand.readline()
         #print prot
         if prot.startswith('Best model'):
+            prot_hand.readline()
             prot_hand.readline()
             prot_hand.readline()
             prot_hand.readline()
@@ -148,12 +149,13 @@ def generateReport(name,quer,models,dom):
                     break
             break
     print 'models printed'              
-    ## print trees: ProtTest best tree
+    
     trees=''
-    ret.write('\nTree found by ProtTest using the best model:\n')
-    tree=open('prot/'+dom+'-'+name+'-mod.pro.tre').readline()
-    trees+=tree
-    ret.write(tree+'\n')
+## print trees: ProtTest best tree
+#    ret.write('\nTree found by ProtTest using the best model:\n')
+#    tree=open('Prot/'+dom+'-'+name+'-mod.pro.tre').readline()
+#    trees+=tree
+#    ret.write(tree+'\n')
     ##              PhyML1 + (PhyML2)
     try:
         for i in models:
@@ -165,7 +167,7 @@ def generateReport(name,quer,models,dom):
         ret.write('Tree not found')
     ##              Bayesian selected tree
     ret.write('\nTree found by MrBayes using the best model:\n')
-    read=open('Bayes/'+dom+'-'+name+'-bayes.nxs.con')
+    read=open('Bayes/'+dom+'-'+name+'-bayes.nxs.con.tre')
     while read:
         lin=read.readline()
         #print lin

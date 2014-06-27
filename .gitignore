@@ -58,7 +58,9 @@ phyml/
 prottest/
 *.zip
 *.tgz
+phylip/
 
 # Generated data
 XML/
 Orthos/
+*~

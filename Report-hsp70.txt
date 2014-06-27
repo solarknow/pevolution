@@ -1,8 +1,32 @@
-#NEXUS
-begin data;
-dimensions ntax=8 nchar=800;
-format datatype=protein interleave=yes gap=-;
-matrix
+Orthologous sequence Search and Alignment
+Python Scripts Written by Mihir Sarwade
+
+-----------------------------
+Reciprocal Best BLAST Results
+-----------------------------
+
+Query sequence Accension number: 402675 Query sequence organism: Escherichia coli
+BLASTs are performed using expected value (E-value) thresholds based on the kingdom (Bacteria, Archaea, and Eukaryota).
+ These lists are then refined by picking only those sequences that are at least 50% similar and
+ whose aligned portion is at least 25% that of the query, as recommended by Moreno-Hagelsieb and Latimer (2008).
+Organism                       Kingdom     Accession No.(GI)      No.1stlist/lenList     No.1stlist/lenList         Seq Definition
+Arabidopsis thaliana          Eukaryota           15242459                 1/51                220/250             mitochondrial HSO70 2 [Arabidopsis thaliana]. 
+Drosophila melanogaster       Eukaryota           24653595                 1/72                220/250             heat shock protein cognate 5 [Drosophila melanogaster]. 
+Homo sapiens                  Eukaryota           189054793                1/168               220/250             unnamed protein product [Homo sapiens]. 
+Neurospora crassa             Eukaryota           164426355                1/16                216/250             heat shock 70 kDa protein, mitochondrial precursor [Neurospora crassa OR74A]. 
+Oryza sativa                  Eukaryota           125541318                1/120               221/250             hypothetical protein OsI_09127 [Oryza sativa Indica Group]. 
+Plasmodium falciparum         Eukaryota           11127605                 1/33                220/250             heat shock protein hsp70 homologue Pfhsp70-3 [Plasmodium falciparum 3D7]. 
+Saccharomyces cerevisiae      Eukaryota           391359303                1/138               219/250             RecName: Full=Heat shock protein SSC1, mitochondrial; AltName: Full=Endonuclease SceI 75 kDa subunit; Short=Endo.SceI 75 kDa subunit; AltName: Full=mtHSP70; Flags: Precursor. 
+Trypanosoma brucei            Eukaryota           72390395                 1/27                219/250             heat shock 70 kDa protein, mitochondrial precursor [Trypanosoma brucei TREU927]. 
+
+	The higher up on the list of accension number garned by the best BLAST protocol, i.e. the smaller the ratio,
+the more likely the chosen sequence is an ortholog of the query sequence. Granted that several of the species may have 
+several copies of the gene in question due to gene duplication events, this function chooses only the one BEST match of the several copies it may encounter.
+
+
+Alignments:
+Original alignment: Length: 800
+Final alignment: Length: 800
 
 
 Tbru                     -------------------MLARRVCAPMC--------------------LASAPF----
@@ -130,5 +154,23 @@ Scer                     ------GNNAESDET---KQ
 Osat                     ------GEQAPEAEYEEVKK
 Atha                     ------SDQAPEAEYEEVKK
 Pfal                     -----PNNENKAEENKD-NA
-;
-end;
+
+Model          deltaBIC*    BIC          BICw       -lnL    
+------------------------------------------------------------
+LG+G           0.00           14457.12       0.53           7181.77        
+LG+I+G         0.22           14457.34       0.47           7178.53        
+LG+I           64.69          14521.81       0.00           7214.11        
+WAG+I+G        101.99         14559.10       0.00           7229.42        
+WAG+G          111.01         14568.13       0.00           7237.27        
+WAG+I          126.88         14583.99       0.00           7245.20        
+RtREV+I+G      143.02         14600.14       0.00           7249.93        
+RtREV+G        143.66         14600.78       0.00           7253.60        
+VT+I+G         163.02         14620.14       0.00           7259.94        
+VT+G           169.76         14626.88       0.00           7266.65        
+VT+I           189.29         14646.40       0.00           7276.41        
+CpREV+G        199.91         14657.03       0.00           7281.72        
+
+Tree found by PhyML using the WAG model:
+Tree not found
+Tree found by MrBayes using the best model:
+[&U]

@@ -7,8 +7,8 @@ ProtTest 3.2                        Fast selection of the best-fit models of pro
 Contact:                                                     ddarriba@udc.es, dposada@uvigo.es
 ----------------------------------------------------------------------------------------------
 
-Thu Jun 26 16:47:18 EDT 2014
-OS = Linux (3.13.0-29-generic)
+Fri Jun 27 15:54:08 EDT 2014
+OS = Linux (3.13.0-30-generic)
 
 Citation: Darriba D, Taboada GL, Doallo R, Posada D. ProtTest 3: fast selection of best-fit 
           models of protein evolution. Bioinformatics, 27:1164-1165, 2011
@@ -405,8 +405,8 @@ Model................................ : FLU+I+G
      (seconds))
 
 ************************************************************
-Date   :  Thu Jun 26 16:49:43 EDT 2014
-Runtime:  0h:02:25
+Date   :  Fri Jun 27 15:56:32 EDT 2014
+Runtime:  0h:02:24
 
 
 
