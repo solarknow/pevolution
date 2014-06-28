@@ -1,11 +1,19 @@
 import os, sys
 import SeqUtil, Report
+
+if not os.path.exists('aligns'):
+  os.mkdir('aligns')
+if not os.path.exists('Bayes'):
+  os.mkdir('Bayes')
+#if not os.path.exists('ML'):
+#  os.mkdir('ML')
+
 out= sys.argv[1]
 query=sys.argv[2]
 paml=sys.argv[3]
 paml= paml=='-y'
-SeqUtil.rename('arch-'+out+'.fas')
-os.system('prank/bin/prank -d=arch-'+out+' -o=aligns/arch-'+out+' -f=nexus -quiet')
+SeqUtil.rename('Data/arch-'+out+'.fas')
+os.system('prank/bin/prank -d=Data/arch-'+out+' -o=aligns/arch-'+out+' -f=nexus -quiet')
 SeqUtil.splicealign('aligns/arch-'+out+'.2.nex','Bayes/arch-'+out+'-mod.nxs')
 models=SeqUtil.bestmod('Bayes/arch-'+out+'-mod.nxs')
 models_ori=SeqUtil.bestmod('aligns/arch-'+out+'.2.nex')

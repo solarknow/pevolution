@@ -1,6 +1,12 @@
 import sys,os
 import Fetchutil, Reciprocal
 
+#Check for directories' existance, if not create them.
+if not os.path.exists('Data'):
+  os.mkdir('Data')
+if not os.path.exists('Orthos'):
+        os.mkdir('Orthos')
+
 #Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
 phyml=''
 if '-y' in sys.argv:
@@ -17,7 +23,7 @@ except IndexError:
     if phy.lower()=='y':
       phyml='-y'
 try:
-    open(dom+'-'+out+'.fas').read()
+    open('Data/'+dom+'-'+out+'.fas').read()
 except IOError:
     arch_list=['Haloferax volcanii','Sulfolobus tokodaii','Methanococcus aeolicus','Methanobrevibacter smithii', 'Thermococcus sibiricus','Archaeoglobus fulgidus','Nanoarchaeum equitans','Thermoplasma acidophilum']
     bac_list= ['Gemmata obscuriglobus', 'Prosthecobacter dejongeii', 'Verrucomicrobium spinosum','Rickettsia prowazekii', 'Agrobacterium tumefaciens','Escherichia coli', 'Bacillus subtilis','Anabaena variabilis', 'Thermotoga maritima']
@@ -36,11 +42,7 @@ except IOError:
         thresh1=1e-5
         thresh2=1e-10
         thresh3=5
-    try:
-        os.mkdir('XML')
-        os.mkdir('Orthos')
-    except:
-        pass
+
     arch_accs={}
     bac_accs={}
     euk_accs={}
@@ -73,7 +75,7 @@ except IOError:
             else:
                 fil.write(fil_arr[i])
         fil.close()
-        Fetchutil.addseq('arch-'+out+'.fas','Orthos/'+arch_accs[a][0]+'.fasta')
+        Fetchutil.addseq('Data/arch-'+out+'.fas','Orthos/'+arch_accs[a][0]+'.fasta')
 	os.remove('Orthos/'+arch_accs[a][0]+'.fasta')
     for b in bac_accs.keys():
         Fetchutil.seqfetch(bac_accs[b][0])
@@ -87,7 +89,7 @@ except IOError:
             else:
                 fil.write(fil_arr[i])
         fil.close()
-        Fetchutil.addseq('bac-'+out+'.fas','Orthos/'+bac_accs[b][0]+'.fasta')
+        Fetchutil.addseq('Data/bac-'+out+'.fas','Orthos/'+bac_accs[b][0]+'.fasta')
         os.remove('Orthos/'+bac_accs[b][0]+'.fasta')
     for e in euk_accs.keys():
         Fetchutil.seqfetch(euk_accs[e][0])
@@ -101,7 +103,7 @@ except IOError:
             else:
                 fil.write(fil_arr[i])
         fil.close()
-        Fetchutil.addseq('euk-'+out+'.fas','Orthos/'+euk_accs[e][0]+'.fasta')
+        Fetchutil.addseq('Data/euk-'+out+'.fas','Orthos/'+euk_accs[e][0]+'.fasta')
         os.remove('Orthos/'+euk_accs[e][0]+'.fasta')
 
     for c in all_accs.keys():
@@ -116,14 +118,7 @@ except IOError:
             else:
                 fil.write(fil_arr[i])
         fil.close()
-        Fetchutil.addseq('all-'+out+'.fas','Orthos/'+all_accs[c][0]+'.fasta')
+        Fetchutil.addseq('Data/all-'+out+'.fas','Orthos/'+all_accs[c][0]+'.fasta')
         os.remove('Orthos/'+all_accs[c][0]+'.fasta')
 
-try:
-    os.mkdir('aligns')
-    os.mkdir('Bayes')
-    os.mkdir('ML')
-    os.mkdir('Prot')
-except:
-    pass
 os.system('python '+dom+'.py '+out+' '+query+' '+phyml)

@@ -11,7 +11,7 @@ To install pre-reqs,
 
 ```shell
 
-sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre googlecl
+sudo apt-get install python-pip mrbayes wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre
 wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
 tar zxvf prank.linux64.140110.tgz prank
 wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
@@ -69,23 +69,3 @@ tar zxvf clustalw-2.1-linux-x86_64-libcppstatic.tar.gz
 mv clustalw-2.1-linux-x86_64-libcppstatic clustalw
 sudo python setup.py install
 ```
---------
-##Mac OS X:
-
-If you don't have python installed,
-Install python: https://www.python.org/ftp/python/2.7.6/python-2.7.6-macosx10.6.
-dmg
-Install pip: https://pip.pypa.io/en/latest/installing.html
-Install MrBayes: http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/MrBayes-3.2.2_installer_MACx64.pkg
-
-To install dependencies, run sudo python setup.py install in this directory.
--------
-##Windows:
-
-If you don't have python installed,
-Install python: https://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
-Make sure the directory you installed Python in (usually C:\Python27) is in the 
-PATH. 
-Install pip: https://pip.pypa.io/en/latest/installing.html according to the python you have installed (in the above step, python 2.7 32bit)
-
-Open a cmd.exe in this directory and run: python setup.py install

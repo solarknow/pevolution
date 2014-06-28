@@ -361,6 +361,8 @@ def splicealign(inalign,outalign):
 
 def bestmod(infile):
     "Takes in alignment file runs protTest, and extracts best model(s)"
+    if not os.path.exists('Prot'):
+      os.mkdir('Prot')
     procs=int(round(psutil.NUM_CPUS/2.0))
     #print procs
     out=infile.split('/')[1].split('.')[0]

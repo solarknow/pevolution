@@ -3,9 +3,9 @@ import Fetchutil, random
 import os, subprocess, time
 
 if not os.path.exists('XML'):
-  subprocess.call(['mkdir','XML'])
+  os.mkdir('XML')
 if not os.path.exists('dicts'):
-  subprocess.call(['mkdir','dicts'])
+  os.mkdir('dicts')
 
 def bestrecipblast(orgs, seed, thresh):
     "Returns the best pairwise reciprocal BLAST using seed accession no. from seedorg organism against orgs list of organisms"
