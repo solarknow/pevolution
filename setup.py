@@ -18,6 +18,8 @@ setup(name='pevolution',
 
 urlretrieve("https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz",'/tmp/prank.tgz')
 urlretrieve("http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip",'/tmp/PhyML.zip')
-tarfile.open('/tmp/prank.tgz').extractall(path='prank')
-zipfile.open('/tmp/PhyML').extractall(path='phyml')
-tarfile.open('prottest-3.4-20140123.tar.gz').extractall(path='prottest')
+urlretrieve("http://www.clustal.org/download/current/clustalw-2.1-linux-x86_64-libcppstatic.tar.gz",'/tmp/clustalw.tar.gz')
+tarfile.open('/tmp/prank.tgz').extractall(path='/usr/local/bin/')
+zipfile.ZipFile('/tmp/PhyML.zip').extractall(path='/usr/local/bin/')
+tarfile.open('/tmp/clustalw.tar.gz').extractall(path='.')
+tarfile.open('prottest-3.4-20140123.tar.gz').extractall(path='/usr/local/bin/')

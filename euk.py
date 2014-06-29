@@ -12,7 +12,7 @@ out= sys.argv[1]
 query = sys.argv[2]
 SeqUtil.rename('Data/euk-'+out+'.fas')
 if not os.path.exists('aligns/euk-'+out+'.best.nex'):
-  os.system('prank/bin/prank -d=Data/euk-'+out+' -o=aligns/euk-'+out+' -f=nexus -quiet')
+  os.system('prank -d=Data/euk-'+out+' -o=aligns/euk-'+out+' -f=nexus -quiet')
   SeqUtil.bayesinNex('aligns/euk-'+out+'.best.nex')
 #SeqUtil.splicealign('aligns/euk-'+out+'.best.nex','Bayes/euk-'+out+'-mod.nxs')
 #models=SeqUtil.bestmod('Bayes/euk-'+out+'-mod.nxs')

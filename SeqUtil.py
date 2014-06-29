@@ -366,7 +366,7 @@ def bestmod(infile):
     procs=int(round(psutil.NUM_CPUS/2.0))
     #print procs
     out=infile.split('/')[1].split('.')[0]
-    protCmd='java -jar prottest/prottest-3.4.jar -i '+infile+' -o Prot/'+out+'.pro -all-distributions -all -S 1 -threads '+repr(procs)+' -BIC'
+    protCmd='java -jar prottest-3.4.jar -i '+infile+' -o Prot/'+out+'.pro -all-distributions -all -S 1 -threads '+repr(procs)+' -BIC'
     #print protCmd
     os.system(protCmd)
     prot_hand=open('Prot/'+out+'.pro')
