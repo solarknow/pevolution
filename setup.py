@@ -20,3 +20,4 @@ urlretrieve("https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz",'/
 urlretrieve("http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip",'/tmp/PhyML.zip')
 tarfile.open('/tmp/prank.tgz').extractall(path='~/prank')
 zipfile.open('/tmp/PhyML').extractall(path='~/phyml')
+tarfile.open('prottest*.tar.gz').extractall(path='~/prottest')
