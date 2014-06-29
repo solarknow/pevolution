@@ -4,6 +4,8 @@ try:
   from setuptools import setup
 except ImportError:
   from distutils.core import setup
+from urllib.request import urlretrieve
+import tarfile, zipfile
 
 
 setup(name='pevolution',
@@ -14,3 +16,7 @@ setup(name='pevolution',
 #      packages=['pevolution'],
       install_requires=['psutil >= 1.2.1','biopython >= 1.64'])
 
+urlretrieve("https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz",'/tmp/prank.tgz')
+urlretrieve("http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip",'/tmp/PhyML.zip')
+tarfile.open('/tmp/prank.tgz').extractall(path='~/prank')
+zipfile.open('/tmp/PhyML').extractall(path='~/phyml')
