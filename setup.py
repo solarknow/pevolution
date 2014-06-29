@@ -4,7 +4,7 @@ try:
   from setuptools import setup
 except ImportError:
   from distutils.core import setup
-from urllib.request import urlretrieve
+from urllib import urlretrieve
 import tarfile, zipfile
 
 
@@ -18,6 +18,6 @@ setup(name='pevolution',
 
 urlretrieve("https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz",'/tmp/prank.tgz')
 urlretrieve("http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip",'/tmp/PhyML.zip')
-tarfile.open('/tmp/prank.tgz').extractall(path='~/prank')
-zipfile.open('/tmp/PhyML').extractall(path='~/phyml')
-tarfile.open('prottest*.tar.gz').extractall(path='~/prottest')
+tarfile.open('/tmp/prank.tgz').extractall(path='prank')
+zipfile.open('/tmp/PhyML').extractall(path='phyml')
+tarfile.open('prottest-3.4-20140123.tar.gz').extractall(path='prottest')
