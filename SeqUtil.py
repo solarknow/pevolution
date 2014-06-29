@@ -189,7 +189,7 @@ def bayesfile(infile,model,outfile):
             han=open(outfile,'w')
             han.write('#NEXUS\n'+
                       'begin mrbayes;\n'+
-                      '\texe '+outfile+';\n'+
+                      '\texe '+infile+';\n'+
                       '\tprset aamodelpr=fixed('+extra[0]+');\n')
             if len(extra)>1:
                 if 'I' in extra and 'G' in extra:
@@ -201,7 +201,7 @@ def bayesfile(infile,model,outfile):
                     han.write('\tlset rates=Gamma;\n')
                     han.write('\tprset shapepr=fixed('+model[k][0]+');\n')
 
-            han.write('\tmcmc ngen=50000 samplefreq=50 file='+infile+';\n'+
+            han.write('\tmcmc ngen=50000 samplefreq=50 file='+outfile+';\n'+
                       '\tsumt burnin=250;\n'+
                       'end;\n\n')
             han.close()

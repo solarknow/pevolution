@@ -1,0 +1,27 @@
+[ID: 3038939865]
+[   ID     = Partition ID number]
+[   PART   = Description of partition in .* format]
+[   NUM    = Number of trees sampled with the partition]
+[   PROB   = Posterior probability of the partition]
+[   STDDEV(s) = Standard deviation of partition probabilities across partitions]
+[   BRLEN  = Mean branch length]
+[   VAR    = Variance of branch length]
+[   PSRF   = Potential scale reduction factor for branch lengths]
+[   NRUNS  = Number of runs with this partition]
+
+ID	PART	NUM	PROB	STDDEV(s)	BRLEN	VAR	RNRUNS
+1	.*......1502	1.000000	0.000000	0.138840	0.000432	1.001	2
+2	..*.....1502	1.000000	0.000000	0.161373	0.000456	1.000	2
+3	...**...1502	1.000000	0.000000	0.148232	0.000547	0.999	2
+4	.*******1502	1.000000	0.000000	0.398309	0.001379	1.000	2
+5	.****...1502	1.000000	0.000000	0.086941	0.000457	1.003	2
+6	.**.....1502	1.000000	0.000000	0.111308	0.000429	1.000	2
+7	.....*..1502	1.000000	0.000000	0.053697	0.000187	1.001	2
+8	......*.1502	1.000000	0.000000	0.096252	0.000284	1.001	2
+9	.......*1502	1.000000	0.000000	0.308990	0.001158	0.999	2
+10	....*...1502	1.000000	0.000000	0.199103	0.000667	1.000	2
+11	...*....1502	1.000000	0.000000	0.159176	0.000477	1.000	2
+12	.....**.1502	1.000000	0.000000	0.208249	0.000763	1.000	2
+13	.....***940	0.625832	inf	0.040956	0.000313	1.000	2
+14	.****..*476	0.316911	inf	0.039837	0.000335	1.002	2
+15	.******.86	0.057257	inf	0.026769	0.000299	1.024	2

@@ -1,0 +1,22 @@
+#NEXUS
+
+[ID: 3038939865]
+[This file contains the trees that were found during the MCMC
+search, sorted by posterior probability. "p" indicates the
+posterior probability of the tree whereas "P" indicates the
+cumulative posterior probability.]
+
+begin trees;
+   translate
+    1 Tbru,
+    2 Hsap,
+    3 Dmel,
+    4 Ncra,
+    5 Scer,
+    6 Osat,
+    7 Atha,
+    8 Pfal;
+   tree tree_1 [p = 0.626, P = 0.626] = [&W 0.625832] (1,(8,(6,7)),((2,3),(4,5)));
+   tree tree_2 [p = 0.317, P = 0.943] = [&W 0.316911] (1,(8,((2,3),(4,5))),(6,7));
+   tree tree_3 [p = 0.057, P = 1.000] = [&W 0.057257] (1,8,(((2,3),(4,5)),(6,7)));
+end;

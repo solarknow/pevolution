@@ -1,6 +1,7 @@
 from Bio.Blast import NCBIXML
 import Fetchutil, random
-import os, subprocess, time
+import os, subprocess
+#import time
 
 if not os.path.exists('XML'):
   os.mkdir('XML')
@@ -9,7 +10,7 @@ if not os.path.exists('dicts'):
 
 def bestrecipblast(orgs, seed, thresh):
     "Returns the best pairwise reciprocal BLAST using seed accession no. from seedorg organism against orgs list of organisms"
-    start=time.time()
+    #start=time.time()
     seedorg=Fetchutil.orgfetch(seed)
     acclist={}
     seed=Fetchutil.toGI(seed)
@@ -62,6 +63,6 @@ def bestrecipblast(orgs, seed, thresh):
                 
                 open('dicts/'+seed,'a').write(str(acclist)+'\n')
                 break
-	elapsed=time.time()-start
-	print "Time elapsed: "+time.strftime('%M:%S',elapsed)
+	#elapsed=time.time()-start
+	#print "Time elapsed: "+time.strftime('%M:%S',[elapsed])
     return acclist

@@ -1,8 +1,9 @@
 import Fetchutil, SeqUtil, os
-
+if not os.path.exists('Reports'):
+  os.mkdir('Reports')
 def generateReport(name,quer,models,dom):
     "Generates a report summarizing the analysis done"
-    ret=open('Report-'+name+'.txt','w')
+    ret=open('Reports/Report-'+dom+'-'+name+'.txt','w')
     ret.write('Orthologous sequence Search and Alignment\n'+
               'Python Scripts Written by Mihir Sarwade\n\n')
     ##List accession numbers, names of genes and their respective organisms
@@ -14,10 +15,10 @@ def generateReport(name,quer,models,dom):
     ret.write('BLASTs are performed using expected value (E-value) thresholds based on the kingdom (Bacteria, Archaea, and Eukaryota).\n'+
     ' These lists are then refined by picking only those sequences that are at least 50% similar and\n'+
     ' whose aligned portion is at least 25% that of the query, as recommended by Moreno-Hagelsieb and Latimer (2008).\n')
-    all_file=open(dom+'-'+name+'.fas')
+    import_file=open('Data/'+dom+'-'+name+'.fas')
     info={}
-    while all_file:
-        lin=all_file.readline()
+    while import_file:
+        lin=import_file.readline()
         if lin=='':
             break
         spl=lin.split(':')
@@ -160,14 +161,14 @@ def generateReport(name,quer,models,dom):
     try:
         for i in models:
             ret.write('\nTree found by PhyML using the '+i.split('+')[0]+' model:\n')
-            tree=consense('ML/+'+dom+'-'+name+i.split('+')[0]+'_phyml_boot_trees.txt')
+            tree=consense('ML/'+dom+'-'+name+i.split('+')[0]+'_phyml_boot_trees.txt')
             trees+=tree+'\n'
             ret.write(tree+'\n')
     except:
         ret.write('Tree not found')
     ##              Bayesian selected tree
     ret.write('\nTree found by MrBayes using the best model:\n')
-    read=open('Bayes/'+dom+'-'+name+'-bayes.nxs.con.tre')
+    read=open('Bayes/'+dom+'-'+name+'-bayes.nxs.con')
     while read:
         lin=read.readline()
         #print lin
@@ -183,16 +184,20 @@ def generateReport(name,quer,models,dom):
             break
     print 'trees printed'
     ret.close()
-    open(name+'-trees.tre','w').write(trees)
+    open('Reports/'+dom+'-'+name+'-trees.tre','w').write(trees)
 
 def consense(fil):
     "Returns a newick consensus tree of the trees in fil"
     dum=open('inputer','w')
     dum.write(fil+'\nf\n'+fil.split('.')[0]+'_cons\ny\nf\n'+fil.split('.')[0]+'.tre')
     dum.close()
-    os.system('consense < inputer')
+    os.system('./consense < inputer')
     tree=''
-    treefil=open(fil.split('.')[0]+'.tre')
+    treefil=open('Reports/'+fil.split('.')[0]+'.tre')
     for i in treefil:
         tree+=i.strip()
+    try:
+      os.remove('inputer')
+    except OSError:
+      pass
     return tree
