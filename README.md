@@ -11,7 +11,7 @@ To install pre-reqs,
 
 ```shell
 
-sudo apt-get install python-pip mrbayes wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre
+sudo apt-get install python-pip mrbayes wget python-dev unzip ncbi-blast+ openjdk-7-jre prank phyml
 
 sudo python setup.py install
 ```
