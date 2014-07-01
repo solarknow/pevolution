@@ -10,8 +10,11 @@ if not os.path.exists('Bayes'):
 
 out=sys.argv[1]
 query=sys.argv[2]
-paml=sys.argv[3]
-paml= paml=='-y'
+try:
+  paml=sys.argv[3]
+  paml= paml=='-y'
+except IndexError:
+  paml=False
 print "Beginning alignment"
 SeqUtil.rename('Data/all-'+out+'.fas')
 os.system('prank -d=Data/all-'+out+' -o=aligns/all-'+out+' -f=nexus -quiet')
