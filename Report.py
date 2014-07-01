@@ -1,4 +1,4 @@
-import Fetchutil, SeqUtil, os
+import Fetchutil, SeqUtil, os, string
 if not os.path.exists('Reports'):
   os.mkdir('Reports')
 def generateReport(name,quer,models,dom):
@@ -182,15 +182,17 @@ def generateReport(name,quer,models,dom):
         elif len(spl)==0:
             continue
         if spl[0]=='translate':
-          spl=lin.split()
+          spl=read.readline().split()
+          #print spl
           while not spl[0]==';':
             taxa.update({spl[0]:spl[1].split(',')[0]})
-            spl=lin.split()
-   
+            spl=read.readline().split()
+        print taxa
         if spl[0]=='tree':
           tree_temp=spl[4]
           for i in taxa.keys():
-            string.replace(tree_temp,i+'[&prob',taxa[i]+'[&prob')
+            print i, taxa[i]
+            tree_temp=string.replace(tree_temp,i+'[&prob',taxa[i]+'[&prob')
           trees+=tree_temp+'\n'
           ret.write(trees+'\n')
           break
