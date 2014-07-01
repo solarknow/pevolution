@@ -187,11 +187,11 @@ def generateReport(name,quer,models,dom):
           while not spl[0]==';':
             taxa.update({spl[0]:spl[1].split(',')[0]})
             spl=read.readline().split()
-        print taxa
+        #print taxa
         if spl[0]=='tree':
           tree_temp=spl[4]
           for i in taxa.keys():
-            print i, taxa[i]
+            #print i, taxa[i]
             tree_temp=string.replace(tree_temp,i+'[&prob',taxa[i]+'[&prob')
           trees+=tree_temp+'\n'
           ret.write(trees+'\n')
