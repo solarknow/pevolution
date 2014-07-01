@@ -7,29 +7,23 @@ if not os.path.exists('Bayes'):
   os.mkdir('Bayes')
 #if not os.path.exists('ML'):
 #  os.mkdir('ML')
-
+  
 out= sys.argv[1]
-query=sys.argv[2]
-paml=sys.argv[3]
-paml= paml=='-y'
+query = sys.argv[2]
 SeqUtil.rename('Data/arch-'+out+'.fas')
-os.system('prank/bin/prank -d=Data/arch-'+out+' -o=aligns/arch-'+out+' -f=nexus -quiet')
-SeqUtil.splicealign('aligns/arch-'+out+'.2.nex','Bayes/arch-'+out+'-mod.nxs')
-models=SeqUtil.bestmod('Bayes/arch-'+out+'-mod.nxs')
-models_ori=SeqUtil.bestmod('aligns/arch-'+out+'.2.nex')
-
-if paml:
-  for mod in models.keys():
-     SeqUtil.pamlseqnex('Bayes/arch-'+out+'-mod.nxs','ML/arch-'+out)
-     SeqUtil.pamlinput('ML/arch-'+out,'ML/arch-'+out+'.out','ML/arch-'+out+'.ctl',{models.keys()[mod].split('+')[0]:models[models.keys()[mod]][1]})
-     os.system('codeml ML/arch-'+out+'.ctl')
-     SeqUtil.extractMLtree('ML/arch-'+out+'.out')
-  SeqUtil.pamlseqnex('Bayes/arch-'+out+'-mod.nxs','ML/arch-'+out)
-  for mod in models.keys():
-     SeqUtil.pamlinput('ML/arch-'+out,'ML/arch-'+out+'.out','ML/arch-'+out+'.ctl',{models.keys()[mod].split('+')[0]:models[models.keys()[mod]][1]})
-     os.system('codeml ML/arch-'+out+'.ctl')
-     SeqUtil.extractMLtree('ML/arch-'+out+'.out')
-
-SeqUtil.bayesfile('Bayes/arch-'+out+'-mod.nxs',models,'Bayes/arch-'+out+'-bayes.nxs')
+if not os.path.exists('aligns/arch-'+out+'.best.nex'):
+  os.system('prank -d=Data/arch-'+out+' -o=aligns/arch-'+out+' -f=nexus -quiet')
+  SeqUtil.bayesinNex('aligns/arch-'+out+'.best.nex')
+#SeqUtil.splicealign('aligns/arch-'+out+'.best.nex','Bayes/arch-'+out+'-mod.nxs')
+#models=SeqUtil.bestmod('Bayes/arch-'+out+'-mod.nxs')
+models_ori=SeqUtil.bestmod('aligns/arch-'+out+'.best.nex')
+if not os.path.exists('Bayes/arch-'+out+'-bayes.nxs'):
+  SeqUtil.bayesfile('aligns/arch-'+out+'.best.nex',models_ori,'Bayes/arch-'+out+'-bayes.nxs')
+#SeqUtil.bayesfile('Bayes/arch-'+out+'-mod.nxs',models,'Bayes/arch-'+out+'-bayes.nxs')
 os.system('mb Bayes/arch-'+out+'-bayes.nxs')
+#SeqUtil.pamlseqnex('Bayes/arch-'+out+'-mod.nxs','ML/arch-'+out)
+#for mod in models.keys():
+#    SeqUtil.pamlinput('ML/arch-'+out,'ML/arch-'+out+'.out','ML/arch-'+out+'.ctl',{models.keys()[mod].split('+')[0]:models[models.keys()[mod]][1]})
+#    os.system('codeml ML/arch-'+out+'.ctl')
+#    SeqUtil.extractMLtree('ML/arch-'+out+'.out')
 Report.generateReport(out,query,models_ori,'arch')

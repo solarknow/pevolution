@@ -34,7 +34,7 @@ def generateReport(name,quer,models,dom):
     #print info
     for i in info:
         info[i].append(Fetchutil.namefetch(info[i][1]))
-    ret.write('Organism                       Kingdom     Accession No.(GI)      No.1stlist/lenList     No.1stlist/lenList         ')
+    ret.write('Organism                       Kingdom     Accession No.(GI)      No. on list/length of list     No. on list/length of list         ')
 
     ret.write('Seq Definition\n')
     #print info
@@ -159,16 +159,20 @@ def generateReport(name,quer,models,dom):
 #    ret.write(tree+'\n')
     ##              PhyML1 + (PhyML2)
     try:
-        for i in models:
-            ret.write('\nTree found by PhyML using the '+i.split('+')[0]+' model:\n')
-            tree=consense('ML/'+dom+'-'+name+i.split('+')[0]+'_phyml_boot_trees.txt')
-            trees+=tree+'\n'
-            ret.write(tree+'\n')
+      for i in models:
+        ret.write('\nTree found by PhyML using the '+i.split('+')[0]+' model:\n')
+        tree=consense('ML/'+dom+'-'+name+i.split('+')[0]+'_phyml_boot_trees.txt')
+        trees+=tree+'\n'
+        ret.write(tree+'\n')
     except:
-        ret.write('Tree not found')
+      ret.write('Tree not found')
     ##              Bayesian selected tree
     ret.write('\nTree found by MrBayes using the best model:\n')
-    read=open('Bayes/'+dom+'-'+name+'-bayes.nxs.con')
+    try:
+      read=open('Bayes/'+dom+'-'+name+'-bayes.nxs.con')
+    except:
+      read=open('Bayes/'+dom+'-'+name+'-bayes.nxs.con.tre')
+    taxa={}
     while read:
         lin=read.readline()
         #print lin
@@ -177,11 +181,19 @@ def generateReport(name,quer,models,dom):
             break
         elif len(spl)==0:
             continue
+        if spl[0]=='translate':
+          spl=lin.split()
+          while not spl[0]==';':
+            taxa.update({spl[0]:spl[1].split(',')[0]})
+            spl=lin.split()
+   
         if spl[0]=='tree':
-            #print spl[3]
-            trees+=spl[3]+'\n'
-            ret.write(spl[3]+'\n')
-            break
+          tree_temp=spl[4]
+          for i in taxa.keys():
+            string.replace(tree_temp,i+'[&prob',taxa[i]+'[&prob')
+          trees+=tree_temp+'\n'
+          ret.write(trees+'\n')
+          break
     print 'trees printed'
     ret.close()
     open('Reports/'+dom+'-'+name+'-trees.tre','w').write(trees)
