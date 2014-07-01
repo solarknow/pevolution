@@ -41,19 +41,19 @@ if paml:
 
   for mod in models_ori.keys():
     SeqUtil.pamlseqnex('aligns/all-'+out+'.3.nex','ML/all-'+out+mod.split('+')[0]+'-ori')
-     if models_ori[mod][0]=='0' and models_ori[mod][1]=='0':
-         os.system('phyml -i '+'ML/all-'+out+mod.split('+')[0]+'-ori -d aa -b 100 -m '+mod.split('+')[0]+
+    if models_ori[mod][0]=='0' and models_ori[mod][1]=='0':
+      os.system('phyml -i '+'ML/all-'+out+mod.split('+')[0]+'-ori -d aa -b 100 -m '+mod.split('+')[0]+
                    ' -f e -s BEST -u aligns/all-'+out+'.ed.2.dnd -o tl')
-     elif models_ori[mod][0]=='0':
-         os.system('phyml -i '+'ML/all-'+out+mod.split('+')[0]+'-ori -d aa -b 100 -m '+mod.split('+')[0]+
+    elif models_ori[mod][0]=='0':
+      os.system('phyml -i '+'ML/all-'+out+mod.split('+')[0]+'-ori -d aa -b 100 -m '+mod.split('+')[0]+
                    ' -f e -v '+models_ori[mod][1]+' -s BEST '+
                    '-u aligns/all-'+out+'.2.dnd -o tl')
-     elif models_ori[mod][1]=='0':
-         os.system('phyml -i '+'ML/all-'+out+mod.split('+')[0]+'-ori -d aa -b 100 -m '+mod.split('+')[0]+
+    elif models_ori[mod][1]=='0':
+      os.system('phyml -i '+'ML/all-'+out+mod.split('+')[0]+'-ori -d aa -b 100 -m '+mod.split('+')[0]+
                    ' -f e -a '+models_ori[mod][0]+' -s BEST '+
                    '-u aligns/all-'+out+'.2.dnd -o tl')
-     else:
-         os.system('phyml -i '+'ML/all-'+out+mod.split('+')[0]+'-ori -d aa -b 100 -m '+mod.split('+')[0]+
+    else:
+      os.system('phyml -i '+'ML/all-'+out+mod.split('+')[0]+'-ori -d aa -b 100 -m '+mod.split('+')[0]+
                    ' -f e -v '+models_ori[mod][1]+' -a '+models_ori[mod][0]+' -s BEST '+
                    '-u aligns/all-'+out+'.2.dnd -o tl')
         
