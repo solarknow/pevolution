@@ -63,6 +63,6 @@ if paml:
         
 #SeqUtil.bayesfile('Bayes/all-'+out+'-mod.nxs',models,'Bayes/all-'+out+'-bayes.nxs')
 #os.system('mb Bayes/all-'+out+'-bayes.nxs')
-SeqUtil.bayesfile('aligns/all-'+out+'.best.nex',models_ori,'Bayes/all-'+out+'-ori-bayes.nxs')
-os.system('mb Bayes/all-'+out+'-ori-bayes.nxs')
+SeqUtil.bayesfile('aligns/all-'+out+'.best.nex',models_ori,'Bayes/all-'+out+'-bayes.nxs')
+os.system('mb Bayes/all-'+out+'-bayes.nxs')
 Report.generateReport(out,query,models_ori,'all')
