@@ -64,3 +64,11 @@ phylip/
 XML/
 Orthos/
 *~
+Data/
+aligns/
+Bayes/
+dicts/
+Prot/
+Reports/
+inputer
+snapshot/
