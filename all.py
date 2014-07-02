@@ -18,6 +18,7 @@ except IndexError:
 print "Beginning alignment"
 SeqUtil.rename('Data/all-'+out+'.fas')
 os.system('prank -d=Data/all-'+out+' -o=aligns/all-'+out+' -f=nexus -quiet')
+SeqUtil.bayesinNex('aligns/all-'+out+'.best.nex')
 #SeqUtil.splicealign('aligns/all-'+out+'.best.nex','Bayes/all-'+out+'-mod.nxs')
 print "Alignment complete.\nCalculating best model for tree finding"
 models_ori=SeqUtil.bestmod('aligns/all-'+out+'.best.nex')
