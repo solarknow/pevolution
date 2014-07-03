@@ -59,7 +59,7 @@ queue_arch))
         arch_accs.update(queue_arch.get())
     if dom=='bac' or dom=='all':
       #bac_accs=Reciprocal.bestrecipblast(bac_list,query,thresh2)
-       queue_bac=Queue()
+      queue_bac=Queue()
       for b in bac_list:
         p=Process(target=Reciprocal.bestrecipblast, args=(bac_list,query,thresh2,
 queue_bac))
@@ -69,7 +69,7 @@ queue_bac))
         bac_accs.update(queue_bac.get())
     if dom=='euk' or dom=='all':
       #euk_accs=Reciprocal.bestrecipblast(euk_list,query,thresh3)
-       queue_euk=Queue()
+      queue_euk=Queue()
       for e in euk_list:
         p=Process(target=Reciprocal.bestrecipblast, args=(euk_list,query,thresh3,
 queue_euk))
@@ -78,7 +78,7 @@ queue_euk))
       while not queue_euk.empty():
         euk_accs.update(queue_euk.get())
 
-      all_accs={}
+    all_accs={}
     if dom==all:
       
       all_accs.update(arch_accs)
