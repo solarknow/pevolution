@@ -22,8 +22,7 @@ def bestrecipblast(org, seed, thresh, queue):
     dum=str(int(int(seed)*random.random()))
         
     os.system('blastp -db nr -query Orthos/'+seed+'.fasta -evalue '+str(thresh)+
-              ' -out XML/'+dum+'.xml -outfmt 5 -entrez_query 
-\"'+org+'[ORGN]\" -use_sw_tback'+
+              ' -out XML/'+dum+'.xml -outfmt 5 -entrez_query \"'+org+'[ORGN]\" -use_sw_tback'+
               ' -remote')
     qoutput=open('XML/'+dum+'.xml')
         
