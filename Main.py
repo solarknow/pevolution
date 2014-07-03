@@ -87,8 +87,7 @@ queue_euk))
       num_seqs=0
       for j in all_accs:
         num_seqs+=len(all_accs[j])
-      print "Dictionary generated with "+repr(len(all_accs.keys()))+" keys and 
-"+repr(num_seqs)+" sequences."
+      print "Dictionary generated with "+repr(len(all_accs.keys()))+" keys and "+repr(num_seqs)+" sequences."
 ##Fetching the sequences and writing them to file
     print "Writing seqs to file."
     for a in arch_accs.keys():
