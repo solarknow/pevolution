@@ -51,7 +51,7 @@ except IOError:
     if dom=='arch' or dom=='all':
       queue_arch=Queue()
       for a in arch_list:
-        p=Process(target=Reciprocal.bestrecipblast, args=(arch_list,query,thresh1, 
+        p=Process(target=Reciprocal.bestrecipblast, args=(a,query,thresh1, 
 queue_arch))
         p.start()
         p.join()
@@ -61,7 +61,7 @@ queue_arch))
       #bac_accs=Reciprocal.bestrecipblast(bac_list,query,thresh2)
       queue_bac=Queue()
       for b in bac_list:
-        p=Process(target=Reciprocal.bestrecipblast, args=(bac_list,query,thresh2,
+        p=Process(target=Reciprocal.bestrecipblast, args=(b,query,thresh2,
 queue_bac))
         p.start()
         p.join()
@@ -71,7 +71,7 @@ queue_bac))
       #euk_accs=Reciprocal.bestrecipblast(euk_list,query,thresh3)
       queue_euk=Queue()
       for e in euk_list:
-        p=Process(target=Reciprocal.bestrecipblast, args=(euk_list,query,thresh3,
+        p=Process(target=Reciprocal.bestrecipblast, args=(e,query,thresh3,
 queue_euk))
         p.start()
         p.join()
