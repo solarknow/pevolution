@@ -1,5 +1,6 @@
 import sys,os
 import Fetchutil, Reciprocal
+from multiprocessing import Process,Queue
 
 #Check for directories' existance, if not create them.
 if not os.path.exists('Data'):
@@ -48,19 +49,46 @@ except IOError:
     euk_accs={}
     print "Blasting"
     if dom=='arch' or dom=='all':
-      arch_accs=Reciprocal.bestrecipblast(arch_list,query,thresh1)
+      queue_arch=Queue()
+      for a in arch_list:
+        p=Process(target=Reciprocal.bestrecipblast, args=(arch_list,query,thresh1, 
+queue_arch))
+        p.start()
+        p.join()
+      while not queue_arch.empty():
+        arch_accs.update(queue_arch.get())
     if dom=='bac' or dom=='all':
-      bac_accs=Reciprocal.bestrecipblast(bac_list,query,thresh2)
+      #bac_accs=Reciprocal.bestrecipblast(bac_list,query,thresh2)
+       queue_bac=Queue()
+      for b in bac_list:
+        p=Process(target=Reciprocal.bestrecipblast, args=(bac_list,query,thresh2,
+queue_bac))
+        p.start()
+        p.join()
+      while not queue_bac.empty():
+        bac_accs.update(queue_bac.get())
     if dom=='euk' or dom=='all':
-      euk_accs=Reciprocal.bestrecipblast(euk_list,query,thresh3)
-    all_accs={}
-    all_accs.update(arch_accs)
-    all_accs.update(bac_accs)
-    all_accs.update(euk_accs)
-    num_seqs=0
-    for j in all_accs:
-    	num_seqs+=len(all_accs[j])
-    print "Dictionary generated with "+repr(len(all_accs.keys()))+" keys and "+repr(num_seqs)+" sequences."
+      #euk_accs=Reciprocal.bestrecipblast(euk_list,query,thresh3)
+       queue_euk=Queue()
+      for e in euk_list:
+        p=Process(target=Reciprocal.bestrecipblast, args=(euk_list,query,thresh3,
+queue_euk))
+        p.start()
+        p.join()
+      while not queue_euk.empty():
+        euk_accs.update(queue_euk.get())
+
+      all_accs={}
+    if dom==all:
+      
+      all_accs.update(arch_accs)
+      all_accs.update(bac_accs)
+      all_accs.update(euk_accs)
+      num_seqs=0
+      for j in all_accs:
+        num_seqs+=len(all_accs[j])
+      print "Dictionary generated with "+repr(len(all_accs.keys()))+" keys and 
+"+repr(num_seqs)+" sequences."
 ##Fetching the sequences and writing them to file
     print "Writing seqs to file."
     for a in arch_accs.keys():
