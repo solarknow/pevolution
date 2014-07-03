@@ -66,5 +66,7 @@ def bestrecipblast(org, seed, thresh, queue):
             break
 	#elapsed=time.time()-start
 	#print "Time elapsed: "+time.strftime('%M:%S',[elapsed])
-    queue.put(acclist)
-    return acclist
+    if queue is not None:
+      queue.put(acclist)
+    else:
+      return acclist
