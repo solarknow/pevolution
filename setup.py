@@ -13,7 +13,7 @@ setup(name='pevolution',
       description='This is a pipeline to find, align, and find trees for putatively related proteins.',
       author='Mihir Sarwade',
       author_email='mihir.sarwade@effem.com',
-      packages=['pevolution'],
+#      packages=['pevolution'],
       install_requires=['psutil >= 1.2.1','biopython >= 1.64'])
 
 #urlretrieve("https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz",'/tmp/prank.tgz')
