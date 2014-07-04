@@ -132,20 +132,22 @@ queue_euk))
         fil.close()
         Fetchutil.addseq('Data/euk-'+out+'.fas','Orthos/'+euk_accs[e][0]+'.fasta')
         os.remove('Orthos/'+euk_accs[e][0]+'.fasta')
-
-    for c in all_accs.keys():
-        Fetchutil.seqfetch(all_accs[c][0])
-        fil=open('Orthos/'+all_accs[c][0]+'.fasta')
-        fil_arr=fil.readlines()
-        fil.close()
-        fil=open('Orthos/'+all_accs[c][0]+'.fasta','w')
-        for i in range(len(fil_arr)):
-            if i==0:
-                fil.write(fil_arr[i].strip()+' '+all_accs[c][1]+'  '+all_accs[c][2]+'\n')
-            else:
-                fil.write(fil_arr[i])
-        fil.close()
-        Fetchutil.addseq('Data/all-'+out+'.fas','Orthos/'+all_accs[c][0]+'.fasta')
-        os.remove('Orthos/'+all_accs[c][0]+'.fasta')
+    Fetchutil.addseq('Data/all-'+out+'.fas','Data/arch-'+out+'.fas')
+    Fetchutil.addseq('Data/all-'+out+'.fas','Data/bac-'+out+'.fas')
+    Fetchutil.addseq('Data/all-'+out+'.fas','Data/euk-'+out+'.fas')
+#    for c in all_accs.keys():
+#        Fetchutil.seqfetch(all_accs[c][0])
+#        fil=open('Orthos/'+all_accs[c][0]+'.fasta')
+#        fil_arr=fil.readlines()
+#        fil.close()
+#        fil=open('Orthos/'+all_accs[c][0]+'.fasta','w')
+#        for i in range(len(fil_arr)):
+#            if i==0:
+#                fil.write(fil_arr[i].strip()+' '+all_accs[c][1]+'  '+all_accs[c][2]+'\n')
+#            else:
+#                fil.write(fil_arr[i])
+#        fil.close()
+#        Fetchutil.addseq('Data/all-'+out+'.fas','Orthos/'+all_accs[c][0]+'.fasta')
+#        os.remove('Orthos/'+all_accs[c][0]+'.fasta')
 
 os.system('python '+dom+'.py '+out+' '+query+' '+phyml)
