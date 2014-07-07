@@ -11,15 +11,11 @@ To install pre-reqs,
 
 ```shell
 
-sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre googlecl
+sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre paml
 wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
 tar zxvf prank.linux64.140110.tgz prank
-wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
-unzip PhyML-3.1.zip
-mv Phyml-3.1 phyml
 wget http://evolution.gs.washington.edu/phylip/download/phylip-3.695.tar.gz
-tar zxvf phylip-3.695.tar.gz
-mv phylip-3.695 phylip
+tar zxvf prottest-3.4-20140123.tar.gz prottest
 
 python setup.py install
 ```
