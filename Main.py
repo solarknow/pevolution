@@ -1,7 +1,8 @@
-import sys,os
+import sys,os, psutil
 import Fetchutil, Reciprocal
 from multiprocessing import Process,Queue
 
+PROCS=psutil.NUM_CPUS
 #Check for directories' existance, if not create them.
 if not os.path.exists('Data'):
   os.mkdir('Data')
@@ -54,7 +55,7 @@ except IOError:
         p=Process(target=Reciprocal.bestrecipblast, args=(a,query,thresh1, 
 queue_arch))
         p.start()
-        p.join()
+#        p.join()
       while not queue_arch.empty():
         arch_accs.update(queue_arch.get())
     if dom=='bac' or dom=='all':
@@ -64,7 +65,7 @@ queue_arch))
         p=Process(target=Reciprocal.bestrecipblast, args=(b,query,thresh2,
 queue_bac))
         p.start()
-        p.join()
+#        p.join()
       while not queue_bac.empty():
         bac_accs.update(queue_bac.get())
     if dom=='euk' or dom=='all':
@@ -74,7 +75,7 @@ queue_bac))
         p=Process(target=Reciprocal.bestrecipblast, args=(e,query,thresh3,
 queue_euk))
         p.start()
-        p.join()
+#        p.join()
       while not queue_euk.empty():
         euk_accs.update(queue_euk.get())
 

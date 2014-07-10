@@ -11,11 +11,10 @@ To install pre-reqs,
 
 ```shell
 
-sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre paml
-wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
-tar zxvf prank.linux64.140110.tgz prank
-wget http://evolution.gs.washington.edu/phylip/download/phylip-3.695.tar.gz
-tar zxvf prottest-3.4-20140123.tar.gz prottest
+sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre paml prank
+
+tar zxvf prottest-3.4-20140123.tar.gz 
+mv prottest-3.4-20140123 prottest
 
 python setup.py install
 ```
