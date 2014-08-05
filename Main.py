@@ -55,7 +55,7 @@ except IOError:
         p=Process(target=Reciprocal.bestrecipblast, args=(a,query,thresh1, 
 queue_arch))
         p.start()
- #       p.join()
+        p.join()
       while not queue_arch.empty():
         arch_accs.update(queue_arch.get())
     if dom=='bac' or dom=='all':

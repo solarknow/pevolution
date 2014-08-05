@@ -1,5 +1,14 @@
 #import Main
 import multiprocessing, psutil, subprocess
+import sys, shutil
+
+if 'clear' in sys.argv:
+  try:
+    shutil.rmtree('aligns')
+    shutil.rmtree('Data')
+  except:
+    pass
+  print sys.exit(0)
 
 jobs=open('jobs.txt').readlines()
 
@@ -14,3 +23,4 @@ if __name__=='__main__':
     p = multiprocessing.Process(name=name, target=launch, 
 args=(quer,name,'all'))
     p.start()
+    p.join()
