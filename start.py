@@ -6,6 +6,7 @@ if 'clear' in sys.argv:
   try:
     shutil.rmtree('aligns')
     shutil.rmtree('Data')
+    shutil.rmtree('Orthos')
   except:
     pass
   print sys.exit(0)
