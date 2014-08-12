@@ -1,7 +1,7 @@
 import Fetchutil, SeqUtil, os, string
 if not os.path.exists('Reports'):
   os.mkdir('Reports')
-def generateReport(name,quer,models,dom):
+def generateReport(name,quer,models,dom, phyml):
     "Generates a report summarizing the analysis done"
     ret=open('Reports/Report-'+dom+'-'+name+'.txt','w')
     ret.write('Orthologous sequence Search and Alignment\n'+
@@ -158,14 +158,14 @@ def generateReport(name,quer,models,dom):
 #    trees+=tree
 #    ret.write(tree+'\n')
     ##              PhyML1 + (PhyML2)
-    try:
+    if phyml:
       for i in models:
         ret.write('\nTree found by PhyML using the '+i.split('+')[0]+' model:\n')
         tree=consense('ML/'+dom+'-'+name+i.split('+')[0]+'_phyml_boot_trees.txt')
         trees+=tree+'\n'
         ret.write(tree+'\n')
-    except:
-      ret.write('Tree not found')
+#    except:
+#      ret.write('Tree not found')
     ##              Bayesian selected tree
     ret.write('\nTree found by MrBayes using the best model:\n')
     try:

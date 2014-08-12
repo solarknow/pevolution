@@ -5,8 +5,6 @@ if not os.path.exists('aligns'):
   os.mkdir('aligns')
 if not os.path.exists('Bayes'):
   os.mkdir('Bayes')
-#if not os.path.exists('ML'):
-#  os.mkdir('ML')
 
 out=sys.argv[1]
 query=sys.argv[2]
@@ -25,6 +23,8 @@ models_ori=SeqUtil.bestmod('aligns/all-'+out+'.best.nex')
 #models=SeqUtil.bestmod('Bayes/all-'+out+'-mod.nxs')
 #print models_ori, models
 if paml:
+  if not os.path.exists('ML'):
+    os.mkdir('ML')
   for mod in models.keys():
      SeqUtil.pamlseqnex('Bayes/all-'+out+'-mod.nxs','ML/all-'+out+mod.split('+')[0])
      if models[mod][0]=='0' and models[mod][1]=='0':
@@ -65,4 +65,4 @@ if paml:
 #os.system('mb Bayes/all-'+out+'-bayes.nxs')
 SeqUtil.bayesfile('aligns/all-'+out+'.best.nex',models_ori,'Bayes/all-'+out+'-bayes.nxs')
 os.system('mb Bayes/all-'+out+'-bayes.nxs')
-Report.generateReport(out,query,models_ori,'all')
+Report.generateReport(out,query,models_ori,'all',paml)
