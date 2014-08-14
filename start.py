@@ -1,5 +1,5 @@
-#import Main
-import multiprocessing, psutil, subprocess
+#import Main, multiprocessing
+import psutil, subprocess
 import sys, shutil
 
 if 'clear' in sys.argv:
@@ -21,7 +21,7 @@ if __name__=='__main__':
   for i in jobs:
     spl=i.split()
     (name,quer)=(spl[0],spl[1])
-    p = multiprocessing.Process(name=name, target=launch, 
-args=(quer,name,'all'))
-    p.start()
-    p.join()
+    launch(quer,name,'all')
+#    p = multiprocessing.Process(name=name, target=launch, args=(quer,name,'all'))
+#    p.start()
+#    p.join()
