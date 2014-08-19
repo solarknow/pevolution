@@ -58,27 +58,6 @@ def namefetch(acc):
 #                name+=recun[i]+' '
 #        i+=1
 
-def taxidfetch(list_binom):
-  "Prints the taxid for binom organisms to file"
-  org_map=open('orgmap','a')
-  if type(list_binom) is str:
-    list_binom=[list_binom]
-  for org in list_binom:
-    hand=Entrez.esearch(db='taxonomy', term=org+'[ORGN]')
-    results=Entrez.read(hand)
-    #print results
-    hand.close()
-    taxid=results['IdList']
-    taxa=''
-    for t in taxid:
-      taxa+=str(t)+', '
-    hand=Entrez.esummary(db='taxonomy',id=taxa)
-    res=Entrez.read(hand)
-    for i in range(len(res)):
-      resi=res[i]
-      org_map.write(resi['ScientificName']+'\t'+taxid[i]+'\n')
-  org_map.close()
-
 def orgfetch(acc):
   "Fetches source organism for acc"
   ret=[]
