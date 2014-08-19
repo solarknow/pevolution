@@ -27,108 +27,155 @@ def addseq(oldseq, newseq):
         old.write(add)
         if add=='':
             return
-
 def namefetch(acc):
-    "Fetchs definition of specified gene product"
-    hand=Entrez.efetch(db="protein", id=acc ,rettype='gp')
-    record=''
-    while hand:
-        read=hand.readline()
-        record+=read.strip()+'  '
-        if read=='':
-            break
-    rec=record.split('  ')
-    recun=[]
-    for s in rec:
-        if s!='':
-            recun.append(s)
-    i=0
-    name=''
-    while i<len(recun):
-        if recun[i].endswith('DEFINITION'):
-            while i:
-                i+=1
-                if recun[i].startswith('ACCESSION'):
-                    return name
-                name+=recun[i]+' '
-        i+=1
+  "Returns the description of acc"
+  hand=Entrez.esummary(db='protein',id=acc)
+  res=Entrez.read(hand)[0]
+  hand.close()
+  return res['Title']
+#def namefetch(acc):
+#    "Fetchs definition of specified gene product"
+#    hand=Entrez.efetch(db="protein", id=acc ,rettype='gp')
+#    record=''
+#    while hand:
+#        read=hand.readline()
+#        record+=read.strip()+'  '
+#        if read=='':
+#            break
+#    rec=record.split('  ')
+#    recun=[]
+#    for s in rec:
+#        if s!='':
+#            recun.append(s)
+#    i=0
+#    name=''
+#    while i<len(recun):
+#        if recun[i].endswith('DEFINITION'):
+#            while i:
+#                i+=1
+#                if recun[i].startswith('ACCESSION'):
+#                    return name
+#                name+=recun[i]+' '
+#        i+=1
 
+def taxidfetch(list_binom):
+  "Prints the taxid for binom organisms to file"
+  org_map=open('orgmap','a')
+  if type(list_binom) is str:
+    list_binom=[list_binom]
+  for org in list_binom:
+    hand=Entrez.esearch(db='taxonomy', term=org+'[ORGN]')
+    results=Entrez.read(hand)
+    #print results
+    hand.close()
+    taxid=results['IdList']
+    taxa=''
+    for t in taxid:
+      taxa+=str(t)+', '
+    hand=Entrez.esummary(db='taxonomy',id=taxa)
+    res=Entrez.read(hand)
+    for i in range(len(res)):
+      resi=res[i]
+      org_map.write(resi['ScientificName']+'\t'+taxid[i]+'\n')
+  org_map.close()
 
 def orgfetch(acc):
-    "Fetchs the organism from which acc accession number of a protein came from"
-    hand=Entrez.efetch(db="protein", id=acc ,rettype='gp')
-    record=''
-    while hand:
-        read=hand.readline()
-        record+=read.strip()+'  '
-        if read=='':
-            break
-    rec=record.split('  ')
-    recun=[]
-    for s in rec:
-        if s!='':
-            recun.append(s)
-    i=0
-    ret=[]
-    retu=['']
-    #print recun
-    mutisp=False
-    while i<len(recun):
-        j=0
-        if recun[i]=='DEFINITION':
-            multisp=recun[i+1].startswith("MULTISPECIES:")
-            if not multisp:
-              tab=recun[i+1].strip().split()
-              if not recun[i+2]=='ACCESSION':
-                  tab+=recun[i+2].strip().split()
-              for k in range(len(tab)):
-                  if tab[k].startswith('[') and len(tab[k])>5:
-                      retu=[tab[k][1:]]
-                      while k<len(tab):
-                          k+=1
-                          if tab[k].endswith('].'):
-                              retu[0]+=' '+tab[k][0:tab[k].index(']')]
-                              retu.append('Unknown.')
-                              break
-                          else:
-                              retu[0]+=' '+tab[k]
-            else:
-              return [recun[i+11]+' multispecies',recun[i+14].split(';')[0]]
-#        elif recun[i+1].startswith("MULTISPECIES:"):
-#          ret=
-        if recun[i]=='ORGANISM':
-            try:
-                ret=[recun[i+1].split()[0]+' '+recun[i+1].split()[1]]
-            except:
-                return retu
-            if ret[0].endswith('.'):
-                ret[0]+=' '+recun[i+1].split()[2]
-            ret.append(recun[i+2].split(';')[0])
-            return ret
-
-        i+=1
+  "Fetches source organism for acc"
+  ret=[]
+  hand=Entrez.esummary(db="protein", id=acc)
+  taxid=Entrez.read(hand)[0]['TaxId']
+  hand.close()
+  hand=Entrez.efetch(db='taxonomy',id=str(taxid))
+  result=Entrez.read(hand)[0]
+  hand.close()
+  ret.append(result['ScientificName'])
+  for i in result['LineageEx']:
+    if i['Rank']=='superkingdom':
+      ret.append(i['ScientificName'])
+      return ret
+  return ret
+    
+#def orgfetch(acc):
+#    "Fetchs the organism from which acc accession number of a protein came from"
+#    hand=Entrez.efetch(db="protein", id=acc ,rettype='gp')
+#    record=''
+#    while hand:
+#        read=hand.readline()
+#        record+=read.strip()+'  '
+#        if read=='':
+#            break
+#    rec=record.split('  ')
+#    recun=[]
+#    for s in rec:
+#        if s!='':
+#            recun.append(s)
+#    i=0
+#    ret=[]
+#    retu=['']
+#    #print recun
+#    mutisp=False
+#    while i<len(recun):
+#        j=0
+#        if recun[i]=='DEFINITION':
+#            multisp=recun[i+1].startswith("MULTISPECIES:")
+#            if not multisp:
+#              tab=recun[i+1].strip().split()
+#              if not recun[i+2]=='ACCESSION':
+#                  tab+=recun[i+2].strip().split()
+#              for k in range(len(tab)):
+#                  if tab[k].startswith('[') and len(tab[k])>5:
+#                      retu=[tab[k][1:]]
+#                      while k<len(tab):
+#                          k+=1
+#                          if tab[k].endswith('].'):
+#                              retu[0]+=' '+tab[k][0:tab[k].index(']')]
+#                              retu.append('Unknown.')
+#                              break
+#                          else:
+#                              retu[0]+=' '+tab[k]
+#            else:
+#              return [recun[i+11]+' multispecies',recun[i+14].split(';')[0]]
+##        elif recun[i+1].startswith("MULTISPECIES:"):
+##          ret=
+#        if recun[i]=='ORGANISM':
+#            try:
+#                ret=[recun[i+1].split()[0]+' '+recun[i+1].split()[1]]
+#            except:
+#                return retu
+#            if ret[0].endswith('.'):
+#                ret[0]+=' '+recun[i+1].split()[2]
+#            ret.append(recun[i+2].split(';')[0])
+#            return ret
+#
+#        i+=1
 
 def toGI(acc):
-    "Converts given accession no acc to a GI number"
-    hand=Entrez.efetch(db="protein", id=acc ,rettype='gp')
-    record=''
-    while hand:
-        read=hand.readline()
-        record+=read.strip()+'  '
-        if read=='':
-            break
-    rec=record.split('  ')
-    recun=[]
-    for s in rec:
-        if s!='':
-            recun.append(s)
-    string=''
-    for g in recun:
-        if g.startswith('GI:'):
-            for char in g[3:]:
-                if char.isdigit():
-                    string+=char
-            return string
+  "Returns GI number for acc"
+  hand=Entrez.esearch(db='protein', term=acc)
+  res=Entrez.read(hand)
+  return res['IdList'][0]
+
+#def toGI(acc):
+#    "Converts given accession no acc to a GI number"
+#    hand=Entrez.efetch(db="protein", id=acc ,rettype='gp')
+#    record=''
+#    while hand:
+#        read=hand.readline()
+#        record+=read.strip()+'  '
+#        if read=='':
+#            break
+#    rec=record.split('  ')
+#    recun=[]
+#    for s in rec:
+#        if s!='':
+#            recun.append(s)
+#    string=''
+#    for g in recun:
+#        if g.startswith('GI:'):
+#            for char in g[3:]:
+#                if char.isdigit():
+#                    string+=char
+#            return string
 
 def findlonglen(dicto):
     "finds the length of the longest key in dicto"
