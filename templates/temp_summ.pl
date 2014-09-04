@@ -82,10 +82,10 @@ my $base = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
 $params{email} = "@@@@mihir.sarwade@effem.com@@@@";
 $params{db} = "taxonomy";
 $params{tool} = "ebot";
-$params{term} = "$$Homo+sapiens$$";
+$params{term} = "$$Homo+sapiens$$[ORGN]";
 %params = esearch(%params);
 
-$params{linkname} = "taxonomy_protein_exp";
+$params{linkname} = "taxonomy_protein";
 %params = elink_by_id_to('protein', %params);
 
 $params{outfile} = "&&&hsap&&&_summary";

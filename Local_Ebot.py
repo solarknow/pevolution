@@ -1,5 +1,5 @@
 import sys, os, subprocess
-from Bio import SeqIO
+from Bio import SeqIO, Entrez
 import Fetchutil
 ####
 ## This version of Local makes use of NCBI's eBot and the scripts it generates.
@@ -54,9 +54,9 @@ def taxidmap(org):
   subprocess.call(['perl', 'Proteomes/'+org+'_tax.pl'])
   results=Entrez.read(open('Proteomes/'+org+'_tax'))
   for i in results:
-    taxid=results['IdList']
+    taxid=i['TaxId']
     subprocess.call(['perl', 'Proteomes/'+org+'_summ.pl'])
-    res=Entrez.read('Proteomes/'+org+'_summary')
+    res=Entrez.read(open('Proteomes/'+org+'_summary'))
     for i in range(len(res)):
       resi=res[i]
       org_map.write(resi['ScientificName']+'\t'+taxid[i]+'\n')
@@ -90,7 +90,11 @@ if __name__=="__main__":
   print "Generating scripts"
   four=generatescripts(org)
   print "Scripts are generates"
-  print "Fetching seqs"
-  fasta=fetchfasta(four)
+  if not os.path.exists('Proteomes/'+four+'.aa'):
+    print "Fetching seqs"
+    fasta=fetchfasta(four)
+  else:
+    fasta='Proteomes/'+four+'.aa'
   print "Making seqmap"
+  taxidmap(four)
   seqmap(fasta)

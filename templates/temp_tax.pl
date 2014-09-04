@@ -82,13 +82,13 @@ my $base = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
 $params{email} = "@@@@mihir.sarwade@effem.com@@@@";
 $params{db} = "taxonomy";
 $params{tool} = "ebot";
-$params{term} = "$$Homo+sapiens$$";
+$params{term} = "$$Homo+sapiens$$[ORGN]";
 %params = esearch(%params);
 
 $params{report} = "xml";
 $params{retmode} = "text";
 $params{outfile} = "&&&hsap&&&_tax";
-efetch_batch(%params);
+esummary(%params);
 
 #** END SCRIPT MAIN BODY ************************************
 #************************************************************
