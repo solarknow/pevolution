@@ -2,6 +2,10 @@ from Bio import Entrez
 import subprocess,os
 Entrez.email=os.environ['ENTREZ_EMAIL']
 
+from socket import error as SocketError
+import errno
+import time
+
 def seqfetch(acc):
     "prints the sequence in fasta format to file"
     hand=Entrez.efetch(db='protein',id=str(acc),rettype='fasta')
@@ -61,10 +65,22 @@ def namefetch(acc):
 def orgfetch(acc):
   "Fetches source organism for acc"
   ret=[]
-  hand=Entrez.esummary(db="protein", id=acc)
+  try:
+    hand=Entrez.esummary(db="protein", id=acc)
+  except SocketError:
+#    if e.errno != errno.ECONNRESET:
+#      raise # Not error we are looking for
+    time.sleep(1.5)
+    hand=Entrez.esummary(db="protein", id=acc)
   taxid=Entrez.read(hand)[0]['TaxId']
   hand.close()
-  hand=Entrez.efetch(db='taxonomy',id=str(taxid))
+  try:
+    hand=Entrez.efetch(db='taxonomy',id=str(taxid))
+  except SocketError:
+#    if e.errno != errno.ECONNRESET:
+#      raise # Not error we are looking for
+    time.sleep(1.5)
+    hand=Entrez.efetch(db='taxonomy',id=str(taxid))
   result=Entrez.read(hand)[0]
   hand.close()
   ret.append(result['ScientificName'])

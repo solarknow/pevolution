@@ -60,9 +60,10 @@ def seqmap(aa):
   taxa_map={}
   print 'reading the orgmap'
   for i in tax_map:
+    i=i.strip()
     spl=i.split('\t')
     taxa_map.update({spl[0]:spl[1]}) 
-  seq_map=open(aa.split('.')[0]+'map','a')  
+  seq_map=open(aa.split('.')[0]+'map','w')  
   hand=open(aa,'r')
   print 'parsing aa'
   for rec in SeqIO.parse(hand, 'fasta'):
@@ -75,3 +76,8 @@ def seqmap(aa):
       seq_map.write(rid+'\t'+org[0]+'\n')
   hand.close()
   seq_map.close()
+
+if __name__=="__main__":
+  org=sys.argv[1]
+  fasta=fetchfasta(generatescript(org))
+  seqmap(fasta)
