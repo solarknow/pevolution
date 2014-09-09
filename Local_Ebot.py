@@ -1,4 +1,4 @@
-import sys, os, subprocess
+import sys, os, subprocess, shutil, glob
 from Bio import SeqIO, Entrez
 import Fetchutil
 ####
@@ -50,7 +50,7 @@ def fetchfasta(org):
 
 def taxidmap(org):
   "Prints the taxid for binom organisms to file"
-  org_map=open('orgmap','a')
+  org_map=open('Proteomes/orgmap_'+four,'w')
   subprocess.call(['perl', 'Proteomes/'+org+'_tax.pl'])
   results=Entrez.read(open('Proteomes/'+org+'_tax'))
   #print results
@@ -79,42 +79,67 @@ def taxidmap(org):
   for i in range(len(res)):
     resi=res[i]
     #print resi
-    org_map.write(repr(resi['Gi'])+'\t'+repr(resi['TaxId'])+'\t'+orgs[resi['TaxId']]+'\n')
+    org_map.write(repr(resi['Gi'])+'\t'+repr(resi['TaxId'])+'\n')
   org_map.close()
 
-def seqmap(aa):
-  "Prints a seq-taxid map to file for aa file"
-  tax_map=open('orgmap').readlines()
-  taxa_map={}
-  print 'reading the orgmap'
-  for i in tax_map:
-    i=i.strip()
-    spl=i.split('\t')
-    taxa_map.update({spl[0]:spl[1]}) 
-  seq_map=open(aa.split('.')[0]+'map','w')  
-  hand=open(aa,'r')
-  print 'parsing aa'
-  for rec in SeqIO.parse(hand, 'fasta'):
-    rid=rec.id.split('|')[1]
-    #print rid
-    org=Fetchutil.orgfetch(rid)
-    try:
-      seq_map.write(rid+'\t'+taxa_map[org[0]]+'\n')
-    except KeyError:
-      seq_map.write(rid+'\t'+org[0]+'\n')
-  hand.close()
-  seq_map.close()
+#def seqmap(aa):
+#  "Prints a seq-taxid map to file for aa file"
+#  tax_map=open('orgmap').readlines()
+#  taxa_map={}
+#  print 'reading the orgmap'
+#  for i in tax_map:
+#    i=i.strip()
+#    spl=i.split('\t')
+#    taxa_map.update({spl[0]:spl[1]}) 
+#  seq_map=open(aa.split('.')[0]+'map','w')  
+#  hand=open(aa,'r')
+#  print 'parsing aa'
+#  for rec in SeqIO.parse(hand, 'fasta'):
+#    rid=rec.id.split('|')[1]
+#    #print rid
+#    org=Fetchutil.orgfetch(rid)
+#    try:
+#      seq_map.write(rid+'\t'+taxa_map[org[0]]+'\n')
+#    except KeyError:
+#      seq_map.write(rid+'\t'+org[0]+'\n')
+#  hand.close()
+#  seq_map.close()
+
+def makedb(binom,four):
+  "runs makeblastdb with appropriate params"
+  infile='Proteomes/'+four+'.aa'
+  intype='fasta'
+  dbtype='prot'
+  title='Protein Database for all variants of '+binom
+  parse='-parse_seqids'
+  out=four
+  taxmap='Proteomes/orgmap_'+four
+  log='Proteomes/'+four+'.log'
+  subprocess.call(['makeblastdb','-in',infile,'-input_type',intype,'-title',
+                   title,parse,'-out',out,'-taxid_map',taxmap,'-logfile',log,
+                   '-dbtype',dbtype])
+
 
 if __name__=="__main__":
-  org=sys.argv[1]
-  print "Generating scripts"
-  four=generatescripts(org)
-  print "Scripts are generates"
-  if not os.path.exists('Proteomes/'+four+'.aa'):
-    print "Fetching seqs"
-    fasta=fetchfasta(four)
-  else:
-    fasta='Proteomes/'+four+'.aa'
-  print "Making seqmap"
-  taxidmap(four)
-  seqmap(fasta)
+  orgs=sys.argv[1:]
+  fours=[]
+  for org in orgs:
+    print "Fetching localdb for "+org
+    print "Generating scripts"
+    four=generatescripts(org)
+    fours.append(four)
+    print "Scripts are generated"
+    if not os.path.exists('Proteomes/'+four+'.aa'):
+      print "Fetching seqs"
+      fasta=fetchfasta(four)
+    else:
+      fasta='Proteomes/'+four+'.aa'
+    print "Making taxmap"
+    taxidmap(four)
+    print 'making blastDB'
+    makedb(org,four)
+    print 'moving to database folder'
+    dbs=glob.glob(four+'.p*')
+    for g in dbs:
+      shutil.move(g,'Proteomes/')  
+  print fours
