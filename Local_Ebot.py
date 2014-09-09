@@ -53,13 +53,33 @@ def taxidmap(org):
   org_map=open('orgmap','a')
   subprocess.call(['perl', 'Proteomes/'+org+'_tax.pl'])
   results=Entrez.read(open('Proteomes/'+org+'_tax'))
-  for i in results:
-    taxid=i['TaxId']
-    subprocess.call(['perl', 'Proteomes/'+org+'_summ.pl'])
+  #print results
+  orgs={}
+  for o in results:
+    orgs.update({o['TaxId']:o['ScientificName']})
+  subprocess.call(['perl', 'Proteomes/'+org+'_summ.pl'])
+  try:
     res=Entrez.read(open('Proteomes/'+org+'_summary'))
-    for i in range(len(res)):
-      resi=res[i]
-      org_map.write(resi['ScientificName']+'\t'+taxid[i]+'\n')
+  except Entrez.Parser.CorruptedXMLError:
+    fil=open('Proteomes/'+org+'_summary')
+    fil_read=fil.read().split('<?xml version="1.0" encoding="UTF-8"?>\n')
+    #print len(fil_read)
+      #first=['<?xml version="1.0" encoding="UTF-8"?>'].append(fil_read[0].split('\n')[:-1])
+    first=fil_read[1].split('\n')[:-2]
+    first.insert(0,'<?xml version="1.0" encoding="UTF-8"?>')
+    second=fil_read[2].split('\n')[2:]
+    first.extend(second)
+    fil.close()
+    fil=open('Proteomes/'+org+'_summary','w')
+    #print len(first)
+    fil.write('\n'.join(first))
+    fil.close()
+    res=Entrez.read(open('Proteomes/'+org+'_summary'))
+      
+  for i in range(len(res)):
+    resi=res[i]
+    #print resi
+    org_map.write(repr(resi['Gi'])+'\t'+repr(resi['TaxId'])+'\t'+orgs[resi['TaxId']]+'\n')
   org_map.close()
 
 def seqmap(aa):

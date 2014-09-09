@@ -88,6 +88,8 @@ $params{term} = "$$Homo+sapiens$$[ORGN]";
 $params{linkname} = "taxonomy_protein";
 %params = elink_by_id_to('protein', %params);
 
+$params{report} = "xml";
+$params{retmode} = "text";
 $params{outfile} = "&&&hsap&&&_summary";
 esummary(%params);
 
