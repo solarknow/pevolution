@@ -135,7 +135,7 @@ def makedb(binom,four):
 if __name__=="__main__":
   orgs=sys.argv[1:]
   fours=[]
-  taxa=open('Proteomes/taxa','w')
+ # taxa=open('Proteomes/taxa','w')
   for org in orgs:
     print "Fetching localdb for "+org
     print "Generating scripts"
