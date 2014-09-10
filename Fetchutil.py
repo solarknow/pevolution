@@ -9,26 +9,22 @@ import time
 def seqfetch(acc):
   "prints the sequence in fasta format to file"
   if os.path.exists('Proteomes/orgmap_all'):
-    dict_all={}
-    with open('Proteomes/orgmap_all') as infile:
-      for line in infile:
-        spl=line.split()
-        dict_all.update({spl[0]:spl[1:]})
-    taxid=dict_all[acc][0]
-    taxall={}
-    with open('Proteomes/all_tax') as infile:
-      for line in infile:
-        spl=line.split('\t')
-        taxall.update({spl[0]:spl[1]})
-      binom=taxall[taxid]
-      bspl=binom.split()
-      four=bspl[0][0]+bspl[1][:3]
-      four.lower()
-      ##DB params
-      db='Proteomes/'+four
-      out='Orthos/'+acc+'.fas'
-      subprocess.call(['blastdbcmd','-db',db,'-out',out,'-entry',acc])
-      return out
+    org=orgfetch(acc)
+    binom=org[0]
+    bspl=binom.split()
+    four=bspl[0][0]+bspl[1][:3]
+    four.lower()
+    ##DB params
+    db='Proteomes/'+four
+    out='Orthos/'+acc+'.fas'
+    subprocess.call(['blastdbcmd','-db',db,'-out',out,'-entry',acc])
+    new_out=[]
+    with open(out) as out_fil:
+      new_out=out_fil.readlines()
+      new_out[0]='>'+org[0]+': '+org[1]+' '+acc+'\n'
+    with open(out,'w') as new_fil:
+      new_fil.write(''.join(new_out))
+    return out
   else:
     hand=Entrez.efetch(db='protein',id=str(acc),rettype='fasta')
     string=''
@@ -104,35 +100,35 @@ def orgfetch(acc):
       bspl=binom.split()
       four=bspl[0][0]+bspl[1][:3]
       four.lower()
-  with Entrez.efetch(db='taxonomy',id=ids) as hand:
-    for line in hand:
-      with open(four+'_tax_fetch','w') as taxf:
-        taxf.write(line)
-
-  try:
-    hand=Entrez.esummary(db="protein", id=acc)
-  except SocketError:
+      with open(four+'_tax_fetch') as taxf:
+        read=Entrez.read(taxf)
+        ret.append(read[0]['LineageEx'][1]['ScientificName'])
+        return ret
+  else:
+    try:
+      hand=Entrez.esummary(db="protein", id=acc)
+    except SocketError:
 #    if e.errno != errno.ECONNRESET:
 #      raise # Not error we are looking for
-    time.sleep(1.5)
-    hand=Entrez.esummary(db="protein", id=acc)
-  taxid=Entrez.read(hand)[0]['TaxId']
-  hand.close()
-  try:
-    hand=Entrez.efetch(db='taxonomy',id=str(taxid))
-  except SocketError:
+      time.sleep(1.5)
+      hand=Entrez.esummary(db="protein", id=acc)
+    taxid=Entrez.read(hand)[0]['TaxId']
+    hand.close()
+    try:
+      hand=Entrez.efetch(db='taxonomy',id=str(taxid))
+    except SocketError:
 #    if e.errno != errno.ECONNRESET:
 #      raise # Not error we are looking for
-    time.sleep(1.5)
-    hand=Entrez.efetch(db='taxonomy',id=str(taxid))
-  result=Entrez.read(hand)[0]
-  hand.close()
-  ret.append(result['ScientificName'])
-  for i in result['LineageEx']:
-    if i['Rank']=='superkingdom':
-      ret.append(i['ScientificName'])
-      return ret
-  return ret
+      time.sleep(1.5)
+      hand=Entrez.efetch(db='taxonomy',id=str(taxid))
+    result=Entrez.read(hand)[0]
+    hand.close()
+    ret.append(result['ScientificName'])
+    for i in result['LineageEx']:
+      if i['Rank']=='superkingdom':
+        ret.append(i['ScientificName'])
+        return ret
+    return ret
     
 #def orgfetch(acc):
 #    "Fetchs the organism from which acc accession number of a protein came from"

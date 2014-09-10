@@ -1,5 +1,6 @@
 import sys, os, subprocess, shutil, glob
 from Bio import SeqIO, Entrez
+Entrez.email=os.environ['ENTREZ_EMAIL']
 ####
 ## This version of Local makes use of NCBI's eBot and the scripts it generates.
 ## Thus it is not a pure pythonic implementation. You have been warned.
@@ -62,10 +63,10 @@ def taxidmap(org):
       orgout.write(repr(ori)+'\t'+orgs[ori]+'\n')
       ids+=repr(ori)+','
   ids=ids[:-1]
-  with Entrez.efetch(db='taxonomy',id=ids) as hand:
-    for line in hand:
-      with open(four+'_tax_fetch','w') as taxf:
-        taxf.write(line)
+  hand=Entrez.efetch(db='taxonomy',id=ids)
+  with open('Proteomes/'+four+'_tax_fetch','a') as taxf:
+    taxf.write(hand.read())
+  hand.close()
   subprocess.call(['perl', 'Proteomes/'+org+'_summ.pl'])
   try:
     res=Entrez.read(open('Proteomes/'+org+'_summary'))
