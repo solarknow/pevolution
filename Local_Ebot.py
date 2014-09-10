@@ -1,6 +1,5 @@
 import sys, os, subprocess, shutil, glob
 from Bio import SeqIO, Entrez
-import Fetchutil
 ####
 ## This version of Local makes use of NCBI's eBot and the scripts it generates.
 ## Thus it is not a pure pythonic implementation. You have been warned.
@@ -57,6 +56,16 @@ def taxidmap(org):
   orgs={}
   for o in results:
     orgs.update({o['TaxId']:o['ScientificName']})
+  ids=''
+  with open('Proteomes/all_tax','a') as orgout:
+    for ori in orgs:
+      orgout.write(repr(ori)+'\t'+orgs[ori]+'\n')
+      ids+=repr(ori)+','
+  ids=ids[:-1]
+  with Entrez.efetch(db='taxonomy',id=ids) as hand:
+    for line in hand:
+      with open(four+'_tax_fetch','w') as taxf:
+        taxf.write(line)
   subprocess.call(['perl', 'Proteomes/'+org+'_summ.pl'])
   try:
     res=Entrez.read(open('Proteomes/'+org+'_summary'))
@@ -123,11 +132,13 @@ def makedb(binom,four):
 if __name__=="__main__":
   orgs=sys.argv[1:]
   fours=[]
+  taxa=open('Proteomes/taxa','w')
   for org in orgs:
     print "Fetching localdb for "+org
     print "Generating scripts"
     four=generatescripts(org)
     fours.append(four)
+  #  taxa.write(four+'\n')
     print "Scripts are generated"
     if not os.path.exists('Proteomes/'+four+'.aa'):
       print "Fetching seqs"
@@ -136,10 +147,19 @@ if __name__=="__main__":
       fasta='Proteomes/'+four+'.aa'
     print "Making taxmap"
     taxidmap(four)
-    print 'making blastDB'
-    makedb(org,four)
-    print 'moving to database folder'
-    dbs=glob.glob(four+'.p*')
-    for g in dbs:
-      shutil.move(g,'Proteomes/')  
-  print fours
+    if not os.path.exists('Proteomes/'+four+'.pin'):
+      print 'making blastDB'
+      makedb(org,four)
+      print 'moving to database folder'
+      dbs=glob.glob(four+'.p*')
+      for g in dbs:
+        shutil.move(g,'Proteomes/')
+    else:
+      print "DB "+four+" already made"  
+ # taxa.close()
+  print "merging orgmaps"
+  with open('Proteomes/orgmap_all', 'w') as outfile:
+    for f in fours:
+      with open('Proteomes/orgmap_'+f) as infile:
+        for line in infile:
+          outfile.write(line)
