@@ -13,6 +13,12 @@ def bestrecipblast(org, seed, thresh, queue):
     "Returns the best pairwise reciprocal BLAST using seed accession no. from seedorg organism against orgs list of organisms"
     #start=time.time()
     seedorg=Fetchutil.orgfetch(seed)
+    binspl=seedorg[0].split()
+    four=binspl[0][0]+binspl[1][:3]
+    four.lower()
+    orgspl=org.split()
+    orgfour=orgspl[0][0]+orgspl[1][:3]
+    orgfour.lower()
     acclist={}
     seed=Fetchutil.toGI(seed)
     #for i in orgs:
@@ -21,9 +27,8 @@ def bestrecipblast(org, seed, thresh, queue):
     Fetchutil.seqfetch(seed)
     dum=str(int(int(seed)*random.random()))
         
-    os.system('blastp -db nr -query Orthos/'+seed+'.fasta -evalue '+str(thresh)+
-              ' -out XML/'+dum+'.xml -outfmt 5 -entrez_query \"'+org+'[ORGN]\" -use_sw_tback'+
-              ' -remote')
+    subprocess.call(['blastp', '-db', 'Proteomes/'+orgfour, '-query', 'Orthos/'+seed+'.fasta', '-evalue',str(thresh),
+              '-out', 'XML/'+dum+'.xml', '-outfmt', '5', '-use_sw_tback'])
     qoutput=open('XML/'+dum+'.xml')
         
     parser=NCBIXML.parse(qoutput)
@@ -37,9 +42,8 @@ def bestrecipblast(org, seed, thresh, queue):
     for o in ac:
         print o
         Fetchutil.seqfetch(o)
-        os.system('blastp -db nr -query Orthos/'+o+'.fasta -evalue '+str(thresh)+
-              ' -out XML/'+dum+'.xml -outfmt 5 -entrez_query \"'+seedorg[0]+'[ORGN]\" -use_sw_tback'+
-              ' -remote')
+        os.system('blastp -db Proteomes/'+four+' -query Orthos/'+o+'.fasta -evalue '+str(thresh)+
+              ' -out XML/'+dum+'.xml -outfmt 5 -use_sw_tback')
         q1output=open('XML/'+dum+'.xml')
         parse=NCBIXML.parse(q1output)
         acc=[]

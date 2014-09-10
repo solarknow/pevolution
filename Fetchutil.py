@@ -16,7 +16,7 @@ def seqfetch(acc):
     four.lower()
     ##DB params
     db='Proteomes/'+four
-    out='Orthos/'+acc+'.fas'
+    out='Orthos/'+acc+'.fasta'
     subprocess.call(['blastdbcmd','-db',db,'-out',out,'-entry',acc])
     new_out=[]
     with open(out) as out_fil:
