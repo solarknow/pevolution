@@ -100,7 +100,7 @@ def orgfetch(acc):
       bspl=binom.split()
       four=bspl[0][0]+bspl[1][:3]
       four=four.lower()
-      with open(four+'_tax_fetch') as taxf:
+      with open('Proteomes/'+four+'_tax_fetch') as taxf:
         read=Entrez.read(taxf)
         ret.append(read[0]['LineageEx'][1]['ScientificName'])
         return ret

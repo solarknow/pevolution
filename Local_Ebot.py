@@ -16,6 +16,8 @@ def generatescripts(org):
   four=bi[0][0]+bi[1][:3]
   four=four.lower()
   for fil in os.listdir(TEMP_DIR):
+    if fil.endswith('~'):
+     continue
     print fil
     template=open(TEMP_DIR+'/'+fil).readlines()
     if not os.path.exists('Proteomes'):
@@ -147,7 +149,8 @@ if __name__=="__main__":
     else:
       fasta='Proteomes/'+four+'.aa'
     print "Making taxmap"
-    taxidmap(four)
+    if not os.path.exists('Proteomes/orgmap_'+four):
+      taxidmap(four)
     if not os.path.exists('Proteomes/'+four+'.pin'):
       print 'making blastDB'
       makedb(org,four)
