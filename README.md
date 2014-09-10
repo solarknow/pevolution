@@ -11,20 +11,23 @@ To install pre-reqs,
 
 ```shell
 
-sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre paml prank
+sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre paml prank cpan
 
 tar zxvf prottest-3.4-20140123.tar.gz 
 mv prottest-3.4-20140123 prottest
 
 python setup.py install
+
+sudo cpan LWP::simple
 ```
 ------------------
 ##RHEL/Fedora/CentOS:
 
 ```shell
 
-sudo yum install python-pip python-devel java-1.7.0-openjdk-devel wget autoconf automake svn unzip ncbi-blast+
+sudo yum install python-pip python-devel java-1.7.0-openjdk-devel wget autoconf automake svn unzip ncbi-blast+ cpan
 sudo yum groupinstall "Development Tools"
+sudo cpan LWP::simple
 ```
 ###Install libhmsbeagle for mrbayes
 
