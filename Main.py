@@ -1,18 +1,18 @@
-import sys,os, psutil
+import sys,os, psutil, subprocess
 import Fetchutil, Reciprocal
 from multiprocessing import Process,Queue
 
 PROCS=psutil.NUM_CPUS
 #Check for directories' existance, if not create them.
 if not os.path.exists('Data'):
-  os.mkdir('Data')
+    os.mkdir('Data')
 if not os.path.exists('Orthos'):
-        os.mkdir('Orthos')
+    os.mkdir('Orthos')
 
 #Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
 phyml=''
 if '-y' in sys.argv:
-	phyml='-y'
+    phyml='-y'
 try:
     query= sys.argv[1]
     out=sys.argv[2]
@@ -25,20 +25,29 @@ except IndexError:
     if phy.lower()=='y':
       phyml='-y'
 if not os.path.exists('Data/'+dom+'-'+out+'.fas'):
-  arch_list=['\"Haloferax volcanii\"','\"Sulfolobus tokodaii\"','\"Methanococcus aeolicus\"','\"Methanobrevibacter smithii\"', '\"Thermococcus sibiricus\"','\"Archaeoglobus fulgidus\"','\"Nanoarchaeum equitans\"','\"Thermoplasma acidophilum\"']
-  bac_list= ['\"Gemmata obscuriglobus\"', '\"Prosthecobacter dejongeii\"', '\"Verrucomicrobium spinosum\"','\"Rickettsia prowazekii\"', '\"Agrobacterium tumefaciens\"','\"Escherichia coli\"', '\"Bacillus subtilis\"','\"Anabaena variabilis\"', '\"Thermotoga maritima\"']
+  arch_list=['Haloferax volcanii','Sulfolobus tokodaii','Methanococcus aeolicus','Methanobrevibacter smithii', 'Thermococcus sibiricus','Archaeoglobus fulgidus','Nanoarchaeum equitans','Thermoplasma acidophilum']
+  bac_list= ['Gemmata obscuriglobus', 'Prosthecobacter dejongeii', 'Verrucomicrobium spinosum','Rickettsia prowazekii', 'Agrobacterium tumefaciens','Escherichia coli', 'Bacillus subtilis','Anabaena variabilis', 'Thermotoga maritima']
   euk_list= ['\"Drosophila melanogaster\"','\"Homo sapiens\"','\"Oryza sativa\"', '\"Trypanosoma brucei\"','\"Plasmodium falciparum\"','\"Saccharomyces cerevisiae\"', '\"Neurospora crassa\"','\"Arabidopsis thaliana\"']#subject to change
   print "creating local databases"
+  params=['python','Local_Ebot.py']
   if dom=='arch':
-    subprocess.call(['python','Local_Ebot.py',' '.join(arch_list)
+    params_arch=params
+    params_arch.extend(arch_list)
+    subprocess.call(params_arch)
   elif dom=='bac':
-    subprocess.call(['python','Local_Ebot.py',' '.join(bac_list)
+    params_bac=params
+    params_bac.extend(bac_list)
+    subprocess.call(params_bac)
   elif dom=='euk':
-    subprocess.call(['python','Local_Ebot.py',' '.join(euk_list)
+    params_euk=params
+    params_euk.extend(euk_list)
+    subprocess.call(params_euk)
   else:
-    subprocess.call(['python','Local_Ebot.py',' '.join(arch_list)
-    subprocess.call(['python','Local_Ebot.py',' '.join(bac_list)
-    subprocess.call(['python','Local_Ebot.py',' '.join(euk_list)
+    params_all=params
+    params_all.extend(arch_list)
+    params_all.extend(bac_list)
+    params_all.extend(euk_list)
+    subprocess.call(params_all)
   #setting threshold values: thresh1-w/ arch ;thresh2-w/ bac; 
   dom_query=Fetchutil.orgfetch(query)[1]
   if dom_query=='Archaea':
