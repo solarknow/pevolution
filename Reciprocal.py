@@ -19,6 +19,7 @@ def bestrecipblast(org, seed, thresh, queue):
     orgspl=org.split()
     orgfour=orgspl[0][0]+orgspl[1][:3]
     orgfour=orgfour.lower()
+    print four, orgfour
     acclist={}
     seed=Fetchutil.toGI(seed)
     #for i in orgs:
