@@ -99,7 +99,7 @@ queue_euk))
       euk_accs.update(queue_euk.get())
 
   all_accs={}
-  if dom==all:
+  if dom=='all':
       
     all_accs.update(arch_accs)
     all_accs.update(bac_accs)
@@ -152,9 +152,9 @@ queue_euk))
     fil.close()
     Fetchutil.addseq('Data/euk-'+out+'.fas','Orthos/'+euk_accs[e][0]+'.fasta')
     os.remove('Orthos/'+euk_accs[e][0]+'.fasta')
-  Fetchutil.addseq('Data/all-'+out+'.fas','Data/arch-'+out+'.fas')
-  Fetchutil.addseq('Data/all-'+out+'.fas','Data/bac-'+out+'.fas')
-  Fetchutil.addseq('Data/all-'+out+'.fas','Data/euk-'+out+'.fas')
+  for fil in os.listdir('Data/'):
+    if out+'.fas' in fil:
+      Fetchutil.addseq('Data/all-'+out+'.fas',fil)
 #    for c in all_accs.keys():
 #        Fetchutil.seqfetch(all_accs[c][0])
 #        fil=open('Orthos/'+all_accs[c][0]+'.fasta')

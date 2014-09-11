@@ -13,7 +13,7 @@ def seqfetch(acc):
     binom=org[0]
     bspl=binom.split()
     four=bspl[0][0]+bspl[1][:3]
-    four.lower()
+    four=four.lower()
     ##DB params
     db='Proteomes/'+four
     out='Orthos/'+acc+'.fasta'
