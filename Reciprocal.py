@@ -15,10 +15,10 @@ def bestrecipblast(org, seed, thresh, queue):
     seedorg=Fetchutil.orgfetch(seed)
     binspl=seedorg[0].split()
     four=binspl[0][0]+binspl[1][:3]
-    four.lower()
+    four=four.lower()
     orgspl=org.split()
     orgfour=orgspl[0][0]+orgspl[1][:3]
-    orgfour.lower()
+    orgfour=orgfour.lower()
     acclist={}
     seed=Fetchutil.toGI(seed)
     #for i in orgs:
