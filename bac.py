@@ -33,4 +33,4 @@ if paml:
     SeqUtil.pamlinput('ML/bac-'+out,'ML/bac-'+out+'.out','ML/bac-'+out+'.ctl',{models.keys()[mod].split('+')[0]:models[models.keys()[mod]][1]})
     os.system('codeml ML/bac-'+out+'.ctl')
     SeqUtil.extractMLtree('ML/bac-'+out+'.out')
-Report.generateReport(out,query,models_ori,'bac')
+Report.generateReport(out,query,models_ori,'bac',paml)
