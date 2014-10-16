@@ -26,7 +26,7 @@ except IndexError:
       phyml='-y'
 if not os.path.exists('Data/'+dom+'-'+out+'.fas'):
   arch_list=['Haloferax volcanii','Sulfolobus tokodaii','Methanococcus aeolicus','Methanobrevibacter smithii', 'Thermococcus sibiricus','Archaeoglobus fulgidus','Nanoarchaeum equitans','Thermoplasma acidophilum']
-  bac_list= ['Gemmata obscuriglobus', 'Prosthecobacter dejongeii', 'Verrucomicrobium spinosum','Rickettsia prowazekii', 'Agrobacterium tumefaciens','Escherichia coli', 'Bacillus subtilis','Anabaena variabilis', 'Thermotoga maritima']
+  bac_list= ['Gemmata obscuriglobus', 'Verrucomicrobium spinosum','Rickettsia prowazekii', 'Agrobacterium tumefaciens','Escherichia coli K-12', 'Bacillus subtilis','Anabaena variabilis', 'Thermotoga maritima']
   euk_list= ['\"Drosophila melanogaster\"','\"Homo sapiens\"','\"Oryza sativa\"', '\"Trypanosoma brucei\"','\"Plasmodium falciparum\"','\"Saccharomyces cerevisiae\"', '\"Neurospora crassa\"','\"Arabidopsis thaliana\"']#subject to change
   print "creating local databases"
   params=['python','Local_Ebot.py']

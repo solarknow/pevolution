@@ -140,7 +140,7 @@ if __name__=="__main__":
     print "Fetching localdb for "+org
     print "Generating scripts"
     four=generatescripts(org)
-    fours.append(four)
+  #  fours.append(four)
   #  taxa.write(four+'\n')
     print "Scripts are generated"
     if not os.path.exists('Proteomes/'+four+'.aa'):
@@ -161,9 +161,14 @@ if __name__=="__main__":
     else:
       print "DB "+four+" already made"  
  # taxa.close()
+  fils=os.listdir('Proteomes')
+  orgmaps=[]
+  for f in fils:
+    if f.startswith('orgmap') and not f.endswith('all'):
+      orgmaps.append(f)
   print "merging orgmaps"
   with open('Proteomes/orgmap_all', 'w') as outfile:
-    for f in fours:
-      with open('Proteomes/orgmap_'+f) as infile:
+    for f in orgmaps:
+      with open('Proteomes/'+f) as infile:
         for line in infile:
           outfile.write(line)
