@@ -2,7 +2,7 @@
 import psutil, subprocess
 import sys, shutil
 
-if 'clear' in sys.argv:
+if 'clean' in sys.argv:
   try:
     shutil.rmtree('aligns')
     shutil.rmtree('Data')

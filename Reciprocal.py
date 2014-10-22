@@ -60,7 +60,7 @@ def bestrecipblast(org, seed, thresh, queue):
         print "Done. Number of sequences found: "+repr(len(acc))
             
         if seed in acc:
-            print 'it\'s twue!'
+            print "it\'s twue!"
             name=Fetchutil.orgfetch(o)[0]
             try:
                 acclist[name]=[o,str(ac.index(o)+1)+'/'+str(len(ac)),str(acc.index(seed)+1)+'/'+str(len(acc))]

@@ -95,7 +95,7 @@ def orgfetch(acc):
       for line in infile:
         spl=line.split('\t')
         taxall.update({spl[0]:spl[1]})
-      binom=taxall[taxid]
+      binom=taxall[taxid].strip()
       ret.append(binom)
       bspl=binom.split()
       four=bspl[0][0]+bspl[1][:3]
