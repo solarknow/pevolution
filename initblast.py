@@ -5,6 +5,7 @@ try:
     query=sys.argv[1]
 except:
     query=raw_input('Query: ')
+local='-local' in sys.argv
 dom=Fetchutil.orgfetch(query)
 if dom=='Archaea':
     thresh1=1e-10
@@ -33,7 +34,7 @@ for e in init_acc:
     print "Pass "+repr(count)
     for o in orgs:
       q=Queue()
-      p=Process(target=Reciprocal.bestrecipblast, args=(o, e.values()[0][0], 5, q))
+      p=Process(target=Reciprocal.bestrecipblast, args=(o, e.values()[0][0], 5, q, local))
       p.start()
       p.join()
       acs=[]

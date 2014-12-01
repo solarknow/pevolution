@@ -11,8 +11,11 @@ if not os.path.exists('Orthos'):
 
 #Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
 phyml=''
+local=True
 if '-y' in sys.argv:
     phyml='-y'
+local= '-local' in sys.argv
+  
 try:
     query= sys.argv[1]
     out=sys.argv[2]
@@ -28,27 +31,31 @@ if not os.path.exists('Data/'+dom+'-'+out+'.fas'):
   arch_list=['Haloferax volcanii','Sulfolobus tokodaii','Methanococcus aeolicus','Methanobrevibacter smithii', 'Thermococcus sibiricus','Archaeoglobus fulgidus','Nanoarchaeum equitans','Thermoplasma acidophilum']
   bac_list= ['Gemmata obscuriglobus', 'Verrucomicrobium spinosum','Rickettsia prowazekii', 'Agrobacterium tumefaciens','Escherichia coli K-12', 'Bacillus subtilis','Anabaena variabilis', 'Thermotoga maritima']
   euk_list= ['\"Drosophila melanogaster\"','\"Homo sapiens\"','\"Oryza sativa\"', '\"Trypanosoma brucei\"','\"Plasmodium falciparum\"','\"Saccharomyces cerevisiae\"', '\"Neurospora crassa\"','\"Arabidopsis thaliana\"']#subject to change
-  print "creating local databases"
-  params=['python','Local_Ebot.py']
-  if dom=='arch':
-    params_arch=params
-    params_arch.extend(arch_list)
-    subprocess.call(params_arch)
-  elif dom=='bac':
-    params_bac=params
-    params_bac.extend(bac_list)
-    subprocess.call(params_bac)
-  elif dom=='euk':
-    params_euk=params
-    params_euk.extend(euk_list)
-    subprocess.call(params_euk)
+  if local:
+    print "creating local databases"
+    params=['python','Local_Ebot.py']
+    if dom=='arch':
+      params_arch=params
+      params_arch.extend(arch_list)
+      subprocess.call(params_arch)
+    elif dom=='bac':
+      params_bac=params
+      params_bac.extend(bac_list)
+      subprocess.call(params_bac)
+    elif dom=='euk':
+      params_euk=params
+      params_euk.extend(euk_list)
+      subprocess.call(params_euk)
+    else:
+      params_all=params
+      params_all.extend(arch_list)
+      params_all.extend(bac_list)
+      params_all.extend(euk_list)
+      subprocess.call(params_all)
   else:
-    params_all=params
-    params_all.extend(arch_list)
-    params_all.extend(bac_list)
-    params_all.extend(euk_list)
-    subprocess.call(params_all)
+    pass
   #setting threshold values: thresh1-w/ arch ;thresh2-w/ bac; 
+ 
   dom_query=Fetchutil.orgfetch(query)[1]
   if dom_query=='Archaea':
     thresh1=1e-10
@@ -72,7 +79,7 @@ if not os.path.exists('Data/'+dom+'-'+out+'.fas'):
     queue_arch=Queue()
     for a in arch_list:
       p=Process(target=Reciprocal.bestrecipblast, args=(a,query,thresh1, 
-queue_arch))
+queue_arch, local))
       p.start()
       p.join()
     while not queue_arch.empty():
@@ -82,7 +89,7 @@ queue_arch))
     queue_bac=Queue()
     for b in bac_list:
       p=Process(target=Reciprocal.bestrecipblast, args=(b,query,thresh2,
-queue_bac))
+queue_bac, local))
       p.start()
       p.join()
     while not queue_bac.empty():
@@ -92,7 +99,7 @@ queue_bac))
     queue_euk=Queue()
     for e in euk_list:
       p=Process(target=Reciprocal.bestrecipblast, args=(e,query,thresh3,
-queue_euk))
+queue_euk, local))
       p.start()
       p.join()
     while not queue_euk.empty():
