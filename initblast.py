@@ -1,12 +1,18 @@
+#!/usr/bin/env python
 import Reciprocal, Fetchutil
 import sys
 from multiprocessing import Process,Queue
+if '-h' in sys.argv:
+  print '''Syntax: ./initblast.py query [-local|-h]\n
+	\t-h\tThis help screen\n
+	\t-local\tRun this script on local BLAST db's'''
+  sys.exit()
 try:
     query=sys.argv[1]
 except:
     query=raw_input('Query: ')
 local='-local' in sys.argv
-dom=Fetchutil.orgfetch(query)
+dom=Fetchutil.orgfetch(query,local)
 if dom=='Archaea':
     thresh1=1e-10
     thresh2=1e-5
@@ -21,9 +27,9 @@ else:
     thresh3=5
 
 init_acc=[]
-init_acc.append(Reciprocal.bestrecipblast('Homo sapiens', query, thresh3,None))
-init_acc.append(Reciprocal.bestrecipblast('Escherichia coli', query, thresh2,None))
-init_acc.append(Reciprocal.bestrecipblast('Haloferax volcanii', query, thresh1,None))
+init_acc.append(Reciprocal.bestrecipblast('Homo sapiens', query, thresh3,None,local))
+init_acc.append(Reciprocal.bestrecipblast('Escherichia coli', query, thresh2,None,local))
+init_acc.append(Reciprocal.bestrecipblast('Haloferax volcanii', query, thresh1,None,local))
 runs=[]
 count=0
 orgs=['Homo sapiens','Escherichia coli','Haloferax volcanii']
