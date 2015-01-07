@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys,os, psutil, subprocess
 import Fetchutil, Reciprocal
 from multiprocessing import Process,Queue
@@ -8,7 +9,12 @@ if not os.path.exists('Data'):
     os.mkdir('Data')
 if not os.path.exists('Orthos'):
     os.mkdir('Orthos')
-
+if '-h' in sys.argv:
+  print '''Syntax: Main.py query_no prefix [euk,bac,arch,all]\n
+           query_no\tAn NCBI accession number\n
+           prefix\tName of the run\n
+           [euk,bac,arch,all]\tWhich Domain to search in'''
+  sys.exit()
 #Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
 phyml=''
 local=True
@@ -56,7 +62,7 @@ if not os.path.exists('Data/'+dom+'-'+out+'.fas'):
     pass
   #setting threshold values: thresh1-w/ arch ;thresh2-w/ bac; 
  
-  dom_query=Fetchutil.orgfetch(query)[1]
+  dom_query=Fetchutil.orgfetch(query,local)[1]
   if dom_query=='Archaea':
     thresh1=1e-10
     thresh2=1e-5
@@ -118,7 +124,7 @@ queue_euk, local))
 ##Fetching the sequences and writing them to file
   print "Writing seqs to file."
   for a in arch_accs.keys():
-    Fetchutil.seqfetch(arch_accs[a][0])
+    Fetchutil.seqfetch(arch_accs[a][0],local)
     fil=open('Orthos/'+arch_accs[a][0]+'.fasta')
     fil_arr=fil.readlines()
     fil.close()
@@ -132,7 +138,7 @@ queue_euk, local))
     Fetchutil.addseq('Data/arch-'+out+'.fas','Orthos/'+arch_accs[a][0]+'.fasta')
     os.remove('Orthos/'+arch_accs[a][0]+'.fasta')
   for b in bac_accs.keys():
-    Fetchutil.seqfetch(bac_accs[b][0])
+    Fetchutil.seqfetch(bac_accs[b][0],local)
     fil=open('Orthos/'+bac_accs[b][0]+'.fasta')
     fil_arr=fil.readlines()
     fil.close()
@@ -146,7 +152,7 @@ queue_euk, local))
     Fetchutil.addseq('Data/bac-'+out+'.fas','Orthos/'+bac_accs[b][0]+'.fasta')
     os.remove('Orthos/'+bac_accs[b][0]+'.fasta')
   for e in euk_accs.keys():
-    Fetchutil.seqfetch(euk_accs[e][0])
+    Fetchutil.seqfetch(euk_accs[e][0],local)
     fil=open('Orthos/'+euk_accs[e][0]+'.fasta')
     fil_arr=fil.readlines()
     fil.close()
@@ -161,7 +167,7 @@ queue_euk, local))
     os.remove('Orthos/'+euk_accs[e][0]+'.fasta')
   for fil in os.listdir('Data/'):
     if out+'.fas' in fil:
-      Fetchutil.addseq('Data/all-'+out+'.fas',fil)
+      Fetchutil.addseq('Data/all-'+out+'.fas','Data/'+fil)
 #    for c in all_accs.keys():
 #        Fetchutil.seqfetch(all_accs[c][0])
 #        fil=open('Orthos/'+all_accs[c][0]+'.fasta')
