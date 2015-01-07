@@ -73,5 +73,5 @@ Proteomes/
 Reports/
 inputer
 snapshot/
-*taxonomy_protein.idx
+taxonomy_protein.idx
 *.save
