@@ -33,6 +33,8 @@ def seqfetch(acc,local):
     string+='>'+org[0]+': '+org[1]+' '+acc+'\n'
     for l in lines:
       inpout=l
+      if inpout.startswith('>'):
+        continue
       string+=inpout
     with open('Orthos/'+acc+'.fasta','w') as op:
       op.write(string)
