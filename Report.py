@@ -1,7 +1,7 @@
 import Fetchutil, SeqUtil, os, string
 if not os.path.exists('Reports'):
   os.mkdir('Reports')
-def generateReport(name,quer,models,dom, phyml):
+def generateReport(name,quer,models,dom, phyml,local):
     "Generates a report summarizing the analysis done"
     ret=open('Reports/Report-'+dom+'-'+name+'.txt','w')
     ret.write('Orthologous sequence Search and Alignment\n'+
@@ -11,7 +11,7 @@ def generateReport(name,quer,models,dom, phyml):
     ret.write('Reciprocal Best BLAST Results\n')
     ret.write('-----------------------------\n\n')
     ret.write('Query sequence Accension number: '+quer+' Query sequence organism: '+
-                Fetchutil.orgfetch(quer)[0]+'\n')
+                Fetchutil.orgfetch(quer,local)[0]+'\n')
     ret.write('BLASTs are performed using expected value (E-value) thresholds based on the kingdom (Bacteria, Archaea, and Eukaryota).\n'+
     ' These lists are then refined by picking only those sequences that are at least 50% similar and\n'+
     ' whose aligned portion is at least 25% that of the query, as recommended by Moreno-Hagelsieb and Latimer (2008).\n')

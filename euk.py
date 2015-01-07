@@ -8,11 +8,8 @@ if not os.path.exists('Bayes'):
   
 out= sys.argv[1]
 query = sys.argv[2]
-try:
-  paml=sys.argv[3]
-  paml= paml=='-y'
-except IndexError:
-  paml=False
+paml= '-y' in sys.argv
+local= '-local' in sys.argv
 
 SeqUtil.rename('Data/euk-'+out+'.fas')
 if not os.path.exists('aligns/euk-'+out+'.best.nex'):
@@ -33,4 +30,4 @@ if paml:
     SeqUtil.pamlinput('ML/euk-'+out,'ML/euk-'+out+'.out','ML/euk-'+out+'.ctl',{models.keys()[mod].split('+')[0]:models[models.keys()[mod]][1]})
     os.system('codeml ML/euk-'+out+'.ctl')
     SeqUtil.extractMLtree('ML/euk-'+out+'.out')
-Report.generateReport(out,query,models_ori,'euk',paml)
+Report.generateReport(out,query,models_ori,'euk',paml,local)

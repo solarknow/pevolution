@@ -182,5 +182,7 @@ queue_euk, local))
 #        fil.close()
 #        Fetchutil.addseq('Data/all-'+out+'.fas','Orthos/'+all_accs[c][0]+'.fasta')
 #        os.remove('Orthos/'+all_accs[c][0]+'.fasta')
-
-os.system('python '+dom+'.py '+out+' '+query+' '+phyml)
+if local:
+  os.system('python '+dom+'.py '+out+' '+query+' '+phyml+'-local')
+else:
+  os.system('python '+dom+'.py '+out+' '+query+' '+phyml)

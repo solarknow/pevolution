@@ -8,11 +8,8 @@ if not os.path.exists('Bayes'):
 
 out=sys.argv[1]
 query=sys.argv[2]
-try:
-  paml=sys.argv[3]
-  paml= paml=='-y'
-except IndexError:
-  paml=False
+paml= '-y' in sys.argv
+local= '-local' in sys.argv
 print "Beginning alignment"
 SeqUtil.rename('Data/all-'+out+'.fas')
 os.system('prank -d=Data/all-'+out+' -o=aligns/all-'+out+' -f=nexus -quiet')
@@ -65,4 +62,4 @@ if paml:
 #os.system('mb Bayes/all-'+out+'-bayes.nxs')
 SeqUtil.bayesfile('aligns/all-'+out+'.best.nex',models_ori,'Bayes/all-'+out+'-bayes.nxs')
 os.system('mb Bayes/all-'+out+'-bayes.nxs')
-Report.generateReport(out,query,models_ori,'all',paml)
+Report.generateReport(out,query,models_ori,'all',paml,local)
