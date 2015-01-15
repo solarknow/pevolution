@@ -12,7 +12,10 @@ try:
 except:
     query=raw_input('Query: ')
 local='-local' in sys.argv
-orgs=['Homo sapiens','Escherichia coli','Haloferax volcanii']
+orgs=['Homo sapiens','Bacillus subtilis','Haloferax volcanii']
+quer_org=Fetchutil.orgfetch(query,False)[0]
+if not quer_org in orgs:
+  orgs.append(quer_org)
 if local:
   params=['python','Local_Ebot.py']+orgs
   subprocess.call(params)
@@ -33,7 +36,7 @@ else:
 
 init_acc=[]
 init_acc.append(Reciprocal.bestrecipblast('Homo sapiens', query, thresh3,None,local))
-init_acc.append(Reciprocal.bestrecipblast('Escherichia coli', query, thresh2,None,local))
+init_acc.append(Reciprocal.bestrecipblast('Bacillus subtilis', query, thresh2,None,local))
 init_acc.append(Reciprocal.bestrecipblast('Haloferax volcanii', query, thresh1,None,local))
 runs=[]
 count=0

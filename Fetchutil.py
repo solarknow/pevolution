@@ -64,8 +64,9 @@ def orgfetch(acc,local):
     with open('Proteomes/orgmap_all') as infile:
       for line in infile:
         spl=line.split()
-        dict_all.update({spl[0]:spl[1:]})
-    taxid=dict_all[acc][0]
+        #print spl
+        dict_all.update({spl[0]:spl[1]})
+    taxid=dict_all[acc]
     taxall={}
     with open('Proteomes/all_tax') as infile:
       for line in infile:
