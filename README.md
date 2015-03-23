@@ -18,7 +18,7 @@ mv prottest-3.4-20140123 prottest
 
 python setup.py install
 
-sudo cpan LWP::simple
+sudo cpan LWP::Simple
 ```
 ------------------
 ##RHEL/Fedora/CentOS:

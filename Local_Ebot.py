@@ -52,7 +52,7 @@ def fetchfasta(org):
 
 def taxidmap(org):
   "Prints the taxid for binom organisms to file"
-  org_map=open('Proteomes/orgmap_'+four,'w')
+#  org_map=open('Proteomes/orgmap_'+org,'w')
   subprocess.call(['perl', 'Proteomes/'+org+'_tax.pl'])
   results=Entrez.read(open('Proteomes/'+org+'_tax'))
   #print results
@@ -66,7 +66,7 @@ def taxidmap(org):
       ids+=repr(ori)+','
   ids=ids[:-1]
   hand=Entrez.efetch(db='taxonomy',id=ids)
-  with open('Proteomes/'+four+'_tax_fetch','a') as taxf:
+  with open('Proteomes/'+org+'_tax_fetch','a') as taxf:
     taxf.write(hand.read())
   hand.close()
   subprocess.call(['perl', 'Proteomes/'+org+'_summ.pl'])
@@ -75,8 +75,6 @@ def taxidmap(org):
   except Entrez.Parser.CorruptedXMLError:
     fil=open('Proteomes/'+org+'_summary')
     fil_read=fil.read().split('<?xml version="1.0" encoding="UTF-8"?>\n')
-    #print len(fil_read)
-      #first=['<?xml version="1.0" encoding="UTF-8"?>'].append(fil_read[0].split('\n')[:-1])
     first=fil_read[1].split('\n')[:-2]
     first.insert(0,'<?xml version="1.0" encoding="UTF-8"?>')
     second=fil_read[2].split('\n')[2:]
@@ -86,36 +84,11 @@ def taxidmap(org):
     #print len(first)
     fil.write('\n'.join(first))
     fil.close()
-    res=Entrez.read(open('Proteomes/'+org+'_summary'))
-      
-  for i in range(len(res)):
-    resi=res[i]
-    #print resi
-    org_map.write(repr(resi['Gi'])+'\t'+repr(resi['TaxId'])+'\n')
-  org_map.close()
-
-#def seqmap(aa):
-#  "Prints a seq-taxid map to file for aa file"
-#  tax_map=open('orgmap').readlines()
-#  taxa_map={}
-#  print 'reading the orgmap'
-#  for i in tax_map:
-#    i=i.strip()
-#    spl=i.split('\t')
-#    taxa_map.update({spl[0]:spl[1]}) 
-#  seq_map=open(aa.split('.')[0]+'map','w')  
-#  hand=open(aa,'r')
-#  print 'parsing aa'
-#  for rec in SeqIO.parse(hand, 'fasta'):
-#    rid=rec.id.split('|')[1]
-#    #print rid
-#    org=Fetchutil.orgfetch(rid)
-#    try:
-#      seq_map.write(rid+'\t'+taxa_map[org[0]]+'\n')
-#    except KeyError:
-#      seq_map.write(rid+'\t'+org[0]+'\n')
-#  hand.close()
-#  seq_map.close()
+#    res=Entrez.read(open('Proteomes/'+org+'_summary'))
+#  with open('Proteomes/orgmap_'+org,'w') as org_map:
+#    for i in range(len(res)):
+#      resi=res[i]
+#      org_map.write(repr(resi['Gi'])+'\t'+repr(resi['TaxId'])+'\n')
 
 def makedb(binom,four):
   "runs makeblastdb with appropriate params"
@@ -148,9 +121,9 @@ if __name__=="__main__":
       fasta=fetchfasta(four)
     else:
       fasta='Proteomes/'+four+'.aa'
-    print "Making taxmap"
-    if not os.path.exists('Proteomes/orgmap_'+four):
-      taxidmap(four)
+#    print "Making taxmap"
+#    if not os.path.exists('Proteomes/orgmap_'+four):
+#      taxidmap(four)
     if not os.path.exists('Proteomes/'+four+'.pin'):
       print 'making blastDB'
       makedb(org,four)
@@ -161,14 +134,14 @@ if __name__=="__main__":
     else:
       print "DB "+four+" already made"  
  # taxa.close()
-  fils=os.listdir('Proteomes')
-  orgmaps=[]
-  for f in fils:
-    if f.startswith('orgmap') and not f.endswith('all'):
-      orgmaps.append(f)
-  print "merging orgmaps"
-  with open('Proteomes/orgmap_all', 'w') as outfile:
-    for f in orgmaps:
-      with open('Proteomes/'+f) as infile:
-        for line in infile:
-          outfile.write(line)
+#  fils=os.listdir('Proteomes')
+#  orgmaps=[]
+#  for f in fils:
+#    if f.startswith('orgmap') and not f.endswith('all'):
+#      orgmaps.append(f)
+#  print "merging orgmaps"
+#  with open('Proteomes/orgmap_all', 'w') as outfile:
+#    for f in orgmaps:
+#      with open('Proteomes/'+f) as infile:
+#        for line in infile:
+#          outfile.write(line)
