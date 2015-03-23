@@ -1,0 +1,36 @@
+#!/bin/bash
+
+yum install -y python-devel java-1.7.0-openjdk-devel wget autoconf automake svn unzip perl-libwww-perl perl-Archive-Tar perl-List-MoreUtils
+yum groupinstall -y "Development Tools"
+./install.pip
+
+python setup.py install
+
+mkdir Deps
+cd Deps
+wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.2.30+-3.x86_64.rpm
+rpm -i ncbi-blast-2.2.30+-3.x86_64.rpm
+
+svn checkout http://beagle-lib.googlecode.com/svn/trunk/ beagle-lib
+cd beagle-lib
+./autogen.sh
+./configure
+make
+make install
+
+cd ..
+wget http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.4/mrbayes-3.2.4.tar.gz
+tar zxvf mrbayes-3.2.4.tar.gz
+cd src
+autoconf
+./configure
+make
+sudo make install
+
+cd ..
+wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
+unzip PhyML-3.1.zip
+cp PhyML-3.1/PhyML-3.1_linux64 phyml
+
+wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
+tar zxvf prank.linux64.140110.tgz prank

@@ -11,47 +11,18 @@ To install pre-reqs,
 
 ```shell
 
-sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre paml prank cpan
+sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre paml prank
 
 tar zxvf prottest-3.4-20140123.tar.gz 
 mv prottest-3.4-20140123 prottest
 
 python setup.py install
-
-sudo cpan LWP::Simple
 ```
 ------------------
 ##RHEL/Fedora/CentOS:
 
-```shell
-
-sudo yum install python-pip python-devel java-1.7.0-openjdk-devel wget autoconf automake svn unzip ncbi-blast+ cpan
-sudo yum groupinstall "Development Tools"
-sudo cpan LWP::simple
-```
-###Install libhmsbeagle for mrbayes
-
-```shell
-
-svn checkout http://beagle-lib.googlecode.com/svn/trunk/ beagle-lib
-cd beagle-lib
-./autogen.sh
-./configure
-make
-sudo make install
-```
-###Install MrBayes
-
-```shell
-
-wget http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/mrbayes-3.2.2.tar.gz
-tar zxvf mrbayes-3.2.2.tar.gz
-cd mrbayes_3.2.2
-autoconf
-./configure
-make
-sudo make install
-```
+Run ./installdeps.rhel
+as root.
 ---------
 ###Other Deps (no compilation necessary)
 
@@ -59,9 +30,6 @@ sudo make install
 
 wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
 tar zxvf prank.linux64.140110.tgz prank
-wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
-unzip PhyML-3.1.zip
-mv Phyml-3.1 phyml
 wget http://www.clustal.org/download/current/clustalw-2.1-linux-x86_64-libcppstatic.tar.gz
 tar zxvf clustalw-2.1-linux-x86_64-libcppstatic.tar.gz
 mv clustalw-2.1-linux-x86_64-libcppstatic clustalw

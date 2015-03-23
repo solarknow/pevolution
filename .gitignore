@@ -59,8 +59,10 @@ prottest/
 *.zip
 *.tgz
 phylip/
+Deps/
+get-pip.py*
 
-# App Generated data
+# Generated data
 XML/
 Orthos/
 *~
@@ -69,9 +71,6 @@ aligns/
 Bayes/
 dicts/
 Prot/
-Proteomes/
 Reports/
 inputer
 snapshot/
-taxonomy_protein.idx
-*.save
