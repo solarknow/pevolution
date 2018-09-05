@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apt-get update
-apt-get install -y python-pip wget python-dev unzip openjdk-7-jre
+apt-get install -y python-pip wget python-dev unzip default-jre subversion
 cpan install LWP:Simple
 
 apt-get install -y ncbi-blast+ clustalw phyml mrbayes mrbayes-doc

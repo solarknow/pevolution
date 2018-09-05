@@ -4,10 +4,13 @@ pevolution
 This is a pipeline to find, align, and find trees for putatively related proteins.
 
 ----------
+
 Before installing make sure you have your email set as ENTREZ_EMAIL as an environmental variable.
 To install pre-reqs,
+
 --------------------
-##Debian/Ubuntu:
+
+## Debian/Ubuntu:
 
 ```shell
 
@@ -19,14 +22,15 @@ mv prottest-3.4-20140123 prottest
 python setup.py install
 ```
 ------------------
-##RHEL/Fedora/CentOS:
+
+## RHEL/Fedora/CentOS:
 
 ```shell
 
 sudo yum install python-pip python-devel java-1.7.0-openjdk-devel wget autoconf automake svn unzip ncbi-blast+
 sudo yum groupinstall "Development Tools"
 ```
-###Install libhmsbeagle for mrbayes
+### Install libhmsbeagle for mrbayes
 
 ```shell
 
@@ -37,7 +41,7 @@ cd beagle-lib
 make
 sudo make install
 ```
-###Install MrBayes
+### Install MrBayes
 
 ```shell
 
@@ -50,10 +54,10 @@ make
 sudo make install
 ```
 ---------
-###Other Deps (no compilation necessary)
+
+### Other Deps (no compilation necessary)
 
 ```shell
-
 wget https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz
 tar zxvf prank.linux64.140110.tgz prank
 wget http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip
@@ -65,7 +69,8 @@ mv clustalw-2.1-linux-x86_64-libcppstatic clustalw
 sudo python setup.py install
 ```
 --------
-##Mac OS X:
+
+## Mac OS X:
 
 If you don't have python installed,
 Install python: https://www.python.org/ftp/python/2.7.6/python-2.7.6-macosx10.6.
@@ -74,8 +79,10 @@ Install pip: https://pip.pypa.io/en/latest/installing.html
 Install MrBayes: http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/MrBayes-3.2.2_installer_MACx64.pkg
 
 To install dependencies, run sudo python setup.py install in this directory.
+
 -------
-##Windows:
+
+## Windows:
 
 If you don't have python installed,
 Install python: https://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
