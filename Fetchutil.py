@@ -1,22 +1,27 @@
 from Bio import Entrez
 import subprocess,os
-Entrez.email=os.environ['ENTREZ_EMAIL']
 
-def seqfetch(acc):
+def set_email(email):
+    Entrez.email=email
+
+def fetch_protein(acc, fmt='fasta'):
+    "returns a file-like handle of a Entrez search for acc accession number and returns in fmt format"
+    fetched = Entrez.efetch(db='protein',id=str(acc),rettype=fmt)
+    return fetched.readlines()
+def fetch_fasta(acc):
     "prints the sequence in fasta format to file"
-    hand=Entrez.efetch(db='protein',id=str(acc),rettype='fasta')
+    hand = fetch_protein(acc)
     string=''
-    hand.readline()
-    org=orgfetch(acc)
+    org = fetch_organism(acc)
     string+='>'+org[0]+': '+org[1]+' '+acc+'\n'
-    while hand:
-        inpout=hand.readline()
-        string+=inpout
-        if inpout=='':
+    for line in hand[1:]:
+        string+=line
+        if line == '\n':
             if not os.path.exists('Orthos'):
-              subprocess.call(['mkdir','Orthos'])
-            open('Orthos/'+acc+'.fasta','w').write(string)
-            return 'Orthos/'+acc+'.fasta'
+                subprocess.call(['mkdir','Orthos'])
+            with open('Orthos/'+acc+'.fasta','w') as writ_file:
+                writ_file.write(string)
+        return 'Orthos/'+acc+'.fasta'
 
 def addseq(oldseq, newseq):
     "Transfers the sequence from newseq to oldseq"
@@ -28,15 +33,13 @@ def addseq(oldseq, newseq):
         if add=='':
             return
 
-def namefetch(acc):
+def fetch_definition(acc):
     "Fetchs definition of specified gene product"
-    hand=Entrez.efetch(db="protein", id=acc ,rettype='gp')
+    hand=fetch_protein(acc,'gp')
     record=''
-    while hand:
-        read=hand.readline()
+    for line in hand:
+        read=line
         record+=read.strip()+'  '
-        if read=='':
-            break
     rec=record.split('  ')
     recun=[]
     for s in rec:
@@ -49,20 +52,18 @@ def namefetch(acc):
             while i:
                 i+=1
                 if recun[i].startswith('ACCESSION'):
-                    return name
+                    return name.strip()
                 name+=recun[i]+' '
         i+=1
 
 
-def orgfetch(acc):
+def fetch_organism(acc):
     "Fetchs the organism from which acc accession number of a protein came from"
-    hand=Entrez.efetch(db="protein", id=acc ,rettype='gp')
+    hand=fetch_protein(acc,'gp')
     record=''
-    while hand:
-        read=hand.readline()
+    for line in hand:
+        read=line
         record+=read.strip()+'  '
-        if read=='':
-            break
     rec=record.split('  ')
     recun=[]
     for s in rec:
@@ -71,10 +72,8 @@ def orgfetch(acc):
     i=0
     ret=[]
     retu=['']
-    #print recun
-    mutisp=False
+    multisp=False
     while i<len(recun):
-        j=0
         if recun[i]=='DEFINITION':
             multisp=recun[i+1].startswith("MULTISPECIES:")
             if not multisp:
@@ -94,8 +93,7 @@ def orgfetch(acc):
                               retu[0]+=' '+tab[k]
             else:
               return [recun[i+11]+' multispecies',recun[i+14].split(';')[0]]
-#        elif recun[i+1].startswith("MULTISPECIES:"):
-#          ret=
+
         if recun[i]=='ORGANISM':
             try:
                 ret=[recun[i+1].split()[0]+' '+recun[i+1].split()[1]]
@@ -107,28 +105,6 @@ def orgfetch(acc):
             return ret
 
         i+=1
-
-def toGI(acc):
-    "Converts given accession no acc to a GI number"
-    hand=Entrez.efetch(db="protein", id=acc ,rettype='gp')
-    record=''
-    while hand:
-        read=hand.readline()
-        record+=read.strip()+'  '
-        if read=='':
-            break
-    rec=record.split('  ')
-    recun=[]
-    for s in rec:
-        if s!='':
-            recun.append(s)
-    string=''
-    for g in recun:
-        if g.startswith('GI:'):
-            for char in g[3:]:
-                if char.isdigit():
-                    string+=char
-            return string
 
 def findlonglen(dicto):
     "finds the length of the longest key in dicto"

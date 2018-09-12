@@ -2,7 +2,7 @@ import sys,os, psutil
 import Fetchutil, Reciprocal
 from multiprocessing import Process,Queue
 
-PROCS=psutil.NUM_CPUS
+PROCS=psutil.cpu_count()
 #Check for directories' existance, if not create them.
 if not os.path.exists('Data'):
   os.mkdir('Data')
@@ -48,7 +48,7 @@ except IOError:
     arch_accs={}
     bac_accs={}
     euk_accs={}
-    print "Blasting"
+    print("Blasting")
     if dom=='arch' or dom=='all':
       queue_arch=Queue()
       for a in arch_list:

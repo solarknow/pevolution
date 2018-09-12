@@ -55,7 +55,7 @@ docs/_build/
 # Dependencies
 prank/
 phyml/
-prottest/
+prottest*/
 *.zip
 *.tgz
 phylip/
