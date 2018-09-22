@@ -1,33 +1,40 @@
-import os, Fetchutil, random, psutil, subprocess
+import os, FetchUtil, random, psutil, subprocess
 bayesmodels=['poisson','jtt','mtrev','mtmam','wag','rtrev','cprev','vt','blosum','dayhoff']
+
+
+def findlonglen(dicto):
+    "finds the length of the longest key in dicto"
+    keys=dicto.keys()
+    pivot=''
+    for k in keys:
+        if len(k)>len(pivot):
+            pivot=k
+    return len(pivot)
 
 def clusttofasta(clust,out):
     "converts a clustal alignment file to a fasta file out"
-    hand=open(clust)
-
-    seqs={}
-    hand.readline()
-    hand.readline()
-    hand.readline()
-    while hand:
-        line=hand.readline()
-        #print line
-        if line.split()==[] and len(line)>0:
-            continue
-        if line=='':
-            break
-        elif line.split()[0][0] in [':','.','*']:
-            #print line
-            hand.readline()
-            continue
-        lin=line.split()
-        #print line
-        try:
-            seqs[lin[0]]+=lin[1]
-        except KeyError:
-            seqs.update({lin[0]:lin[1]})
-    for j in seqs.keys():
-        open(out,'a').write('>'+j+'\n'+seqs[j]+'\n\n')
+    with open(clust) as hand:
+        seqs={}
+        hand.readline()
+        hand.readline()
+        hand.readline()
+        while hand:
+            line=hand.readline()
+            if line.split()==[] and len(line)>0:
+                continue
+            if line=='':
+                break
+            elif line.split()[0][0] in [':','.','*']:
+                hand.readline()
+                continue
+            lin=line.split()
+            try:
+                seqs[lin[0]]+=lin[1]
+            except KeyError:
+                seqs.update({lin[0]:lin[1]})
+        for j in seqs.keys():
+            with open(out,'a') as outfile:
+                outfile.write('>'+j+'\n'+seqs[j]+'\n\n')
 
 
 def dicextract(fil):
@@ -307,7 +314,7 @@ def splicealign(inalign,outalign):
 
         for k in dicto.keys():
             han.write(k)
-            for i in range((Fetchutil.findlonglen(dicto)+6)-len(k)):
+            for i in range((findlonglen(dicto)+6)-len(k)):
                 han.write(' ')
             han.write(dicto[k]+'\n')
         han.write(';\nend;\n')
@@ -427,3 +434,13 @@ def bestmod(infile):
            #         break
            # open('Prot/'+out+'.tre','w').write(tree)
             return ret
+
+def addseq(oldseq, newseq):
+    "Transfers the sequence from newseq to oldseq"
+    old=open(oldseq,'a')
+    new=open(newseq)
+    while new:
+        add=new.readline()
+        old.write(add)
+        if add=='':
+            return
