@@ -1,36 +1,41 @@
+import os
+import subprocess
+
 from Bio import Entrez
-import subprocess,os
+
 
 def set_email(email):
-    Entrez.email=email
+    Entrez.email = email
+
 
 def fetch_protein(acc, fmt='fasta'):
-    "returns a file-like handle of a Entrez search for acc accession number and returns in fmt format"
-    fetched = Entrez.efetch(db='protein',id=str(acc),rettype=fmt)
+    """returns a file-like handle of a Entrez search for acc accession number and returns in fmt format"""
+    fetched = Entrez.efetch(db='protein', id=str(acc), rettype=fmt)
     return fetched.readlines()
 
+
 def fetch_fasta(acc):
-    "prints the sequence in fasta format to file"
+    """prints the sequence in fasta format to file"""
     hand = fetch_protein(acc)
-    string=''
+    string = ''
     org = fetch_organism(acc)
-    string+='>'+org[0]+': '+org[1]+' '+acc+'\n'
+    string += '>'+org[0]+': '+org[1]+' '+acc+'\n'
     for line in hand[1:]:
-        string+=line
+        string += line
         if line == '\n':
             if not os.path.exists('Orthos'):
-                subprocess.call(['mkdir','Orthos'])
+                subprocess.call(['mkdir', 'Orthos'])
             with open('Orthos/'+acc+'.fasta','w') as writ_file:
                 writ_file.write(string)
             return 'Orthos/'+acc+'.fasta'
 
 
 def fetch_definition(acc):
-    "Fetchs definition of specified gene product"
-    hand=fetch_protein(acc,'gp')
-    record=''
+    """Fetchs definition of specified gene product"""
+    hand = fetch_protein(acc,'gp')
+    record = ''
     for line in hand:
-        read=line
+        read = line
         record+=read.strip()+'  '
     rec=record.split('  ')
     recun=[]

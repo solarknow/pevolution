@@ -8,4 +8,4 @@ apt-get install -y ncbi-blast+ clustalw phyml mrbayes mrbayes-doc
 
 python setup.py install
 
-tar zxvf prottest-3.4-20140123.tar.gz
+tar zxvf prottest-3.4.2-20160508.tar.gz

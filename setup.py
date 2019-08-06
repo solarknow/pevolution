@@ -9,12 +9,12 @@ except ImportError:
 
 
 setup(name='pevolution',
-      version='1.0',
+      version='1.1',
       description='This is a pipeline to find, align, and find trees for putatively related proteins.',
       author='Mihir Sarwade',
-      author_email='mihir.sarwade@effem.com',
-#      packages=['pevolution'],
-      install_requires=['psutil >= 1.2.1','biopython >= 1.64'])
+      author_email='mihir.sarwade@gmail.com',
+      #      packages=['pevolution'],
+      install_requires=['psutil >= 5.6.3','biopython >= 1.74', 'Bio'])
 
 #urlretrieve("https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz",'/tmp/prank.tgz')
 #urlretrieve("http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip",'/tmp/PhyML.zip')

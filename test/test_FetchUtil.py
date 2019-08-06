@@ -3,6 +3,7 @@ import FetchUtil
 from Bio import Entrez
 from glob import glob
 
+
 class TestFetchUtil(unittest.TestCase):
     def setUp(self):
         Entrez.email = 'example@gmail.com'
@@ -21,7 +22,7 @@ class TestFetchUtil(unittest.TestCase):
     
     def test_fetch_organism_returns_expected_list(self):
         test_organism = FetchUtil.fetch_organism(self.test_accession)
-        self.assertAlmostEqual(test_organism, self.expected_organism)
+        self.assertListEqual(test_organism, self.expected_organism)
         
     def test_fetch_fasta_writes_file(self):
         FetchUtil.fetch_fasta(self.test_accession)
@@ -30,6 +31,7 @@ class TestFetchUtil(unittest.TestCase):
     def test_fetch_definition_returns_definition(self):
         test_definition = FetchUtil.fetch_definition(self.test_accession)
         self.assertEqual(test_definition, self.expected_definition)
-    
+
+
 if __name__ == '__main__':
     unittest.main()
