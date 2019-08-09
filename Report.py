@@ -122,7 +122,7 @@ def generateReport(name,quer,models,dom):
 #                    break
 #                seq+=lan
 #    print 'modding'
-#    moddedseqs=SeqUtil.modseqs('Bayes/'+dom+'-'+name+'-mod.nxs')
+#    moddedseqs=SeqUtil.remove_gaps_nexus('Bayes/'+dom+'-'+name+'-mod.nxs')
 #    print len(oriseqs),len(moddedseqs)
 #    for m in moddedseqs:
 #        lenmod=len(moddedseqs[m])
