@@ -1,5 +1,6 @@
 #import Main
-import multiprocessing, psutil, subprocess
+import multiprocessing
+import subprocess
 
 jobs=open('jobs.txt').readlines()
 

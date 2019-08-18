@@ -1,10 +1,11 @@
 import ast
+import os
 import shutil
 import unittest
-import SeqUtil
-import os
+
 from Bio import Entrez
 
+import SeqUtil
 
 temp_dir = os.getcwd() + os.sep + 'Orthos'
 

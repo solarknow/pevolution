@@ -1,7 +1,8 @@
-import os
-import psutil
-import random
 import ast
+import os
+import random
+
+import psutil
 
 from helpers.commands import run_prottest, clustal_align
 from helpers.file_formats import nexus_fmt

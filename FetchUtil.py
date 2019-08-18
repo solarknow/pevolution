@@ -24,7 +24,7 @@ def fetch_fasta(acc):
         if line == '\n':
             if not os.path.exists('Orthos'):
                 os.mkdir('Orthos')
-            with open('Orthos/' + acc + '.fasta', 'w') as writ_file:
+            with open('Orthos' + os.sep + acc + '.fasta', 'w') as writ_file:
                 writ_file.write(string)
             return 'Orthos/' + acc + '.fasta'
 

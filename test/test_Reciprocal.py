@@ -1,6 +1,7 @@
 import unittest
-import Reciprocal
+
 from Bio import Entrez
+
 
 class TestFetchUtil(unittest.TestCase):
     def setUp(self):
