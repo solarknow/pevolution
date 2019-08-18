@@ -1,5 +1,8 @@
-import os, sys
-import SeqUtil, Report
+import os
+import sys
+
+import Report
+import SeqUtil
 
 if not os.path.exists('aligns'):
     os.mkdir('aligns')
@@ -8,12 +11,13 @@ if not os.path.exists('Bayes'):
 
 out = sys.argv[1]
 query = sys.argv[2]
-SeqUtil.rename_seqs('Data/bac-' + out + '.fas')
-if not os.path.exists('aligns/bac-' + out + '.best.nex'):
-    os.system('prank -d=Data/bac-' + out + ' -o=aligns/bac-' + out + ' -f=nexus -quiet')
-    SeqUtil.bayes_in_nex('aligns/bac-' + out + '.best.nex')
-models_ori = SeqUtil.bestmod('aligns/bac-' + out + '.best.nex')
-if not os.path.exists('Bayes/bac-' + out + '-bayes.nxs'):
-    SeqUtil.bayesfile('aligns/bac-' + out + '.best.nex', models_ori, 'Bayes/bac-' + out + '-bayes.nxs')
-os.system('mb Bayes/bac-' + out + '-bayes.nxs')
-Report.generateReport(out, query, models_ori, 'bac')
+SeqUtil.rename_seqs('Data' + os.sep + 'bac-' + out + '.fas')
+if not os.path.exists('aligns' + os.sep + 'bac-' + out + '.best.nex'):
+    os.system('prank -d=Data' + os.sep + 'bac-' + out + ' -o=aligns' + os.sep + 'bac-' + out + ' -f=nexus -quiet')
+    SeqUtil.bayes_in_nex('aligns' + os.sep + 'bac-' + out + '.best.nex')
+models_ori = SeqUtil.bestmod('aligns' + os.sep + 'bac-' + out + '.best.nex')
+if not os.path.exists('Bayes' + os.sep + 'bac-' + out + '-bayes.nxs'):
+    SeqUtil.bayesfile('aligns' + os.sep + 'bac-' + out + '.best.nex', models_ori,
+                      'Bayes' + os.sep + 'bac-' + out + '-bayes.nxs')
+os.system('mb Bayes' + os.sep + 'bac-' + out + '-bayes.nxs')
+Report.generate_report(out, query, models_ori, 'bac')

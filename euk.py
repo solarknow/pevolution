@@ -1,5 +1,8 @@
-import os, sys
-import SeqUtil, Report
+import os
+import sys
+
+import Report
+import SeqUtil
 
 if not os.path.exists('aligns'):
     os.mkdir('aligns')
@@ -16,4 +19,4 @@ models_ori = SeqUtil.bestmod('aligns/euk-' + out + '.best.nex')
 if not os.path.exists('Bayes/euk-' + out + '-bayes.nxs'):
     SeqUtil.bayesfile('aligns/euk-' + out + '.best.nex', models_ori, 'Bayes/euk-' + out + '-bayes.nxs')
 os.system('mb Bayes/euk-' + out + '-bayes.nxs')
-Report.generateReport(out, query, models_ori, 'euk')
+Report.generate_report(out, query, models_ori, 'euk')
