@@ -1,5 +1,6 @@
+import os
+
 from Bio import Entrez
-import subprocess, os
 
 
 def set_email(email):
@@ -7,39 +8,42 @@ def set_email(email):
 
 
 def fetch_protein(acc, fmt='fasta'):
-    "returns a file-like handle of a Entrez search for acc accession number and returns in fmt format"
+    """
+    returns a file-like handle of a Entrez search for acc accession number and returns in fmt format
+    """
     fetched = Entrez.efetch(db='protein', id=str(acc), rettype=fmt)
     return fetched.readlines()
 
 
 def fetch_fasta(acc):
-    "prints the sequence in fasta format to file"
+    """
+    prints the sequence in fasta format to file
+    """
     hand = fetch_protein(acc)
-    string = ''
     org = fetch_organism(acc)
-    string += '>' + org[0] + ': ' + org[1] + ' ' + acc + '\n'
+    string = '>{spec}: {domain} {id}\n'.format(
+        spec=org[0],
+        domain=org[1],
+        id=acc
+    )
     for line in hand[1:]:
         string += line
         if line == '\n':
-            if not os.path.exists('Orthos'):
-                subprocess.call(['mkdir', 'Orthos'])
-            with open('Orthos/' + acc + '.fasta', 'w') as writ_file:
+            os.makedirs('Orthos', exist_ok=True)
+            new_file = 'Orthos' + os.sep + acc + '.fasta'
+            with open(new_file, 'w') as writ_file:
                 writ_file.write(string)
-            return 'Orthos/' + acc + '.fasta'
+            return new_file
 
 
 def fetch_definition(acc):
-    "Fetchs definition of specified gene product"
+    """
+    Fetchs definition of specified gene product
+    """
     hand = fetch_protein(acc, 'gp')
-    record = ''
-    for line in hand:
-        read = line
-        record += read.strip() + '  '
+    record = '  '.join(line.strip() for line in hand)
     rec = record.split('  ')
-    recun = []
-    for s in rec:
-        if s != '':
-            recun.append(s)
+    recun = [s for s in rec if s != '']
     i = 0
     name = ''
     while i < len(recun):
@@ -53,21 +57,15 @@ def fetch_definition(acc):
 
 
 def fetch_organism(acc):
-    "Fetchs the organism from which acc accession number of a protein came from"
+    """
+    Fetchs the organism from which acc accession number of a protein came from
+    """
+    retu = []
     hand = fetch_protein(acc, 'gp')
-    record = ''
-    for line in hand:
-        read = line
-        record += read.strip() + '  '
+    record = '  '.join(line.strip() for line in hand)
     rec = record.split('  ')
-    recun = []
-    for s in rec:
-        if s != '':
-            recun.append(s)
+    recun = [s for s in rec if s != '']
     i = 0
-    ret = []
-    retu = ['']
-    multisp = False
     while i < len(recun):
         if recun[i] == 'DEFINITION':
             multisp = recun[i + 1].startswith("MULTISPECIES:")
@@ -92,7 +90,7 @@ def fetch_organism(acc):
         if recun[i] == 'ORGANISM':
             try:
                 ret = [recun[i + 1].split()[0] + ' ' + recun[i + 1].split()[1]]
-            except:
+            except IndexError:
                 return retu
             if ret[0].endswith('.'):
                 ret[0] += ' ' + recun[i + 1].split()[2]
