@@ -1,32 +1,22 @@
 import os
+import subprocess
 import sys
 
 import Report
 import SeqUtil
-
-if not os.path.exists('aligns'):
-    os.mkdir('aligns')
-if not os.path.exists('Bayes'):
-    os.mkdir('Bayes')
-# if not os.path.exists('ML'):
-#  os.mkdir('ML')
+from constants import DATA_PATH, ALIGNS_PATH, BAYES_PATH
 
 out = sys.argv[1]
 query = sys.argv[2]
-SeqUtil.rename('Data/arch-' + out + '.fas')
-if not os.path.exists('aligns/arch-' + out + '.best.nex'):
-    os.system('prank -d=Data/arch-' + out + ' -o=aligns/arch-' + out + ' -f=nexus -quiet')
-    SeqUtil.bayesinNex('aligns/arch-' + out + '.best.nex')
-# SeqUtil.splicealign('aligns/arch-'+out+'.best.nex','Bayes/arch-'+out+'-mod.nxs')
-# models=SeqUtil.bestmod('Bayes/arch-'+out+'-mod.nxs')
-models_ori = SeqUtil.bestmod('aligns/arch-' + out + '.best.nex')
-if not os.path.exists('Bayes/arch-' + out + '-bayes.nxs'):
-    SeqUtil.bayesfile('aligns/arch-' + out + '.best.nex', models_ori, 'Bayes/arch-' + out + '-bayes.nxs')
-# SeqUtil.bayesfile('Bayes/arch-'+out+'-mod.nxs',models,'Bayes/arch-'+out+'-bayes.nxs')
-os.system('mb Bayes/arch-' + out + '-bayes.nxs')
-# SeqUtil.pamlseqnex('Bayes/arch-'+out+'-mod.nxs','ML/arch-'+out)
-# for mod in models.keys():
-#    SeqUtil.pamlinput('ML/arch-'+out,'ML/arch-'+out+'.out','ML/arch-'+out+'.ctl',{models.keys()[mod].split('+')[0]:models[models.keys()[mod]][1]})
-#    os.system('codeml ML/arch-'+out+'.ctl')
-#    SeqUtil.extractMLtree('ML/arch-'+out+'.out')
+
+SeqUtil.shorten_seqence_names(DATA_PATH + 'arch-' + out + '.fas')
+if not os.path.exists(ALIGNS_PATH + 'arch-' + out + '.best.nex'):
+    subprocess.call(['prank', '-d=' + DATA_PATH + 'arch-' + out, '-o=' + ALIGNS_PATH + 'arch-' + out, '-f=nexus',
+                     '-quiet'])
+    SeqUtil.prank_to_mrbayes(ALIGNS_PATH + 'arch-' + out + '.best.nex')
+models_ori = SeqUtil.prottest_best_models(ALIGNS_PATH + 'arch-' + out + '.best.nex')
+if not os.path.exists(BAYES_PATH + 'arch-' + out + '-bayes.nxs'):
+    SeqUtil.write_to_mrbayes(ALIGNS_PATH + 'arch-' + out + '.best.nex', models_ori,
+                             BAYES_PATH + 'arch-' + out + '-bayes.nxs')
+subprocess.call(['mb', BAYES_PATH + 'arch-' + out + '-bayes.nxs'])
 Report.generateReport(out, query, models_ori, 'arch')

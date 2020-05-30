@@ -2,11 +2,10 @@ import FetchUtil
 import SeqUtil
 import os
 
-if not os.path.exists('Reports'):
-    os.mkdir('Reports')
+os.makedirs('Reports', exist_ok=True)
 
 
-def generateReport(name, quer, models, dom):
+def generateReport(name, protein, models, dom):
     """Generates a report summarizing the analysis done"""
     ret = open('Reports/Report-' + dom + '-' + name + '.txt', 'w')
     ret.write('Orthologous sequence Search and Alignment\n' +
@@ -15,8 +14,8 @@ def generateReport(name, quer, models, dom):
     ret.write('-----------------------------\n')
     ret.write('Reciprocal Best BLAST Results\n')
     ret.write('-----------------------------\n\n')
-    ret.write('Query sequence Accension number: ' + quer + ' Query sequence organism: ' +
-              FetchUtil.fetch_organism(quer)[0] + '\n')
+    ret.write('Query sequence Accension number: ' + protein.accession + ' Query sequence organism: ' +
+              protein.binomial + '\n')
     ret.write(
         'BLASTs are performed using expected value (E-value) thresholds based on the kingdom (Bacteria, Archaea, '
         'and Eukaryota).\n' +
@@ -41,7 +40,7 @@ def generateReport(name, quer, models, dom):
 
     # print info
     for i in info:
-        info[i].append(FetchUtil.fetch_definition(info[i][1]))
+        info[i].append(FetchUtil.fetch_protein(info[i][1]).definition)
     ret.write(
         'Organism                       Kingdom     Accession No.(GI)      No. on list/length of list     No. on '
         'list/length of list         ')
@@ -50,7 +49,7 @@ def generateReport(name, quer, models, dom):
     # print info
     keys = list(info.keys())
     keys.sort()
-    length = SeqUtil.findlonglen(info) + 6
+    length = SeqUtil.longest_key_length(info) + 6
     for i in keys:
         # print info[i]
         # writing organism

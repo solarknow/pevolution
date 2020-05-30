@@ -1,5 +1,4 @@
 import sys
-from multiprocessing import Process, Queue
 
 import FetchUtil
 import Reciprocal
@@ -10,7 +9,7 @@ if len(sys.argv) > 1:
 else:
     query = input('Query: ')
     FetchUtil.set_email(input("Email: "))
-dom = FetchUtil.fetch_organism(query)[1]
+dom = FetchUtil.fetch_protein(query).domain
 print("Source domain: " + str(dom))
 if dom == 'Archaea':
     arch_e_thresh = 1e-10
@@ -25,25 +24,18 @@ else:
     bac_e_thresh = 1e-10
     euk_e_thresh = 5
 
-init_acc = [Reciprocal.bestrecipblast('Homo sapiens', query, euk_e_thresh, None),
-            Reciprocal.bestrecipblast('Escherichia coli', query, bac_e_thresh, None),
-            Reciprocal.bestrecipblast('Haloferax volcanii', query, arch_e_thresh, None)]
+init_acc = [Reciprocal.bestrecipblast('Homo sapiens', query, euk_e_thresh),
+            Reciprocal.bestrecipblast('Escherichia coli', query, bac_e_thresh),
+            Reciprocal.bestrecipblast('Haloferax volcanii', query, arch_e_thresh)]
 runs = []
 count = 0
 orgs = ['Homo sapiens', 'Escherichia coli', 'Haloferax volcanii']
 for acc in init_acc:
-    count += 1
     if acc == {}:
         continue
+    count += 1
     print("Pass " + repr(count))
-    for o in orgs:
-        q = Queue()
-        p = Process(target=Reciprocal.bestrecipblast, args=(o, acc.values()[0][0], 5, q))
-        p.start()
-        p.join()
-        acs = []
-        while not q.empty():
-            acs.append(q.get())
-        runs.append(acs)
+    acs = [Reciprocal.bestrecipblast(o, list(acc.values())[0][0], 5) for o in orgs]
+    runs.append(acs)
 
 print(runs)

@@ -3,48 +3,58 @@ import os
 from Bio.Blast import NCBIXML
 
 import FetchUtil
-import random
+from constants import ORTHOS_PATH, XML_PATH, DICTS_PATH
 
-os.makedirs('XML', exist_ok=True)
-os.makedirs('dicts', exist_ok=True)
+os.makedirs(XML_PATH, exist_ok=True)
+os.makedirs(DICTS_PATH, exist_ok=True)
 
 
-def bestrecipblast(org, source, thresh=5, queue=None):
-    """Returns the best pairwise reciprocal BLAST using source accession no. from
-    against org organism"""
-
-    sourceorg = FetchUtil.fetch_organism(source)[0]
+def bestrecipblast(org, source, thresh=5):
+    """
+    Returns the best pairwise reciprocal BLAST using source accession no. from
+    against org organism
+    :param org: Target binomial organism
+    :param source: source accession Id
+    :param thresh: E-value threshold
+    :return: Dict[Binomial Organism: List[Best Accession Number, place in target search, place in source search]]
+    """
+    source_protein = FetchUtil.fetch_protein(source)
+    source_binomial = source_protein.binomial
     acclist = {}
     ac = []
-    print("Source Organism: " + str(sourceorg))
-    FetchUtil.fetch_fasta(source)
-    file_name = str(int(int(source.split('.')[0][-5:]) * random.random()))
+    print("Source Organism: " + str(source_binomial))
+    FetchUtil.write_fasta(source_protein)
+    file_name = source_protein.accession + '_' + ''.join(w[:2] for w in org.split())
     print("Using {} as filename".format(file_name))
-    print('blastp -db nr -query Orthos' + os.sep + source + '.fasta -evalue ' + str(thresh) +
-              ' -out XML' + os.sep + file_name + '.xml -outfmt 5 -entrez_query \"' + org + '[ORGN]\"' +
-              ' -remote')
-    os.system('blastp -db nr -query Orthos' + os.sep + source + '.fasta -evalue ' + str(thresh) +
-              ' -out XML' + os.sep + file_name + '.xml -outfmt 5 -entrez_query \"' + org + '[ORGN]\"' +
-              ' -remote')
-    with open('XML' + os.sep + file_name + '.xml') as qoutput:
+    outfile = XML_PATH + file_name + '.xml'
+    if not os.path.exists(outfile):
+        FetchUtil.remote_blast(ORTHOS_PATH + source + '.fasta', thresh, outfile, org)
+    else:
+        print('Outfile exists')
+    with open(outfile) as qoutput:
         parser = NCBIXML.parse(qoutput)
         for lin in parser:
             for align in lin.alignments:
                 for hsp in align.hsps:
                     if (hsp.positives / float(hsp.align_length)) >= .4 and (
                             float(hsp.align_length) / len(hsp.query)) >= .25:
-                        ac.append(align.title.split('|')[1])
-    print("First BLAST Done. Number of sequences found: " + repr(ac))
+                        ac.append(align.accession)
+    print("First BLAST Done. Number of sequences found: " + str(ac))
 
     for o in ac:
-        print("BLASTING back to " + sourceorg[0])
+        print("BLASTING back to " + source_binomial)
         print(o)
+        o_prot = FetchUtil.fetch_protein(o)
         acc = []
-        FetchUtil.fetch_fasta(o)
-        os.system('blastp -db nr -query Orthos' + os.sep + o + '.fasta -evalue ' + str(thresh) +
-                  ' -out XML' + os.sep + file_name + '.xml -outfmt 5 -entrez_query \"' + sourceorg[0] + '[ORGN]\" -use_sw_tback' +
-                  ' -remote')
-        with open('XML' + os.sep + file_name + '.xml') as q1output:
+        FetchUtil.write_fasta(o_prot)
+        file_name = o_prot.accession + '_' + ''.join(w[:2] for w in source_binomial.split())
+        print("Using " + file_name + " as a new filename")
+        outfile = XML_PATH + file_name + '.xml'
+        if not os.path.exists(outfile):
+            FetchUtil.remote_blast(ORTHOS_PATH + o_prot.accession + '.fasta', thresh, outfile, source_binomial)
+        else:
+            print('Outfile exists')
+        with open(outfile) as q1output:
             parse = NCBIXML.parse(q1output)
             print('blasted')
             for lin in parse:
@@ -52,21 +62,18 @@ def bestrecipblast(org, source, thresh=5, queue=None):
                     for hsp in align.hsps:
                         if (hsp.positives / float(hsp.align_length)) >= .4 and (
                                 float(hsp.align_length) / len(hsp.query)) > .25:
-                            acc.append(align.title.split('|')[1])
+                            acc.append(align.accession)
         print("Done. Number of sequences found: " + repr(len(acc)))
 
         if source in acc:
-            print('it\'s twue!')
-            name = FetchUtil.fetch_organism(o)[0]
+            print("It's twue!")
+            name = o_prot.binomial
             acclist[name] = [
                 o,
                 str(ac.index(o) + 1) + '/' + str(len(ac)),
                 str(acc.index(source) + 1) + '/' + str(len(acc))
             ]
-            with open('dicts' + os.sep + source, 'a') as seed_file:
+            with open(DICTS_PATH + source, 'a') as seed_file:
                 seed_file.write(str(acclist) + '\n')
             break
-    if queue is not None:
-        queue.put(acclist)
-    else:
-        return acclist
+    return acclist

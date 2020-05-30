@@ -1,32 +1,21 @@
 import os
+import subprocess
 import sys
 
 import Report
 import SeqUtil
-
-if not os.path.exists('aligns'):
-    os.mkdir('aligns')
-if not os.path.exists('Bayes'):
-    os.mkdir('Bayes')
-# if not os.path.exists('ML'):
-#  os.mkdir('ML')
+from constants import DATA_PATH, ALIGNS_PATH, BAYES_PATH
 
 out = sys.argv[1]
 query = sys.argv[2]
-SeqUtil.rename('Data/euk-' + out + '.fas')
-if not os.path.exists('aligns/euk-' + out + '.best.nex'):
-    os.system('prank -d=Data/euk-' + out + ' -o=aligns/euk-' + out + ' -f=nexus -quiet')
-    SeqUtil.bayesinNex('aligns/euk-' + out + '.best.nex')
-# SeqUtil.splicealign('aligns/euk-'+out+'.best.nex','Bayes/euk-'+out+'-mod.nxs')
-# models=SeqUtil.bestmod('Bayes/euk-'+out+'-mod.nxs')
-models_ori = SeqUtil.bestmod('aligns/euk-' + out + '.best.nex')
-if not os.path.exists('Bayes/euk-' + out + '-bayes.nxs'):
-    SeqUtil.bayesfile('aligns/euk-' + out + '.best.nex', models_ori, 'Bayes/euk-' + out + '-bayes.nxs')
-# SeqUtil.bayesfile('Bayes/euk-'+out+'-mod.nxs',models,'Bayes/euk-'+out+'-bayes.nxs')
-os.system('mb Bayes/euk-' + out + '-bayes.nxs')
-# SeqUtil.pamlseqnex('Bayes/euk-'+out+'-mod.nxs','ML/euk-'+out)
-# for mod in models.keys():
-#    SeqUtil.pamlinput('ML/euk-'+out,'ML/euk-'+out+'.out','ML/euk-'+out+'.ctl',{models.keys()[mod].split('+')[0]:models[models.keys()[mod]][1]})
-#    os.system('codeml ML/euk-'+out+'.ctl')
-#    SeqUtil.extractMLtree('ML/euk-'+out+'.out')
+SeqUtil.shorten_seqence_names(DATA_PATH + 'euk-' + out + '.fas')
+if not os.path.exists(ALIGNS_PATH + 'euk-' + out + '.best.nex'):
+    subprocess.call(['prank', '-d=' + DATA_PATH + 'euk-' + out, '-o=' + ALIGNS_PATH + 'euk-' + out, '-f=nexus',
+                     '-quiet'])
+    SeqUtil.prank_to_mrbayes(ALIGNS_PATH + 'euk-' + out + '.best.nex')
+models_ori = SeqUtil.prottest_best_models(ALIGNS_PATH + 'euk-' + out + '.best.nex')
+if not os.path.exists(BAYES_PATH + 'euk-' + out + '-bayes.nxs'):
+    SeqUtil.write_to_mrbayes(ALIGNS_PATH + 'euk-' + out + '.best.nex', models_ori,
+                             BAYES_PATH + 'euk-' + out + '-bayes.nxs')
+subprocess.call(['mb', BAYES_PATH + 'euk-' + out + '-bayes.nxs'])
 Report.generateReport(out, query, models_ori, 'euk')
