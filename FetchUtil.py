@@ -108,4 +108,4 @@ def remote_blast(query, threshold, outfile, organism):
     """
     blast_query = ['blastp', '-db', 'nr', '-query', query, '-evalue', str(threshold), '-out',
                    outfile, '-outfmt', str(5), '-entrez_query', organism + '[ORGN]', '-remote']
-    subprocess.call(blast_query)
+    return subprocess.run(blast_query)

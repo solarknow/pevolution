@@ -8,7 +8,7 @@ def launch(query, label, domain):
     """
     Wrapper method to Main.py execution.
     """
-    subprocess.call(['python', 'Main.py', query, label, domain])
+    subprocess.run(['python', 'Main.py', query, label, domain])
 
 
 if __name__ == '__main__':

@@ -7,3 +7,6 @@ DATA_PATH = 'Data' + os.sep
 ALIGNS_PATH = 'aligns' + os.sep
 BAYES_PATH = 'Bayes' + os.sep
 ML_PATH = 'ML' + os.sep
+REPORTS_PATH = 'Reports' + os.sep
+PROT_PATH = 'Prot' + os.sep
+PROTTEST_PATH ='prottest' + os.sep + 'prottest-3.4.jar'

@@ -1,14 +1,18 @@
 import sys
 
+from Bio import Entrez
+
 import FetchUtil
 import Reciprocal
 
 if len(sys.argv) > 1:
     query = sys.argv[1]
-    FetchUtil.set_email(input("Email: "))
+    if Entrez.email is None:
+        FetchUtil.set_email(input("Email: "))
 else:
     query = input('Query: ')
-    FetchUtil.set_email(input("Email: "))
+    if Entrez.email is None:
+        FetchUtil.set_email(input("Email: "))
 dom = FetchUtil.fetch_protein(query).domain
 print("Source domain: " + str(dom))
 if dom == 'Archaea':

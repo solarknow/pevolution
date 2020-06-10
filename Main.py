@@ -1,14 +1,15 @@
 import os
-import subprocess
 import sys
 
 import psutil
+from Bio import Entrez
 
+import AlignUtil
 import FetchUtil
 import Reciprocal
 import SeqUtil
 from FetchUtil import ORTHOS_PATH
-from constants import DATA_PATH
+from constants import DATA_PATH, ALIGNS_PATH
 
 PROCS = psutil.cpu_count()
 
@@ -23,7 +24,8 @@ try:
     query = sys.argv[1]
     out = sys.argv[2]
     dom = sys.argv[3]
-    FetchUtil.set_email(input('Email: '))
+    if Entrez.email is None:
+        FetchUtil.set_email(input('Email: '))
 except IndexError:
     query = input('Query accession no: ')
     out = input('Output file: ')
@@ -33,7 +35,12 @@ except IndexError:
     if phy.lower() == 'y':
         phyml = '-y'
 if os.path.exists(DATA_PATH + dom + '-' + out + '.fas'):
-    subprocess.call(['python', dom + '.py', out, query, phyml])
+    AlignUtil.align_sequences_prank(out, dom)
+    models = SeqUtil.prottest_best_models(ALIGNS_PATH + dom + '-' + out + '.best.nex')
+    if phyml == '-y':
+        AlignUtil.run_phyml(out, dom, models)
+    AlignUtil.prepare_bayes_files(out, dom, models)
+    AlignUtil.run_bayes_and_report(out, dom, FetchUtil.fetch_protein(query), models)
 else:
     arch_list = ['Haloferax volcanii', 'Sulfolobus tokodaii', 'Methanococcus aeolicus', 'Methanobrevibacter smithii',
                  'Thermococcus sibiricus', 'Archaeoglobus fulgidus', 'Nanoarchaeum equitans',
@@ -59,74 +66,54 @@ else:
         thresh2 = 1e-10
         thresh3 = 5
 
-    arch_accs = {}
-    bac_accs = {}
-    euk_accs = {}
+    accs = {}
     print("Blasting")
     if dom == 'arch' or dom == 'all':
+        print("Archea")
         for a in arch_list:
             p = Reciprocal.bestrecipblast(a, query, thresh1)
-            arch_accs.update(p)
+            print(p)
+            if 'arch' in accs:
+                accs['arch'].update(p)
+            else:
+                accs['arch'] = p
     if dom == 'bac' or dom == 'all':
-        # bac_accs=Reciprocal.bestrecipblast(bac_list,query,thresh2)
+        print("Bacteria")
         for b in bac_list:
             p = Reciprocal.bestrecipblast(b, query, thresh2)
-            bac_accs.update(p)
+            if 'bac' in accs:
+                accs['bac'].update(p)
+            else:
+                accs['bac'] = p
     if dom == 'euk' or dom == 'all':
-        # euk_accs=Reciprocal.bestrecipblast(euk_list,query,thresh3)
+        print("Eukarya")
         for e in euk_list:
             p = Reciprocal.bestrecipblast(e, query, thresh3)
-            euk_accs.update(p)
+            if 'euk' in accs:
+                accs['euk'].update(p)
+            else:
+                accs['euk'] = p
 
     if dom == 'all':
+        print("All")
         all_accs = {}
-        all_accs.update(arch_accs)
-        all_accs.update(bac_accs)
-        all_accs.update(euk_accs)
+        for v in accs.values():
+            all_accs.update(v)
         num_seqs = sum(len(all_accs[j]) for j in all_accs)
         print("Dictionary generated with " + repr(len(all_accs)) + " keys and " + repr(num_seqs) + " sequences.")
     # Fetching the sequences and writing them to file
     print("Writing seqs to file.")
-    for a in arch_accs:
-        FetchUtil.write_fasta(arch_accs[a][0])
-        with open(ORTHOS_PATH + arch_accs[a][0] + '.fasta') as fil:
-            fil_arr = fil.readlines()
-        with open(ORTHOS_PATH + arch_accs[a][0] + '.fasta', 'w') as fil:
-            for i in range(len(fil_arr)):
-                if i == 0:
-                    fil.write(fil_arr[i].strip() + ' ' + arch_accs[a][1] + '  ' + arch_accs[a][2] + '\n')
-                else:
-                    fil.write(fil_arr[i])
-        SeqUtil.fasta_add_sequence(DATA_PATH + 'arch-' + out + '.fas', ORTHOS_PATH + arch_accs[a][0] + '.fasta')
-        # os.remove(ORTHOS_PATH + arch_accs[a][0] + '.fasta')
-    for b in bac_accs.keys():
-        FetchUtil.write_fasta(bac_accs[b][0])
-        fil = open(ORTHOS_PATH + bac_accs[b][0] + '.fasta')
-        fil_arr = fil.readlines()
-        fil.close()
-        fil = open(ORTHOS_PATH + bac_accs[b][0] + '.fasta', 'w')
-        for i in range(len(fil_arr)):
-            if i == 0:
-                fil.write(fil_arr[i].strip() + ' ' + bac_accs[b][1] + '  ' + bac_accs[b][2] + '\n')
-            else:
-                fil.write(fil_arr[i])
-        fil.close()
-        SeqUtil.fasta_add_sequence(DATA_PATH + 'bac-' + out + '.fas', ORTHOS_PATH + bac_accs[b][0] + '.fasta')
-        # os.remove(ORTHOS_PATH + bac_accs[b][0] + '.fasta')
-    for e in euk_accs:
-        FetchUtil.write_fasta(euk_accs[e][0])
-        with open(ORTHOS_PATH + euk_accs[e][0] + '.fasta') as fil:
-            fil_arr = fil.readlines()
-        with open(ORTHOS_PATH + euk_accs[e][0] + '.fasta', 'w') as fil:
-            for i in range(len(fil_arr)):
-                if i == 0:
-                    fil.write(fil_arr[i].strip() + ' ' + euk_accs[e][1] + '  ' + euk_accs[e][2] + '\n')
-                else:
-                    fil.write(fil_arr[i])
-        SeqUtil.fasta_add_sequence(DATA_PATH + 'euk-' + out + '.fas', ORTHOS_PATH + euk_accs[e][0] + '.fasta')
-        # os.remove(ORTHOS_PATH + euk_accs[e][0] + '.fasta')
-    SeqUtil.fasta_add_sequence(DATA_PATH + 'all-' + out + '.fas', ORTHOS_PATH + 'arch-' + out + '.fas')
-    SeqUtil.fasta_add_sequence(DATA_PATH + 'all-' + out + '.fas', ORTHOS_PATH + 'bac-' + out + '.fas')
-    SeqUtil.fasta_add_sequence(DATA_PATH + 'all-' + out + '.fas', ORTHOS_PATH + 'euk-' + out + '.fas')
-
-
+    print(accs)
+    for d, daccs in accs.items():
+        print(daccs)
+        for seq in daccs.values():
+            FetchUtil.write_fasta(seq[0])
+            with open(ORTHOS_PATH + seq[0] + '.fasta') as fil_arr:
+                with open(ORTHOS_PATH + seq[0] + '.fasta', 'w') as fil:
+                    for i in fil_arr:
+                        if i.startswith('>'):
+                            fil.write(i.strip() + ' ' + seq[1] + '  ' + seq[2] + '\n')
+                        else:
+                            fil.write(i)
+            SeqUtil.fasta_add_sequence(DATA_PATH + d + '-' + out + '.fas', ORTHOS_PATH + seq[0] + '.fasta')
+        SeqUtil.fasta_add_sequence(DATA_PATH + 'all-' + out + '.fas', DATA_PATH + d + '-' + out + '.fas')

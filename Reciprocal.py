@@ -1,3 +1,5 @@
+import io
+import json
 import os
 
 from Bio.Blast import NCBIXML
@@ -39,11 +41,10 @@ def bestrecipblast(org, source, thresh=5):
                     if (hsp.positives / float(hsp.align_length)) >= .4 and (
                             float(hsp.align_length) / len(hsp.query)) >= .25:
                         ac.append(align.accession)
-    print("First BLAST Done. Number of sequences found: " + str(ac))
+    print("First BLAST Done. Sequences found: " + str(ac))
 
     for o in ac:
         print("BLASTING back to " + source_binomial)
-        print(o)
         o_prot = FetchUtil.fetch_protein(o)
         acc = []
         FetchUtil.write_fasta(o_prot)
@@ -63,7 +64,7 @@ def bestrecipblast(org, source, thresh=5):
                         if (hsp.positives / float(hsp.align_length)) >= .4 and (
                                 float(hsp.align_length) / len(hsp.query)) > .25:
                             acc.append(align.accession)
-        print("Done. Number of sequences found: " + repr(len(acc)))
+        print("Reverse Done. Sequences found: " + str(acc))
 
         if source in acc:
             print("It's twue!")
@@ -74,6 +75,11 @@ def bestrecipblast(org, source, thresh=5):
                 str(acc.index(source) + 1) + '/' + str(len(acc))
             ]
             with open(DICTS_PATH + source, 'a') as seed_file:
-                seed_file.write(str(acclist) + '\n')
+                try:
+                    current = json.load(seed_file)
+                except io.UnsupportedOperation:
+                    current = []
+                current.append(acclist)
+                seed_file.write(json.dumps(current) + '\n')
             break
     return acclist

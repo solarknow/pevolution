@@ -1,9 +1,10 @@
+import json
 import os
 import psutil
 import random
 import subprocess
 
-from constants import BAYES_PATH, ALIGNS_PATH
+from constants import BAYES_PATH, ALIGNS_PATH, PROT_PATH, PROTTEST_PATH
 
 bayesmodels = ['poisson', 'jtt', 'mtrev', 'mtmam', 'wag', 'rtrev', 'cprev', 'vt', 'blosum', 'dayhoff']
 os.makedirs(ALIGNS_PATH, exist_ok=True)
@@ -48,39 +49,29 @@ def clustal_to_fasta(clust, out):
 
 def dict_extract(fil):
     """Extracts a dict object from a given file"""
-    dic = {}
     with open(fil) as p:
-        for i in p:
-            dict_objects = i.strip()[1:-1]
-            ar = dict_objects.split(',')
-            for pair in ar:
-                pairs = pair.split(': ')
-                dic.update({str(pairs[0]): str(pairs[1])})
+        dic = json.load(p)
     return dic
 
 
-def shorten_seqence_names(fas):
+def shorten_sequence_names(fas):
     """Takes in a fasta file fas that has sequences and shortens the names, assigning to a new file"""
     out = fas.split('.')[0]
 
     orgs = {}
     with open(fas) as infile:
-        while infile:
-            line = infile.readline()
-            with open(out, 'w') as outfile:
-                if line == '':
-                    break
-                elif line.startswith('>'):
-                    outfile.write('>')
+        for line in infile:
+            with open(out, 'a') as outfile:
+                if line.startswith('>'):
                     linstr = line[1:].split()
                     org = linstr[0][0] + linstr[1][0:3]
-                    if org in orgs.keys():
+                    if org in orgs:
                         org += repr(orgs[org] + 1)
                     else:
                         orgs[org] = 1
-                    outfile.write(org + '\n')
+                    outfile.write('>' + org + '\n')
                 else:
-                    outfile.write(line)
+                    outfile.write(line + '\n')
 
 
 def remove_gaps(fil):
@@ -364,16 +355,16 @@ def clean_and_realign(inalign, outalign):
 
 def prottest_best_models(infile):
     """Takes in alignment file runs protTest, and extracts best model(s)"""
-    os.makedirs('Prot', exist_ok=True)
+    os.makedirs(PROT_PATH, exist_ok=True)
     procs = int(round(psutil.cpu_count() / 2.0))
     out = infile.split(os.sep)[1].split('.')[0]
-    prot_cmd = ['java', '-jar', 'prottest' + os.sep + 'prottest-3.4.jar', '-i', infile, '-o',
-                'Prot' + os.sep + out + '.pro', '-all-distributions', '-all', '-S', 1, '-threads', procs, '-BIC']
-    subprocess.call(prot_cmd)
+    prot_cmd = ['java', '-jar', PROTTEST_PATH, '-i', infile, '-o', PROT_PATH + out + '.pro', '-all-distributions',
+                '-all', '-S', 1, '-threads', procs, '-BIC']
+    subprocess.run(prot_cmd)
     models = {}
     ret = {}
     # reading and processing prottest output
-    with open('Prot' + os.sep + out + '.pro') as prot_hand:
+    with open(PROT_PATH + out + '.pro') as prot_hand:
         while prot_hand:
             lin = prot_hand.readline()
             if lin.startswith('Model.'):

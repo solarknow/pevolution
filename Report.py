@@ -1,13 +1,16 @@
+import AlignUtil
 import FetchUtil
 import SeqUtil
 import os
+
+from constants import ML_PATH, BAYES_PATH, REPORTS_PATH, DATA_PATH, ALIGNS_PATH, PROT_PATH
 
 os.makedirs('Reports', exist_ok=True)
 
 
 def generateReport(name, protein, models, dom):
     """Generates a report summarizing the analysis done"""
-    ret = open('Reports/Report-' + dom + '-' + name + '.txt', 'w')
+    ret = open(REPORTS_PATH + 'Report-' + dom + '-' + name + '.txt', 'w')
     ret.write('Orthologous sequence Search and Alignment\n' +
               'Python Scripts Written by Mihir Sarwade\n\n')
     # List accession numbers, names of genes and their respective organisms
@@ -22,7 +25,7 @@ def generateReport(name, protein, models, dom):
         ' These lists are then refined by picking only those sequences that are at least 50% similar and\n' +
         'whose aligned portion is at least 25% that of the query, as recommended by Moreno-Hagelsieb and Latimer ('
         '2008).\n')
-    import_file = open('Data/' + dom + '-' + name + '.fas')
+    import_file = open(DATA_PATH + dom + '-' + name + '.fas')
     info = {}
     while import_file:
         lin = import_file.readline()
@@ -83,7 +86,7 @@ def generateReport(name, protein, models, dom):
     # Draw initial alignment +length, final alignment +length
     ret.write('\nAlignments:\n' +
               'Original alignment: Length: ')
-    alig = open('aligns/' + dom + '-' + name + '.best.nex')
+    alig = open(ALIGNS_PATH + dom + '-' + name + '.best.nex')
     length = ''
     while alig:
         lin = alig.readline()
@@ -92,7 +95,7 @@ def generateReport(name, protein, models, dom):
             break
     ret.write(length + '\n' +
               'Final alignment: Length: ')
-    alig = open('aligns/' + dom + '-' + name + '.best.nex')
+    alig = open(ALIGNS_PATH + dom + '-' + name + '.best.nex')
     print('alignment printing')
     while alig:
         lin = alig.readline()
@@ -112,7 +115,7 @@ def generateReport(name, protein, models, dom):
     print('alignment printing done')
 
     # Best model(s)+ respective parameters and BIC values(?)
-    prot_hand = open('Prot/' + dom + '-' + name + '.pro')
+    prot_hand = open(PROT_PATH + dom + '-' + name + '.pro')
     while prot_hand:
         prot = prot_hand.readline()
         # print prot
@@ -137,15 +140,15 @@ def generateReport(name, protein, models, dom):
 
     for i in models:
         ret.write('\nTree found by PhyML using the ' + i.split('+')[0] + ' model:\n')
-        tree = consense('ML/' + dom + '-' + name + i.split('+')[0] + '_phyml_boot_trees.txt')
+        tree = AlignUtil.consense(ML_PATH + dom + '-' + name + i.split('+')[0] + '_phyml_boot_trees.txt')
         trees += tree + '\n'
         ret.write(tree + '\n')
     #              Bayesian selected tree
     ret.write('\nTree found by MrBayes using the best model:\n')
-    try:
-        read = open('Bayes' + os.sep + dom + '-' + name + '-bayes.nxs.con')
-    except NameError:
-        read = open('Bayes' + os.sep + dom + '-' + name + '-bayes.nxs.con.tre')
+    if os.path.exists(BAYES_PATH + dom + '-' + name + '-bayes.nxs.con'):
+        read = open(BAYES_PATH + dom + '-' + name + '-bayes.nxs.con')
+    else:
+        read = open(BAYES_PATH + dom + '-' + name + '-bayes.nxs.con.tre')
     taxa = {}
     while read:
         lin = read.readline()
@@ -169,21 +172,6 @@ def generateReport(name, protein, models, dom):
     print('trees printed')
     read.close()
     ret.close()
-    with open('Reports' + os.sep + dom + '-' + name + '-trees.tre', 'w') as report:
+    with open(REPORTS_PATH + dom + '-' + name + '-trees.tre', 'w') as report:
         report.write(trees)
 
-
-def consense(fil):
-    """Returns a newick consensus tree of the trees in fil"""
-    with open('inputer', 'w') as dum:
-        dum.write(fil + '\nf\n' + fil.split('.')[0] + '_cons\ny\nf\n' + fil.split('.')[0] + '.tre')
-    os.system('./consense < inputer')
-    tree = ''
-    with open('Reports/' + fil.split('.')[0] + '.tre') as treefil:
-        for i in treefil:
-            tree += i.strip()
-    try:
-        os.remove('inputer')
-    except OSError:
-        pass
-    return tree
