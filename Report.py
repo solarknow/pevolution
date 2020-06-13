@@ -18,7 +18,7 @@ def generateReport(name, protein, models, dom):
     ret.write('Reciprocal Best BLAST Results\n')
     ret.write('-----------------------------\n\n')
     ret.write('Query sequence Accension number: ' + protein.accession + ' Query sequence organism: ' +
-              protein.binomial + '\n')
+              protein.organism + '\n')
     ret.write(
         'BLASTs are performed using expected value (E-value) thresholds based on the kingdom (Bacteria, Archaea, '
         'and Eukaryota).\n' +
@@ -174,4 +174,3 @@ def generateReport(name, protein, models, dom):
     ret.close()
     with open(REPORTS_PATH + dom + '-' + name + '-trees.tre', 'w') as report:
         report.write(trees)
-

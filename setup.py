@@ -4,8 +4,6 @@ try:
     from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
-# from urllib import urlretrieve
-# import tarfile, zipfile
 
 
 setup(name='pevolution',

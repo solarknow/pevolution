@@ -57,7 +57,6 @@ def dict_extract(fil):
 def shorten_sequence_names(fas):
     """Takes in a fasta file fas that has sequences and shortens the names, assigning to a new file"""
     out = fas.split('.')[0]
-
     orgs = {}
     with open(fas) as infile:
         for line in infile:

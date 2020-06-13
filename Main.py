@@ -1,7 +1,7 @@
 import os
 import sys
 
-import psutil
+
 from Bio import Entrez
 
 import AlignUtil
@@ -11,15 +11,12 @@ import SeqUtil
 from FetchUtil import ORTHOS_PATH
 from constants import DATA_PATH, ALIGNS_PATH
 
-PROCS = psutil.cpu_count()
 
 os.makedirs('Data', exist_ok=True)
 os.makedirs('Orthos', exist_ok=True)
 
 # Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
-phyml = ''
-if '-y' in sys.argv:
-    phyml = '-y'
+local = '-y' in sys.argv
 try:
     query = sys.argv[1]
     out = sys.argv[2]
@@ -30,27 +27,26 @@ except IndexError:
     query = input('Query accession no: ')
     out = input('Output file: ')
     dom = input('Organism Domain to be explored: euk,bac,arch, or all ').lower()
-    phy = input("Should we use PhyML to find trees, in addition to MrBayes? [y/N]")
+    loc = input('Run locally? [y/N]')
     FetchUtil.set_email(input('Email: '))
-    if phy.lower() == 'y':
-        phyml = '-y'
+    local = loc.lower() == 'y'
 if os.path.exists(DATA_PATH + dom + '-' + out + '.fas'):
     AlignUtil.align_sequences_prank(out, dom)
     models = SeqUtil.prottest_best_models(ALIGNS_PATH + dom + '-' + out + '.best.nex')
-    if phyml == '-y':
-        AlignUtil.run_phyml(out, dom, models)
     AlignUtil.prepare_bayes_files(out, dom, models)
     AlignUtil.run_bayes_and_report(out, dom, FetchUtil.fetch_protein(query), models)
 else:
-    arch_list = ['Haloferax volcanii', 'Sulfolobus tokodaii', 'Methanococcus aeolicus', 'Methanobrevibacter smithii',
-                 'Thermococcus sibiricus', 'Archaeoglobus fulgidus', 'Nanoarchaeum equitans',
-                 'Thermoplasma acidophilum']
-    bac_list = ['Gemmata obscuriglobus', 'Prosthecobacter dejongeii', 'Verrucomicrobium spinosum',
-                'Rickettsia prowazekii', 'Agrobacterium tumefaciens', 'Escherichia coli', 'Bacillus subtilis',
-                'Anabaena variabilis', 'Thermotoga maritima']
-    euk_list = ['Drosophila melanogaster', 'Homo sapiens', 'Oryza sativa', 'Trypanosoma brucei',
-                'Plasmodium falciparum', 'Saccharomyces cerevisiae', 'Neurospora crassa',
-                'Arabidopsis thaliana']  # subject to change
+    arch_list = {'309800': 'Haloferax volcanii DS2', '273063': 'Sulfurisphaera tokodaii str. 7',
+                 '419665': 'Methanococcus aeolicus Nankai-3', '2173': 'Methanobrevibacter smithii',
+                 '604354': 'Thermococcus sibiricus MM 739', '2234': 'Archaeoglobus fulgidus',
+                 '228908': 'Nanoarchaeum equitans Kin4-M', '273075': 'Thermoplasma acidophilum DSM 1728'}
+    bac_list = {'214688': 'Gemmata obscuriglobus UQM 2246', '48465': 'Prosthecobacter dejongeii',
+                '2736': 'Verrucomicrobium spinosum', '782': 'Rickettsia prowazekii', '358': 'Agrobacterium tumefaciens',
+                '562': 'Escherichia coli', '1423': 'Bacillus subtilis', '264691': 'Anabaena variabilis',
+                '243274': 'Thermotoga maritima MSB8'}
+    euk_list = {'7227': 'Drosophila melanogaster', '9606': 'Homo sapiens', '4530': 'Oryza sativa',
+                '5691': 'Trypanosoma brucei', '5833': 'Plasmodium falciparum', '4932': 'Saccharomyces cerevisiae',
+                '5141': 'Neurospora crassa', '3702': 'Arabidopsis thaliana'}  # subject to change
     # setting threshold values: thresh1-w/ arch ;thresh2-w/ bac;
     dom_query = FetchUtil.fetch_protein(query).domain
     if dom_query == 'Archaea':
@@ -70,25 +66,24 @@ else:
     print("Blasting")
     if dom == 'arch' or dom == 'all':
         print("Archea")
-        for a in arch_list:
-            p = Reciprocal.bestrecipblast(a, query, thresh1)
-            print(p)
+        for a, binom in arch_list.items():
+            p = Reciprocal.bestrecipblast([a, binom], query, thresh1, local)
             if 'arch' in accs:
                 accs['arch'].update(p)
             else:
                 accs['arch'] = p
     if dom == 'bac' or dom == 'all':
         print("Bacteria")
-        for b in bac_list:
-            p = Reciprocal.bestrecipblast(b, query, thresh2)
+        for b, binom in bac_list.items():
+            p = Reciprocal.bestrecipblast([b, binom], query, thresh2, local)
             if 'bac' in accs:
                 accs['bac'].update(p)
             else:
                 accs['bac'] = p
     if dom == 'euk' or dom == 'all':
         print("Eukarya")
-        for e in euk_list:
-            p = Reciprocal.bestrecipblast(e, query, thresh3)
+        for e, binom in euk_list.items():
+            p = Reciprocal.bestrecipblast([e, binom], query, thresh3, local)
             if 'euk' in accs:
                 accs['euk'].update(p)
             else:
@@ -107,13 +102,13 @@ else:
     for d, daccs in accs.items():
         print(daccs)
         for seq in daccs.values():
-            FetchUtil.write_fasta(seq[0])
+            FetchUtil.write_fasta(FetchUtil.fetch_protein(seq[0]))
             with open(ORTHOS_PATH + seq[0] + '.fasta') as fil_arr:
-                with open(ORTHOS_PATH + seq[0] + '.fasta', 'w') as fil:
+                with open(ORTHOS_PATH + seq[0] + '.fas', 'w') as fil:
                     for i in fil_arr:
                         if i.startswith('>'):
                             fil.write(i.strip() + ' ' + seq[1] + '  ' + seq[2] + '\n')
                         else:
                             fil.write(i)
-            SeqUtil.fasta_add_sequence(DATA_PATH + d + '-' + out + '.fas', ORTHOS_PATH + seq[0] + '.fasta')
+            SeqUtil.fasta_add_sequence(DATA_PATH + d + '-' + out + '.fas', ORTHOS_PATH + seq[0] + '.fas')
         SeqUtil.fasta_add_sequence(DATA_PATH + 'all-' + out + '.fas', DATA_PATH + d + '-' + out + '.fas')

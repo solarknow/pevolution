@@ -9,4 +9,7 @@ BAYES_PATH = 'Bayes' + os.sep
 ML_PATH = 'ML' + os.sep
 REPORTS_PATH = 'Reports' + os.sep
 PROT_PATH = 'Prot' + os.sep
-PROTTEST_PATH ='prottest' + os.sep + 'prottest-3.4.jar'
+PROTTEST_PATH = 'prottest' + os.sep + 'prottest-3.4.jar'
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(ROOT_DIR, 'blastdb', 'dbs')

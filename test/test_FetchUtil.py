@@ -11,7 +11,7 @@ class TestFetchUtil(unittest.TestCase):
     def setUp(self):
         self.test_email = 'example@gmail.com'
         self.test_accession = 'AJA33470'
-        self.expected_organism = 'Vibrio sp. AN61'
+        self.expected_organism = {'1570068': 'Vibrio sp. AN61'}
         self.expected_domain = 'Bacteria'
         self.expected_path = 'Orthos' + os.sep + 'AJA33470.fasta'
         self.expected_definition = 'MreB, partial [Vibrio sp. AN61].'
@@ -31,7 +31,7 @@ class TestFetchUtil(unittest.TestCase):
         FetchUtil.set_email(self.test_email)
         test_protein = FetchUtil.fetch_protein(self.test_accession)
         self.assertTrue(test_protein.accession == self.test_accession)
-        self.assertTrue(test_protein.binomial == self.expected_organism)
+        self.assertTrue(test_protein.organism == self.expected_organism)
         self.assertTrue(test_protein.domain == self.expected_domain)
         self.assertTrue(test_protein.definition == self.expected_definition)
         self.assertTrue(test_protein.seq == self.expected_seq)
@@ -50,7 +50,12 @@ class TestFetchUtil(unittest.TestCase):
         self.assertIn(self.expected_path, glob('Orthos' + os.sep + '*'))
 
     def test_remote_blast_writes(self):
-        FetchUtil.remote_blast(self.expected_path, 1e-10, self.expected_xml_path, self.expected_organism)
+        FetchUtil.remote_blast(self.expected_path, 1e-10, self.expected_xml_path,
+                               list(self.expected_organism.values())[0])
+        self.assertTrue(os.path.exists(self.expected_xml_path) and Path(self.expected_xml_path).stat().st_size > 0)
+
+    def test_local_blast_writes(self):
+        FetchUtil.local_blast(self.expected_path, 1e-10, self.expected_xml_path, list(self.expected_organism.keys())[0])
         self.assertTrue(os.path.exists(self.expected_xml_path) and Path(self.expected_xml_path).stat().st_size > 0)
 
 

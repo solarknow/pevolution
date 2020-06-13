@@ -11,26 +11,30 @@ os.makedirs(XML_PATH, exist_ok=True)
 os.makedirs(DICTS_PATH, exist_ok=True)
 
 
-def bestrecipblast(org, source, thresh=5):
+def bestrecipblast(org, source, thresh=5, local=False):
     """
     Returns the best pairwise reciprocal BLAST using source accession no. from
     against org organism
-    :param org: Target binomial organism
+    :param local:
+    :param org: Target taxonomic id and binomial organism name
     :param source: source accession Id
     :param thresh: E-value threshold
     :return: Dict[Binomial Organism: List[Best Accession Number, place in target search, place in source search]]
     """
     source_protein = FetchUtil.fetch_protein(source)
-    source_binomial = source_protein.binomial
+    source_organism = source_protein.organism
     acclist = {}
     ac = []
-    print("Source Organism: " + str(source_binomial))
+    print("Source Organism: " + str(source_organism['binomial']))
     FetchUtil.write_fasta(source_protein)
-    file_name = source_protein.accession + '_' + ''.join(w[:2] for w in org.split())
+    file_name = source_protein.accession + '_' + ''.join(w[:2] for w in org[1].split()[:2])
     print("Using {} as filename".format(file_name))
     outfile = XML_PATH + file_name + '.xml'
     if not os.path.exists(outfile):
-        FetchUtil.remote_blast(ORTHOS_PATH + source + '.fasta', thresh, outfile, org)
+        if local:
+            FetchUtil.local_blast(ORTHOS_PATH + source + '.fasta', thresh, outfile, org[0])
+        else:
+            FetchUtil.remote_blast(ORTHOS_PATH + source + '.fasta', thresh, outfile, org[1])
     else:
         print('Outfile exists')
     with open(outfile) as qoutput:
@@ -44,15 +48,20 @@ def bestrecipblast(org, source, thresh=5):
     print("First BLAST Done. Sequences found: " + str(ac))
 
     for o in ac:
-        print("BLASTING back to " + source_binomial)
+        print("BLASTING back to " + source_organism['binomial'])
         o_prot = FetchUtil.fetch_protein(o)
         acc = []
         FetchUtil.write_fasta(o_prot)
-        file_name = o_prot.accession + '_' + ''.join(w[:2] for w in source_binomial.split())
+        file_name = o_prot.accession + '_' + ''.join(w[:2] for w in source_organism['binomial'].split()[:2])
         print("Using " + file_name + " as a new filename")
         outfile = XML_PATH + file_name + '.xml'
         if not os.path.exists(outfile):
-            FetchUtil.remote_blast(ORTHOS_PATH + o_prot.accession + '.fasta', thresh, outfile, source_binomial)
+            if local:
+                FetchUtil.local_blast(ORTHOS_PATH + o_prot.accession + '.fasta', thresh, outfile,
+                                      source_organism['taxid'])
+            else:
+                FetchUtil.remote_blast(ORTHOS_PATH + o_prot.accession + '.fasta', thresh, outfile,
+                                       source_organism['binomial'])
         else:
             print('Outfile exists')
         with open(outfile) as q1output:
@@ -68,8 +77,8 @@ def bestrecipblast(org, source, thresh=5):
 
         if source in acc:
             print("It's twue!")
-            name = o_prot.binomial
-            acclist[name] = [
+            name = o_prot.organism
+            acclist[name['taxid']] = [
                 o,
                 str(ac.index(o) + 1) + '/' + str(len(ac)),
                 str(acc.index(source) + 1) + '/' + str(len(acc))

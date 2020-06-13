@@ -28,18 +28,18 @@ else:
     bac_e_thresh = 1e-10
     euk_e_thresh = 5
 
-init_acc = [Reciprocal.bestrecipblast('Homo sapiens', query, euk_e_thresh),
-            Reciprocal.bestrecipblast('Escherichia coli', query, bac_e_thresh),
-            Reciprocal.bestrecipblast('Haloferax volcanii', query, arch_e_thresh)]
+init_acc = [Reciprocal.bestrecipblast([9606, 'Homo sapiens'], query, euk_e_thresh, True),
+            Reciprocal.bestrecipblast([358, 'Agrobacterium tumefaciens'], query, bac_e_thresh, True),
+            Reciprocal.bestrecipblast([309800, 'Haloferax volcanii'], query, arch_e_thresh, True)]
 runs = []
 count = 0
-orgs = ['Homo sapiens', 'Escherichia coli', 'Haloferax volcanii']
+orgs = [[9606, 'Homo sapiens'], [358, 'Agrobacterium tumefaciens'], [309800, 'Haloferax volcanii']]
 for acc in init_acc:
     if acc == {}:
         continue
     count += 1
     print("Pass " + repr(count))
-    acs = [Reciprocal.bestrecipblast(o, list(acc.values())[0][0], 5) for o in orgs]
+    acs = [Reciprocal.bestrecipblast(o, list(acc.values())[0][0], 5, True) for o in orgs]
     runs.append(acs)
 
 print(runs)

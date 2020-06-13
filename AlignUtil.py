@@ -17,7 +17,7 @@ def align_sequences_prank(out, dom):
     SeqUtil.shorten_sequence_names(DATA_PATH + dom + '-' + out + '.fas')
     if not os.path.exists(ALIGNS_PATH + dom + '-' + out + '.best.nex'):
         subprocess.run(['prank', '-d=' + DATA_PATH + dom + '-' + out, '-o=' + ALIGNS_PATH + dom + '-' + out,
-                         '-f=nexus', '-quiet'])
+                        '-f=nexus', '-quiet'])
         SeqUtil.prank_to_mrbayes(ALIGNS_PATH + dom + '-' + out + '.best.nex')
     print("Alignment Complete")
 
@@ -35,21 +35,21 @@ def run_phyml(out, dom, models_ori):
                                ML_PATH + dom + '-' + out + mod.split('+')[0] + '-ori')
         if models_ori[mod][0] == '0' and models_ori[mod][1] == '0':
             subprocess.run(['phyml', '-i', ML_PATH + dom + '-' + out + mod.split('+')[0] + '-ori', '-d', 'aa', '-b',
-                             '100', '-m', mod.split('+')[0], '-f', 'e', '-s', 'BEST', '-u',
-                             ALIGNS_PATH + dom + '-' + out + '.ed.2.dnd', '-o', 'tl'])
+                            '100', '-m', mod.split('+')[0], '-f', 'e', '-s', 'BEST', '-u',
+                            ALIGNS_PATH + dom + '-' + out + '.ed.2.dnd', '-o', 'tl'])
         elif models_ori[mod][0] == '0':
             subprocess.run(['phyml', '-i', ML_PATH + dom + '-' + out + mod.split('+')[0] + '-ori', '-d', 'aa', '-b',
-                             '100', '-m', mod.split('+')[0], '-f', 'e', '-v', models_ori[mod][1], '-s', 'BEST', '-u',
-                             ALIGNS_PATH + dom + '-' + out + '.2.dnd', '-o', 'tl'])
+                            '100', '-m', mod.split('+')[0], '-f', 'e', '-v', models_ori[mod][1], '-s', 'BEST', '-u',
+                            ALIGNS_PATH + dom + '-' + out + '.2.dnd', '-o', 'tl'])
         elif models_ori[mod][1] == '0':
             subprocess.run(['phyml', '-i', ML_PATH + dom + '-' + out + mod.split('+')[0] + '-ori', '-d', 'aa', '-b',
-                             '100', '-m', mod.split('+')[0], '-f', 'e', '-a', models_ori[mod][0], '-s', 'BEST', '-u',
-                             ALIGNS_PATH + dom + '-' + out + '.2.dnd', '-o', 'tl'])
+                            '100', '-m', mod.split('+')[0], '-f', 'e', '-a', models_ori[mod][0], '-s', 'BEST', '-u',
+                            ALIGNS_PATH + dom + '-' + out + '.2.dnd', '-o', 'tl'])
         else:
             subprocess.run(['phyml', '-i', ML_PATH + dom + '-' + out + mod.split('+')[0] + '-ori', '-d', 'aa', '-b',
-                             '100', '-m', mod.split('+')[0], '-f', 'e', '-v', models_ori[mod][1], '-a',
-                             models_ori[mod][0], '-s', 'BEST', '-u', ALIGNS_PATH + dom + '-' + out + '.2.dnd', '-o',
-                             'tl'])
+                            '100', '-m', mod.split('+')[0], '-f', 'e', '-v', models_ori[mod][1], '-a',
+                            models_ori[mod][0], '-s', 'BEST', '-u', ALIGNS_PATH + dom + '-' + out + '.2.dnd', '-o',
+                            'tl'])
 
 
 def prepare_bayes_files(out, dom, models_ori):

@@ -3,7 +3,7 @@ import subprocess
 
 from Bio import Entrez
 
-from constants import ORTHOS_PATH
+from constants import ORTHOS_PATH, DB_PATH
 
 
 class Protein:
@@ -15,10 +15,10 @@ class Protein:
         self.seq = ''
         self.definition = ''
         self.domain = ''
-        self.binomial = ''
+        self.organism = {}
         self.accession = ''
         processed_gp = [s for s in '  '.join(line.strip() for line in gp).split('  ') if s != '']
-        # print(processed_gp)
+
         for i, word in enumerate(processed_gp):
             if word == 'DEFINITION':
                 for sub_word in processed_gp[i + 1:]:
@@ -29,8 +29,12 @@ class Protein:
             elif word == 'ACCESSION':
                 self.accession = processed_gp[i + 1].strip()
             elif word == 'ORGANISM':
-                self.binomial = processed_gp[i + 1]
+                organism = processed_gp[i + 1]
                 self.domain = processed_gp[i + 2].split(';')[0]
+                for sub_word in processed_gp[i + 2:]:
+                    if sub_word.startswith('/db_xref="taxon'):
+                        xref = sub_word.split('=')[1]
+                        self.organism = {'taxid': xref.split(':')[1][:-1], 'binomial': organism}
             elif word == 'ORIGIN':
                 for sub_word in processed_gp[i + 1:-1]:
                     split_word = sub_word.split()
@@ -43,7 +47,7 @@ class Protein:
         obj.seq = seq
         obj.definition = definition
         obj.domain = domain
-        obj.binomial = binomial
+        obj.organism = binomial
         obj.accession = accession
         return obj
 
@@ -52,7 +56,7 @@ class Protein:
         Definition: {definition}
         Domain: {dom}
         Binomial: {bin}
-        Sequence: {seq}'''.format(acc=self.accession, definition=self.definition, dom=self.domain, bin=self.binomial,
+        Sequence: {seq}'''.format(acc=self.accession, definition=self.definition, dom=self.domain, bin=self.organism,
                                   seq=self.seq)
 
     def __eq__(self, other):
@@ -60,7 +64,7 @@ class Protein:
                self.accession == other.accession and \
                self.definition == other.definition and \
                self.domain == other.domain and \
-               self.binomial == other.binomial
+               self.organism == other.organism
 
 
 def set_email(email):
@@ -70,10 +74,10 @@ def set_email(email):
 def fetch_protein(accession):
     """
     Creates a Protein object of a Entrez search for acc accession number
-    :param accession: Accession ID or GI number
+    :param accession: Accession ID
     :return: Protein instance of fetched data for Accession
     """
-    fetched = Entrez.efetch(db='protein', id=str(accession), rettype='gp')
+    fetched = Entrez.efetch(db='protein', id=accession, rettype='gp')
     return Protein(fetched.readlines())
 
 
@@ -84,16 +88,15 @@ def write_fasta(protein):
     :return: path to file that was written
     """
     string = '>{spec}: {domain} {id}\n{seq}'.format(
-        spec=protein.binomial,
+        spec=protein.organism['binomial'],
         domain=protein.domain,
         id=protein.accession,
         seq=protein.seq
     )
     os.makedirs(ORTHOS_PATH, exist_ok=True)
     new_file = ORTHOS_PATH + protein.accession + '.fasta'
-    if not os.path.exists(new_file):
-        with open(new_file, 'w') as write_file:
-            write_file.write(string)
+    with open(new_file, 'w') as write_file:
+        write_file.write(string)
     return new_file
 
 
@@ -108,4 +111,18 @@ def remote_blast(query, threshold, outfile, organism):
     """
     blast_query = ['blastp', '-db', 'nr', '-query', query, '-evalue', str(threshold), '-out',
                    outfile, '-outfmt', str(5), '-entrez_query', organism + '[ORGN]', '-remote']
+    return subprocess.run(blast_query)
+
+
+def local_blast(query, threshold, outfile, taxid):
+    """
+    Runs a remote BLAST query.
+    :param query: File path to the sequence to use as a query
+    :param threshold: E-value threshold
+    :param outfile: File path to output file
+    :param taxid: Taxonomic id of organism to query against
+    :return: None
+    """
+    blast_query = ['blastp', '-db', os.path.join(DB_PATH, 'nr'), '-query', query, '-evalue',
+                   str(threshold), '-out', outfile, '-outfmt', str(5), '-taxids', str(taxid)]
     return subprocess.run(blast_query)
