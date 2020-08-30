@@ -3,7 +3,7 @@ import subprocess
 
 from Bio import Entrez
 
-from constants import ORTHOS_PATH, DB_PATH
+from constants import ORTHOS_PATH, DB_PATH, XML_PATH
 
 
 class Protein:
@@ -109,6 +109,7 @@ def remote_blast(query, threshold, outfile, organism):
     :param organism: Binomial name of organism to query against
     :return: None
     """
+    os.makedirs(XML_PATH, exist_ok=True)
     blast_query = ['blastp', '-db', 'nr', '-query', query, '-evalue', str(threshold), '-out',
                    outfile, '-outfmt', str(5), '-entrez_query', organism + '[ORGN]', '-remote']
     return subprocess.run(blast_query)
@@ -123,6 +124,7 @@ def local_blast(query, threshold, outfile, taxid):
     :param taxid: Taxonomic id of organism to query against
     :return: None
     """
+    os.makedirs(XML_PATH, exist_ok=True)
     blast_query = ['blastp', '-db', os.path.join(DB_PATH, 'nr'), '-query', query, '-evalue',
                    str(threshold), '-out', outfile, '-outfmt', str(5), '-taxids', str(taxid)]
     return subprocess.run(blast_query)

@@ -25,8 +25,8 @@ EEMVRAAIDGEFTAARKQLETLIVDTGMAGGDIIDQLHRSVWEFDLDERDAVRLMERIGE
 ADYRISEGANEQVQLEALLASLALSQN
 '''
         self.expected_organism = ['Vibrio sp. AN61', 'Bacteria']
-        self.expected_path = ORTHOS_PATH + 'TVT88608.fasta'
-        self.expected_header = '>Hvol\n'
+        self.expected_path = ORTHOS_PATH + 'AJA33470.fasta'
+        self.expected_header = '>Vsp.\n'
         self.test_dict_path = DICTS_PATH + 'test'
 
     def test_longest_key_length_returns_longest_length(self):
@@ -42,8 +42,6 @@ ADYRISEGANEQVQLEALLASLALSQN
             self.assertEqual(SeqUtil.dict_extract(self.test_dict_path), self.test_dict)
 
     def test_shorten_sequence_names_returns_expected_header(self):
-        test_path = self.expected_path.split('.')[0]
-        os.remove(test_path)
         SeqUtil.shorten_sequence_names(self.expected_path)
         with open(self.expected_path.split('.')[0]) as o:
             firstline = o.readline()

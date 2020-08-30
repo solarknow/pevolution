@@ -1,4 +1,4 @@
-bio~=0.1.0
+biopython~=1.70
 psutil~=5.7.0
 setuptools~=46.4.0
 pytest

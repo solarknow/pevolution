@@ -73,9 +73,8 @@ sudo python setup.py install
 ## Mac OS X:
 
 If you don't have python installed,
-Install python: https://www.python.org/ftp/python/2.7.6/python-2.7.6-macosx10.6.
-dmg
-Install pip: https://pip.pypa.io/en/latest/installing.html
+Install python: `brew install python@3.8`
+Install blast: `brew install blast`
 Install MrBayes: http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/MrBayes-3.2.2_installer_MACx64.pkg
 
 To install dependencies, run sudo python setup.py install in this directory.

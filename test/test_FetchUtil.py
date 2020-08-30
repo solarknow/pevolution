@@ -11,7 +11,7 @@ class TestFetchUtil(unittest.TestCase):
     def setUp(self):
         self.test_email = 'example@gmail.com'
         self.test_accession = 'AJA33470'
-        self.expected_organism = {'1570068': 'Vibrio sp. AN61'}
+        self.expected_organism = {'taxid': '1570068', 'binomial': 'Vibrio sp. AN61'}
         self.expected_domain = 'Bacteria'
         self.expected_path = 'Orthos' + os.sep + 'AJA33470.fasta'
         self.expected_definition = 'MreB, partial [Vibrio sp. AN61].'
@@ -51,7 +51,7 @@ class TestFetchUtil(unittest.TestCase):
 
     def test_remote_blast_writes(self):
         FetchUtil.remote_blast(self.expected_path, 1e-10, self.expected_xml_path,
-                               list(self.expected_organism.values())[0])
+                               self.expected_organism['binomial'])
         self.assertTrue(os.path.exists(self.expected_xml_path) and Path(self.expected_xml_path).stat().st_size > 0)
 
     def test_local_blast_writes(self):

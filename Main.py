@@ -1,6 +1,17 @@
+"""
+Script that kicks off a Pevolution homolog search
+Usage:
+    Main.py [options...] --email <email>
+    -d, --domain [arch, bac, euk, all] The domain of life you want to query against
+    -e, --email <email> Sets your email for remote blasting
+    -h, --help This help text
+        --local Sets the blast to run locally, currently requires a blastdb called 'nr'
+    -o, --outprefix <prefix> A short string to label result files
+    -q, --query <sequence id> An NCBI protein sequence id
+"""
 import os
 import sys
-
+import getopt
 
 from Bio import Entrez
 
@@ -15,21 +26,48 @@ from constants import DATA_PATH, ALIGNS_PATH
 os.makedirs('Data', exist_ok=True)
 os.makedirs('Orthos', exist_ok=True)
 
-# Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
-local = '-y' in sys.argv
 try:
-    query = sys.argv[1]
-    out = sys.argv[2]
-    dom = sys.argv[3]
-    if Entrez.email is None:
-        FetchUtil.set_email(input('Email: '))
-except IndexError:
-    query = input('Query accession no: ')
-    out = input('Output file: ')
-    dom = input('Organism Domain to be explored: euk,bac,arch, or all ').lower()
-    loc = input('Run locally? [y/N]')
-    FetchUtil.set_email(input('Email: '))
-    local = loc.lower() == 'y'
+    options, remainders = getopt.getopt(sys.argv[1:], 'q:o:d:e:h',
+                                        ['query=', 'outprefix=', 'domain=', 'email=', 'help', 'local'])
+except getopt.GetoptError as err:
+    # print help information and exit:
+    print(str(err))  # will print something like "option -a not recognized"
+    print(__doc__)
+    sys.exit(2)
+query = ''
+out = ''
+dom = ''
+local = False
+for opt, arg in options:
+    if opt in ('-q', '--query'):
+        query = arg
+    elif opt in ('-o', '--outprefix'):
+        out = arg
+    elif opt in ('-d', '--domain'):
+        dom = arg
+    elif opt in ('-e', '--email'):
+        FetchUtil.set_email(arg)
+    elif opt in ('-h', '--help'):
+        print(__doc__)
+        sys.exit(2)
+    elif opt == '--local':
+        local = True
+
+# # Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
+# local = '-y' in sys.argv
+# try:
+#     query = sys.argv[1]
+#     out = sys.argv[2]
+#     dom = sys.argv[3]
+#     if Entrez.email is None:
+#         FetchUtil.set_email(input('Email: '))
+# except IndexError:
+#     query = input('Query accession no: ')
+#     out = input('Output file: ')
+#     dom = input('Organism Domain to be explored: [euk, bac, arch, all] ').lower()
+#     loc = input('Run locally? [y/N]').lower()
+#     FetchUtil.set_email(input('Email: '))
+#     local = loc == 'y'
 if os.path.exists(DATA_PATH + dom + '-' + out + '.fas'):
     AlignUtil.align_sequences_prank(out, dom)
     models = SeqUtil.prottest_best_models(ALIGNS_PATH + dom + '-' + out + '.best.nex')
