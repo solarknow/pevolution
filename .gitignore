@@ -57,7 +57,7 @@ coverage.xml
 docs/_build/
 
 # Dependencies
-prank/
+prank-msa/
 phyml/
 prottest*/
 *.zip

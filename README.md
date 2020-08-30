@@ -14,7 +14,7 @@ To install pre-reqs,
 
 ```shell
 
-sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre paml prank
+sudo apt-get install python-pip mrbayes mrbayes-doc wget python-dev unzip ncbi-blast+ clustalw openjdk-7-jre paml
 
 tar zxvf prottest-3.4-20140123.tar.gz 
 mv prottest-3.4-20140123 prottest
@@ -75,9 +75,12 @@ sudo python setup.py install
 If you don't have python installed,
 Install python: `brew install python@3.8`
 Install blast: `brew install blast`
-Install MrBayes: http://downloads.sourceforge.net/project/mrbayes/mrbayes/3.2.2/MrBayes-3.2.2_installer_MACx64.pkg
-
-To install dependencies, run sudo python setup.py install in this directory.
+Install MrBayes: `wget https://github.com/NBISweden/MrBayes/releases/download/v3.2.7/mrbayes-3.2.7.tar.gz && tar zxvf mrbayes-3.2.7.tar.gz`
+Install PRANK:  
+```wget http://wasabiapp.org/download/prank/prank.osx64.170427.tgz && tar zxvf prank.osx64.170427.tgz```  
+Install prottest:
+`wget https://github.com/ddarriba/prottest3/releases/download/3.4.2-release/prottest-3.4.2-20160508.tar.gz && tar zxvf prottest-3.4.2-20160508.tar.gz`  
+To install python dependencies, run sudo python3 setup.py install in this directory.
 
 -------
 

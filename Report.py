@@ -8,7 +8,7 @@ from constants import ML_PATH, BAYES_PATH, REPORTS_PATH, DATA_PATH, ALIGNS_PATH,
 os.makedirs('Reports', exist_ok=True)
 
 
-def generateReport(name, protein, models, dom):
+def generate_report(name, protein, models, dom):
     """Generates a report summarizing the analysis done"""
     ret = open(REPORTS_PATH + 'Report-' + dom + '-' + name + '.txt', 'w')
     ret.write('Orthologous sequence Search and Alignment\n' +

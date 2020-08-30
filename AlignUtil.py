@@ -3,7 +3,7 @@ import subprocess
 
 import Report
 import SeqUtil
-from constants import DATA_PATH, ALIGNS_PATH, BAYES_PATH, ML_PATH, REPORTS_PATH
+from constants import DATA_PATH, ALIGNS_PATH, BAYES_PATH, ML_PATH, REPORTS_PATH, PRANK_PATH
 
 
 def align_sequences_prank(out, dom):
@@ -18,7 +18,7 @@ def align_sequences_prank(out, dom):
     aligns_prefix = ALIGNS_PATH + dom + '-' + out
     SeqUtil.shorten_sequence_names(data_prefix + '.fas')
     if not os.path.exists(aligns_prefix + '.best.nex'):
-        subprocess.run(['prank', f'-d={data_prefix}', f'-o={aligns_prefix}',
+        subprocess.run([PRANK_PATH, f'-d={data_prefix}', f'-o={aligns_prefix}',
                         '-f=nexus', '-quiet'])
         SeqUtil.prank_to_mrbayes(aligns_prefix + '.best.nex')
     print("Alignment Complete")
@@ -79,7 +79,7 @@ def run_bayes_and_report(out, dom, protein, models_ori):
     :return: None
     """
     subprocess.run(['mb', BAYES_PATH + dom + '-' + out + '-bayes.nxs'])
-    Report.generateReport(out, protein, models_ori, dom)
+    Report.generate_report(out, protein, models_ori, dom)
 
 
 def consense(filename):
