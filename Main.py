@@ -53,24 +53,9 @@ for opt, arg in options:
     elif opt == '--local':
         local = True
 
-# # Expected: 1=query accession no.; 2=out prefix; 3=domain (euk,bac,arch,all)
-# local = '-y' in sys.argv
-# try:
-#     query = sys.argv[1]
-#     out = sys.argv[2]
-#     dom = sys.argv[3]
-#     if Entrez.email is None:
-#         FetchUtil.set_email(input('Email: '))
-# except IndexError:
-#     query = input('Query accession no: ')
-#     out = input('Output file: ')
-#     dom = input('Organism Domain to be explored: [euk, bac, arch, all] ').lower()
-#     loc = input('Run locally? [y/N]').lower()
-#     FetchUtil.set_email(input('Email: '))
-#     local = loc == 'y'
-if os.path.exists(DATA_PATH + dom + '-' + out + '.fas'):
+if os.path.exists(f'{DATA_PATH}{dom}-{out}.fas'):
     AlignUtil.align_sequences_prank(out, dom)
-    models = SeqUtil.prottest_best_models(ALIGNS_PATH + dom + '-' + out + '.best.nex')
+    models = SeqUtil.prottest_best_models(f'{ALIGNS_PATH}{dom}-{out}.best.nex')
     AlignUtil.prepare_bayes_files(out, dom, models)
     AlignUtil.run_bayes_and_report(out, dom, FetchUtil.fetch_protein(query), models)
 else:
@@ -133,7 +118,7 @@ else:
         for v in accs.values():
             all_accs.update(v)
         num_seqs = sum(len(all_accs[j]) for j in all_accs)
-        print("Dictionary generated with " + repr(len(all_accs)) + " keys and " + repr(num_seqs) + " sequences.")
+        print(f"Dictionary generated with {len(all_accs)} keys and {num_seqs} sequences.")
     # Fetching the sequences and writing them to file
     print("Writing seqs to file.")
     print(accs)
@@ -148,5 +133,5 @@ else:
                             fil.write(i.strip() + ' ' + seq[1] + '  ' + seq[2] + '\n')
                         else:
                             fil.write(i)
-            SeqUtil.fasta_add_sequence(DATA_PATH + d + '-' + out + '.fas', ORTHOS_PATH + seq[0] + '.fas')
-        SeqUtil.fasta_add_sequence(DATA_PATH + 'all-' + out + '.fas', DATA_PATH + d + '-' + out + '.fas')
+            SeqUtil.fasta_add_sequence(f'{DATA_PATH}{d}-{out}.fas', ORTHOS_PATH + seq[0] + '.fas')
+        SeqUtil.fasta_add_sequence(f'{DATA_PATH}all-{out}.fas', f'{DATA_PATH}{d}-{out}.fas')

@@ -36,16 +36,6 @@ for opt, arg in options:
         sys.exit(2)
     elif opt == '--local':
         local = True
-# if len(sys.argv) > 1:
-#     query = sys.argv[1]
-#     local = False if sys.argv[2] == '--remote' else True
-#     if Entrez.email is None:
-#         FetchUtil.set_email(input("Email: "))
-# else:
-#     query = input('Query: ')
-#     local = True if input('Local? [y/n] ') == 'y' else False
-#     if Entrez.email is None:
-#         FetchUtil.set_email(input("Email: "))
 dom = FetchUtil.fetch_protein(query).domain
 print("Source domain: " + str(dom))
 if dom == 'Archaea':
@@ -60,19 +50,20 @@ else:
     arch_e_thresh = 1e-5
     bac_e_thresh = 1e-10
     euk_e_thresh = 5
-
-init_acc = [Reciprocal.bestrecipblast([9606, 'Homo sapiens'], query, euk_e_thresh, local),
-            Reciprocal.bestrecipblast([358, 'Agrobacterium tumefaciens'], query, bac_e_thresh, local),
-            Reciprocal.bestrecipblast([309800, 'Haloferax volcanii'], query, arch_e_thresh, local)]
+orgs = {
+    (9606, 'Homo sapiens'): euk_e_thresh,
+    (358, 'Agrobacterium tumefaciens'): bac_e_thresh,
+    (309800, 'Haloferax volcanii'): arch_e_thresh
+}
+init_acc = [Reciprocal.bestrecipblast(key, query, thresh, local) for key, thresh in orgs.items()]
 runs = []
 count = 0
-orgs = [[9606, 'Homo sapiens'], [358, 'Agrobacterium tumefaciens'], [309800, 'Haloferax volcanii']]
 for acc in init_acc:
     if acc == {}:
         continue
     count += 1
-    print("Pass " + repr(count))
-    acs = [Reciprocal.bestrecipblast(o, list(acc.values())[0][0], 5, True) for o in orgs]
+    print(f"Pass {count}")
+    acs = [Reciprocal.bestrecipblast(o, list(acc.values())[0][0], 5, local) for o in orgs]
     runs.append(acs)
 
 print(runs)

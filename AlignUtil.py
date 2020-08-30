@@ -14,11 +14,13 @@ def align_sequences_prank(out, dom):
     :return: None
     """
     print("Beginning alignment")
-    SeqUtil.shorten_sequence_names(DATA_PATH + dom + '-' + out + '.fas')
-    if not os.path.exists(ALIGNS_PATH + dom + '-' + out + '.best.nex'):
-        subprocess.run(['prank', '-d=' + DATA_PATH + dom + '-' + out, '-o=' + ALIGNS_PATH + dom + '-' + out,
+    data_prefix = DATA_PATH + dom + '-' + out
+    aligns_prefix = ALIGNS_PATH + dom + '-' + out
+    SeqUtil.shorten_sequence_names(data_prefix + '.fas')
+    if not os.path.exists(aligns_prefix + '.best.nex'):
+        subprocess.run(['prank', f'-d={data_prefix}', f'-o={aligns_prefix}',
                         '-f=nexus', '-quiet'])
-        SeqUtil.prank_to_mrbayes(ALIGNS_PATH + dom + '-' + out + '.best.nex')
+        SeqUtil.prank_to_mrbayes(aligns_prefix + '.best.nex')
     print("Alignment Complete")
 
 
@@ -60,11 +62,11 @@ def prepare_bayes_files(out, dom, models_ori):
     :param dom: domain prefix
     :return: None
     """
-    print('Calculating best model for tree inference')
-    print('Found, writing mrbayes input file')
-    if not os.path.exists(BAYES_PATH + dom + '-' + out + '-bayes.nxs'):
+    print('Writing mrbayes input file')
+    bayes_prefix = BAYES_PATH + dom + '-' + out
+    if not os.path.exists(bayes_prefix + '-bayes.nxs'):
         SeqUtil.write_to_mrbayes(ALIGNS_PATH + dom + '-' + out + '.best.nex', models_ori,
-                                 BAYES_PATH + dom + '-' + out + '-bayes.nxs')
+                                 bayes_prefix + '-bayes.nxs')
 
 
 def run_bayes_and_report(out, dom, protein, models_ori):
@@ -77,16 +79,17 @@ def run_bayes_and_report(out, dom, protein, models_ori):
     :return: None
     """
     subprocess.run(['mb', BAYES_PATH + dom + '-' + out + '-bayes.nxs'])
-    Report.generateReport(out, protein, models_ori, 'arch')
+    Report.generateReport(out, protein, models_ori, dom)
 
 
-def consense(fil):
+def consense(filename):
     """Returns a newick consensus tree of the trees in fil"""
+    file_prefix = filename.split('.')[0]
     with open('inputer', 'w') as dum:
-        dum.write(fil + '\nf\n' + fil.split('.')[0] + '_cons\ny\nf\n' + fil.split('.')[0] + '.tre')
+        dum.write(f'{filename}\nf\n{file_prefix}_cons\ny\nf\n{file_prefix}.tre')
     os.system('./consense < inputer')
     tree = ''
-    with open(REPORTS_PATH + fil.split('.')[0] + '.tre') as treefil:
+    with open(REPORTS_PATH + file_prefix + '.tre') as treefil:
         for i in treefil:
             tree += i.strip()
     return tree

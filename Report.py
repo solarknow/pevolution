@@ -25,23 +25,21 @@ def generateReport(name, protein, models, dom):
         ' These lists are then refined by picking only those sequences that are at least 50% similar and\n' +
         'whose aligned portion is at least 25% that of the query, as recommended by Moreno-Hagelsieb and Latimer ('
         '2008).\n')
-    import_file = open(DATA_PATH + dom + '-' + name + '.fas')
-    info = {}
-    while import_file:
-        lin = import_file.readline()
-        if lin == '':
-            break
-        spl = lin.split(':')
+    with open(DATA_PATH + dom + '-' + name + '.fas') as import_file:
+        info = {}
+        while import_file:
+            lin = import_file.readline()
+            if lin == '':
+                break
+            spl = lin.split(':')
 
-        try:
-            spl_data = spl[1].split()
-            # print spl_data
-            org = spl[0][1:]
-            info.update({org: spl_data})
-        except IndexError:
-            continue
+            try:
+                spl_data = spl[1].split()
+                org = spl[0][1:]
+                info.update({org: spl_data})
+            except IndexError:
+                continue
 
-    # print info
     for i in info:
         info[i].append(FetchUtil.fetch_protein(info[i][1]).definition)
     ret.write(
@@ -49,7 +47,6 @@ def generateReport(name, protein, models, dom):
         'list/length of list         ')
 
     ret.write('Seq Definition\n')
-    # print info
     keys = list(info.keys())
     keys.sort()
     length = SeqUtil.longest_key_length(info) + 6
@@ -57,89 +54,88 @@ def generateReport(name, protein, models, dom):
         # print info[i]
         # writing organism
         ret.write(i)
-        for j in range(length - len(i)):
+        for _ in range(length - len(i)):
             ret.write(' ')
         # writing Kingdom
         ret.write(info[i][0])
-        for j in range(20 - len(info[i][0])):
+        for _ in range(20 - len(info[i][0])):
             ret.write(' ')
         # writing Accession No.
         ret.write(info[i][1])
-        for j in range(25 - len(info[i][1])):
+        for _ in range(25 - len(info[i][1])):
             ret.write(' ')
         # writing 1st list no
         ret.write(info[i][2])
-        for j in range(20 - len(info[i][2])):
+        for _ in range(20 - len(info[i][2])):
             ret.write(' ')
         # writing 2nd list no
         ret.write(info[i][3])
-        for j in range(20 - len(info[i][3])):
+        for _ in range(20 - len(info[i][3])):
             ret.write(' ')
         # writing Seq Def
         ret.write(info[i][-1] + '\n')
 
     ret.write(
-        '\n\tThe higher up on the list of accension number garned by the best BLAST protocol, i.e. the smaller the '
+        '\n\tThe higher up on the list of accension number collected by the best BLAST protocol, i.e. the smaller the '
         'ratio,\nthe more likely the chosen sequence is an ortholog of the query sequence. Granted that several of '
         'the species may have \nseveral copies of the gene in question due to gene duplication events, this function '
         'chooses only the one BEST match of the several copies it may encounter.\n\n')
     # Draw initial alignment +length, final alignment +length
-    ret.write('\nAlignments:\n' +
-              'Original alignment: Length: ')
-    alig = open(ALIGNS_PATH + dom + '-' + name + '.best.nex')
-    length = ''
-    while alig:
-        lin = alig.readline()
-        if lin.startswith('dimensions'):
-            length = lin.split()[2][6:-1]
-            break
+    ret.write('\nAlignments:\nOriginal alignment: Length: ')
+    with open(ALIGNS_PATH + dom + '-' + name + '.best.nex') as alig:
+        length = ''
+        while alig:
+            lin = alig.readline()
+            if lin.startswith('dimensions'):
+                length = lin.split()[2][6:-1]
+                break
     ret.write(length + '\n' +
               'Final alignment: Length: ')
-    alig = open(ALIGNS_PATH + dom + '-' + name + '.best.nex')
-    print('alignment printing')
-    while alig:
-        lin = alig.readline()
-        if lin.startswith('dimensions'):
-            length = lin.split()[2][6:-1]
-            ret.write(length + '\n\n')
-        elif lin.startswith('matrix'):
-            alig.readline()
-            while alig:
-                lin = alig.readline()
-                if lin == ';\n':
-                    break
-                ret.write(lin)
-            break
-        elif lin == 'end;\n':
-            break
+    with open(ALIGNS_PATH + dom + '-' + name + '.best.nex') as alig:
+        print('alignment printing')
+        while alig:
+            lin = alig.readline()
+            if lin.startswith('dimensions'):
+                length = lin.split()[2][6:-1]
+                ret.write(length + '\n\n')
+            elif lin.startswith('matrix'):
+                alig.readline()
+                while alig:
+                    lin = alig.readline()
+                    if lin == ';\n':
+                        break
+                    ret.write(lin)
+                break
+            elif lin == 'end;\n':
+                break
     print('alignment printing done')
 
     # Best model(s)+ respective parameters and BIC values(?)
-    prot_hand = open(PROT_PATH + dom + '-' + name + '.pro')
-    while prot_hand:
-        prot = prot_hand.readline()
-        # print prot
-        if prot.startswith('Best model'):
-            prot_hand.readline()
-            prot_hand.readline()
-            prot_hand.readline()
-            prot_hand.readline()
-            ret.write('\nModel          deltaBIC*    BIC          BICw       -lnL    \n' +
-                      '------------------------------------------------------------\n')
-            while prot_hand:
-                prot = prot_hand.readline()
-                # print prot
-                if float(prot.split()[1]) <= 200:
-                    ret.write(prot)
-                else:
-                    break
-            break
+    with open(PROT_PATH + dom + '-' + name + '.pro') as prot_hand:
+        while prot_hand:
+            prot = prot_hand.readline()
+            # print prot
+            if prot.startswith('Best model'):
+                prot_hand.readline()
+                prot_hand.readline()
+                prot_hand.readline()
+                prot_hand.readline()
+                ret.write('\nModel          deltaBIC*    BIC          BICw       -lnL    \n' +
+                          '------------------------------------------------------------\n')
+                while prot_hand:
+                    prot = prot_hand.readline()
+                    # print prot
+                    if float(prot.split()[1]) <= 200:
+                        ret.write(prot)
+                    else:
+                        break
+                break
     print('models printed')
 
     trees = ''
 
     for i in models:
-        ret.write('\nTree found by PhyML using the ' + i.split('+')[0] + ' model:\n')
+        ret.write(f"\nTree found by PhyML using the {i.split('+')[0]} model:\n")
         tree = AlignUtil.consense(ML_PATH + dom + '-' + name + i.split('+')[0] + '_phyml_boot_trees.txt')
         trees += tree + '\n'
         ret.write(tree + '\n')

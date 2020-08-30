@@ -52,12 +52,11 @@ class Protein:
         return obj
 
     def __str__(self):
-        return '''Accession: {acc}
-        Definition: {definition}
-        Domain: {dom}
-        Binomial: {bin}
-        Sequence: {seq}'''.format(acc=self.accession, definition=self.definition, dom=self.domain, bin=self.organism,
-                                  seq=self.seq)
+        return f'''Accession: {self.accession}
+        Definition: {self.definition}
+        Domain: {self.domain}
+        Binomial: {self.organism}
+        Sequence: {self.seq}'''
 
     def __eq__(self, other):
         return self.seq == other.seq and \
@@ -87,12 +86,7 @@ def write_fasta(protein):
     :param protein: Protein instance to write to file
     :return: path to file that was written
     """
-    string = '>{spec}: {domain} {id}\n{seq}'.format(
-        spec=protein.organism['binomial'],
-        domain=protein.domain,
-        id=protein.accession,
-        seq=protein.seq
-    )
+    string = f">{protein.organism['binomial']}: {protein.domain} {protein.accession}\n{protein.seq}"
     os.makedirs(ORTHOS_PATH, exist_ok=True)
     new_file = ORTHOS_PATH + protein.accession + '.fasta'
     with open(new_file, 'w') as write_file:

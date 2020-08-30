@@ -23,18 +23,19 @@ def bestrecipblast(org, source, thresh=5, local=False):
     """
     source_protein = FetchUtil.fetch_protein(source)
     source_organism = source_protein.organism
+    target_taxid, target_binomial = org
     acclist = {}
     ac = []
-    print("Source Organism: " + str(source_organism['binomial']))
+    print(f"Source Organism: {source_organism['binomial']}")
     FetchUtil.write_fasta(source_protein)
-    file_name = source_protein.accession + '_' + ''.join(w[:2] for w in org[1].split()[:2])
-    print("Using {} as filename".format(file_name))
+    file_name = source_protein.accession + '_' + ''.join(w[:2] for w in target_binomial.split()[:2])
+    print(f"Using {file_name} as filename")
     outfile = XML_PATH + file_name + '.xml'
     if not os.path.exists(outfile):
         if local:
-            FetchUtil.local_blast(ORTHOS_PATH + source + '.fasta', thresh, outfile, org[0])
+            FetchUtil.local_blast(ORTHOS_PATH + source + '.fasta', thresh, outfile, target_taxid)
         else:
-            FetchUtil.remote_blast(ORTHOS_PATH + source + '.fasta', thresh, outfile, org[1])
+            FetchUtil.remote_blast(ORTHOS_PATH + source + '.fasta', thresh, outfile, target_binomial)
     else:
         print('Outfile exists')
     with open(outfile) as qoutput:
@@ -45,15 +46,15 @@ def bestrecipblast(org, source, thresh=5, local=False):
                     if (hsp.positives / float(hsp.align_length)) >= .4 and (
                             float(hsp.align_length) / len(hsp.query)) >= .25:
                         ac.append(align.accession)
-    print("First BLAST Done. Sequences found: " + str(ac))
+    print(f"First BLAST Done. Sequences found: {ac}")
 
     for o in ac:
-        print("BLASTING back to " + source_organism['binomial'])
+        print(f"BLASTING back to {source_organism['binomial']}")
         o_prot = FetchUtil.fetch_protein(o)
         acc = []
         FetchUtil.write_fasta(o_prot)
         file_name = o_prot.accession + '_' + ''.join(w[:2] for w in source_organism['binomial'].split()[:2])
-        print("Using " + file_name + " as a new filename")
+        print(f"Using {file_name} as a new filename")
         outfile = XML_PATH + file_name + '.xml'
         if not os.path.exists(outfile):
             if local:
@@ -73,7 +74,7 @@ def bestrecipblast(org, source, thresh=5, local=False):
                         if (hsp.positives / float(hsp.align_length)) >= .4 and (
                                 float(hsp.align_length) / len(hsp.query)) > .25:
                             acc.append(align.accession)
-        print("Reverse Done. Sequences found: " + str(acc))
+        print(f"Reverse Done. Sequences found: {acc}")
 
         if source in acc:
             print("It's twue!")
