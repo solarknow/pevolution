@@ -63,28 +63,28 @@ except IOError:
     if dom == 'arch' or dom == 'all':
         queue_arch = Queue()
         for a in arch_list:
-            p = Process(target=Reciprocal.bestrecipblast, args=(a, query, thresh1,
-                                                                queue_arch))
+            p = Process(target=Reciprocal.best_reciprocal_blast, args=(a, query, thresh1,
+                                                                       queue_arch))
             p.start()
         #       p.join()
         while not queue_arch.empty():
             arch_accs.update(queue_arch.get())
     if dom == 'bac' or dom == 'all':
-        # bac_accs=Reciprocal.bestrecipblast(bac_list,query,thresh2)
+        # bac_accs=Reciprocal.best_reciprocal_blast(bac_list,query,thresh2)
         queue_bac = Queue()
         for b in bac_list:
-            p = Process(target=Reciprocal.bestrecipblast, args=(b, query, thresh2,
-                                                                queue_bac))
+            p = Process(target=Reciprocal.best_reciprocal_blast, args=(b, query, thresh2,
+                                                                       queue_bac))
             p.start()
             p.join()
         while not queue_bac.empty():
             bac_accs.update(queue_bac.get())
     if dom == 'euk' or dom == 'all':
-        # euk_accs=Reciprocal.bestrecipblast(euk_list,query,thresh3)
+        # euk_accs=Reciprocal.best_reciprocal_blast(euk_list,query,thresh3)
         queue_euk = Queue()
         for e in euk_list:
-            p = Process(target=Reciprocal.bestrecipblast, args=(e, query, thresh3,
-                                                                queue_euk))
+            p = Process(target=Reciprocal.best_reciprocal_blast, args=(e, query, thresh3,
+                                                                       queue_euk))
             p.start()
             p.join()
         while not queue_euk.empty():

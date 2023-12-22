@@ -47,7 +47,7 @@ def generateReport(name, quer, models, dom):
     # print info
     keys = list(info.keys())
     keys.sort()
-    length = SeqUtil.findlonglen(info) + 6
+    length = SeqUtil.find_longest_key(info) + 6
     for i in keys:
         # print info[i]
         # writing organism

@@ -39,9 +39,9 @@ except IOError:
         os.mkdir('Orthos')
     except:
         pass
-    arch_accs = recip_edit.bestrecipblast(arch_list, query, thresh1)
-    bac_accs = recip_edit.bestrecipblast(bac_list, query, thresh2)
-    euk_accs = recip_edit.bestrecipblast(euk_list, query, thresh3)
+    arch_accs = recip_edit.best_reciprocal_blast(arch_list, query, thresh1)
+    bac_accs = recip_edit.best_reciprocal_blast(bac_list, query, thresh2)
+    euk_accs = recip_edit.best_reciprocal_blast(euk_list, query, thresh3)
     all_accs = {}
     all_accs.update(arch_accs)
     all_accs.update(bac_accs)

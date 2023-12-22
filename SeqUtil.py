@@ -6,8 +6,8 @@ import subprocess
 bayesmodels = ['poisson', 'jtt', 'mtrev', 'mtmam', 'wag', 'rtrev', 'cprev', 'vt', 'blosum', 'dayhoff']
 
 
-def findlonglen(dicto):
-    "finds the length of the longest key in dicto"
+def find_longest_key(dicto: dict) -> int:
+    """finds the length of the longest key in dicto"""
     keys = dicto.keys()
     pivot = ''
     for k in keys:
@@ -330,7 +330,7 @@ def splicealign(inalign, outalign):
 
         for k in dicto.keys():
             han.write(k)
-            for i in range((findlonglen(dicto) + 6) - len(k)):
+            for i in range((find_longest_key(dicto) + 6) - len(k)):
                 han.write(' ')
             han.write(dicto[k] + '\n')
         han.write(';\nend;\n')
@@ -370,7 +370,7 @@ def splicealign(inalign, outalign):
 
     for k in dicto.keys():
         han.write(k)
-        for i in range((findlonglen(dicto) + 6) - len(k)):
+        for i in range((find_longest_key(dicto) + 6) - len(k)):
             han.write(' ')
         han.write(dicto[k])
         # print dicto[k]
