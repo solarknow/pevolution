@@ -1,4 +1,4 @@
-import os
+from helpers.constants import OrthoPath
 
 from Bio import Entrez
 
@@ -8,25 +8,22 @@ def set_email(email):
 
 
 def fetch_protein(acc, fmt='fasta'):
-    """returns a file-like handle of a Entrez search for acc accession number and returns in fmt format"""
-    fetched = Entrez.efetch(db='protein', id=str(acc), rettype=fmt)
-    return fetched.readlines()
+    """returns a file-like handle of an Entrez search for acc accession number and returns in fmt format"""
+    with Entrez.efetch(db='protein', id=str(acc), rettype=fmt) as o:
+        return o.readlines()
 
 
 def fetch_fasta(acc):
     """prints the sequence in fasta format to file"""
     hand = fetch_protein(acc)
-    string = ''
     org = fetch_organism(acc)
-    string += '>' + org[0] + ': ' + org[1] + ' ' + acc + '\n'
+    string = f'>{org[0]}: {org[1]} {acc}\n'
     for line in hand[1:]:
         string += line
         if line == '\n':
-            if not os.path.exists('Orthos'):
-                os.mkdir('Orthos')
-            with open('Orthos' + os.sep + acc + '.fasta', 'w') as writ_file:
+            with open(str(OrthoPath(filename=acc + '.fasta')), 'w') as writ_file:
                 writ_file.write(string)
-            return 'Orthos/' + acc + '.fasta'
+            return OrthoPath(filename=acc + '.fasta')
 
 
 def fetch_definition(acc):
@@ -35,14 +32,14 @@ def fetch_definition(acc):
     records = '  '.join([line.strip() for line in hand])
     filtered_records = [record for record in records.split('  ') if record]
     i = 0
-    name = ''
+    name = []
     while i < len(filtered_records):
         if filtered_records[i].endswith('DEFINITION'):
             while i:
                 i += 1
                 if filtered_records[i].startswith('ACCESSION'):
-                    return name.strip()
-                name += filtered_records[i] + ' '
+                    return ' '.join(name)
+                name.append(filtered_records[i])
         i += 1
 
 

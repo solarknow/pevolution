@@ -42,7 +42,7 @@ class TestSeqUtil(unittest.TestCase):
 
     def test_dict_extract_parses_dictionary_from_file(self):
         sample_dict = {"name": "solarknow", 'age': 30, "alive": True}
-        file_path = temp_dir+os.sep+'dict_obj'
+        file_path = temp_dir + os.sep + 'dict_obj'
         with open(file_path, 'w') as write_file:
             write_file.write(str(sample_dict))
         extracted = SeqUtil.dict_extract(file_path)
@@ -63,6 +63,7 @@ class TestSeqUtil(unittest.TestCase):
             target_dict = ast.literal_eval(target.read())
         calculated_dict = SeqUtil.remove_gaps_nexus(original_fasta)
         self.assertDictEqual(target_dict, calculated_dict)
+
 
 if __name__ == '__main__':
     unittest.main()

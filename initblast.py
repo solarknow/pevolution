@@ -22,9 +22,9 @@ else:
     thresh2 = 1e-10
     thresh3 = 5
 
-init_acc = [Reciprocal.bestrecipblast('Homo sapiens', query, thresh3, None),
-            Reciprocal.bestrecipblast('Escherichia coli', query, thresh2, None),
-            Reciprocal.bestrecipblast('Haloferax volcanii', query, thresh1, None)]
+init_acc = [Reciprocal.best_reciprocal_blast('Homo sapiens', query, thresh3, None),
+            Reciprocal.best_reciprocal_blast('Escherichia coli', query, thresh2, None),
+            Reciprocal.best_reciprocal_blast('Haloferax volcanii', query, thresh1, None)]
 runs = []
 count = 0
 orgs = ['Homo sapiens', 'Escherichia coli', 'Haloferax volcanii']
@@ -35,7 +35,7 @@ for e in init_acc:
     print("Pass " + repr(count))
     for o in orgs:
         q = Queue()
-        p = Process(target=Reciprocal.bestrecipblast, args=(o, e.values()[0][0], 5, q))
+        p = Process(target=Reciprocal.best_reciprocal_blast, args=(o, e.values()[0][0], 5, q))
         p.start()
         p.join()
         acs = []

@@ -12,9 +12,8 @@ bayesmodels = ['poisson', 'jtt', 'mtrev', 'mtmam', 'wag', 'rtrev', 'cprev', 'vt'
 
 def findlonglen(dicto):
     """finds the length of the longest key in dicto"""
-    keys = dicto.keys()
     pivot = ''
-    for k in keys:
+    for k in dicto:
         if len(k) > len(pivot):
             pivot = k
     return len(pivot)
@@ -37,11 +36,8 @@ def clusttofasta(clust, out):
                 hand.readline()
                 continue
             lin = line.split()
-            try:
-                seqs[lin[0]] += lin[1]
-            except KeyError:
-                seqs.update({lin[0]: lin[1]})
-        for j in seqs.keys():
+            seqs[lin[0]] = seqs.get(lin[0], '') + lin[1]
+        for j in seqs:
             with open(out, 'a') as outfile:
                 outfile.write('>' + j + '\n' + seqs[j] + '\n\n')
 
@@ -49,34 +45,31 @@ def clusttofasta(clust, out):
 def dict_extract(fil):
     """Extracts a dict object from a given file"""
     with open(fil) as p:
-        dic = ast.literal_eval(p.read())
-        return dic
+        return ast.literal_eval(p.read())
 
 
 def rename_seqs(fas, out=None):
     """Takes in a fasta file fas that has sequences and shortens the names, assigning to a new file"""
-    infile = open(fas)
     if not out:
         out = fas.split('.')[0]
-    outfile = open(out, 'w')
     orgs = {}
-    while infile:
-        lin = infile.readline()
-        if lin == '':
-            break
-        elif lin.startswith('>'):
-            outfile.write('>')
-            linstr = lin[1:].split()
-            org = linstr[0][0] + linstr[1][0:3]
-            if org in orgs.keys():
-                org += repr(orgs[org] + 1)
-            else:
-                orgs.update({org: 1})
-            outfile.write(org + '\n')
-        else:
-            outfile.write(lin)
-    infile.close()
-    outfile.close()
+    with open(fas) as infile:
+        with open(out, 'w') as outfile:
+            while infile:
+                lin = infile.readline()
+                if lin == '':
+                    break
+                elif lin.startswith('>'):
+                    outfile.write('>')
+                    linstr = lin[1:].split()
+                    org = linstr[0][0] + linstr[1][0:3]
+                    if org in orgs.keys():
+                        org += repr(orgs[org] + 1)
+                    else:
+                        orgs.update({org: 1})
+                    outfile.write(org + '\n')
+                else:
+                    outfile.write(lin)
 
 
 def remove_gaps_nexus(fil):
@@ -93,17 +86,10 @@ def remove_gaps_nexus(fil):
                     elif title.startswith(';'):
                         break
                     spl = title.split()
-                    try:
-                        arr[spl[0]] += spl[1].strip().split('-')
-                    except KeyError:
-                        arr[spl[0]] = spl[1].strip().split('-')
+                    arr[spl[0]] = arr.get(spl[0], []) + spl[1].strip().split('-')
                 break
-    for k in arr:
-        seq = ''
-        for i in arr[k]:
-            seq += i
-        arr[k] = seq
     return {k: ''.join(v) for k, v in arr.items()}
+
 
 def nexus_to_proml(seqs, inpath):
     """Converts aligned Nexus file seqs to a ProML input file, inpath"""
@@ -130,16 +116,13 @@ def nexus_to_proml(seqs, inpath):
                 break
             name = lin.split()[0]
             seq = lin.split()[1].strip()
-            try:
-                dicto[name] += seq
-            except KeyError:
-                dicto.update({name: seq})
+            dicto[name] = dicto.get(name, '') + seq
     if not length == len(list(dicto.values())[0]):
         length = len(list(dicto.values())[0])
 
     with open(inpath, 'w') as out:
         out.write(repr(count) + '  ' + repr(length) + '\n')
-        for k in dicto.keys():
+        for k in dicto:
             out.write(k)
             for i in range(30 - len(k)):
                 out.write(' ')
@@ -148,7 +131,8 @@ def nexus_to_proml(seqs, inpath):
 
 def bayes_in_nex(infile):
     """Modifies a PRANK alignment file to be compatible with MrBayes"""
-    lines = open(infile).readlines()
+    with open(infile) as inf:
+        lines = inf.readlines()
 
     for i in range(len(lines)):
         if 'trees' in lines[i]:
@@ -156,42 +140,39 @@ def bayes_in_nex(infile):
             break
         else:
             lines[i] = lines[i].replace('\'', '')
-    fil = open(infile, 'w')
-    for j in lines:
-        fil.write(j)
-    fil.close()
+    with open(infile, 'w') as fil:
+        for j in lines:
+            fil.write(j)
 
 
 def bayesfile(infile, model, outfile):
     """Writes a Nexus file for use as a MrBayes batch file"""
-    if not os.path.exists('Bayes'):
-        os.mkdir('Bayes')
-    for k in model.keys():
+    os.makedirs('Bayes', exist_ok=True)
+    for k in model:
         extra = k.split('+')
         if extra[0].lower() == 'jtt':
             extra[0] = 'jones'
         elif extra[0].lower() == 'blosum62':
             extra[0] = 'blosum'
         if extra[0].lower() in bayesmodels:
-            han = open(outfile, 'w')
-            han.write('#NEXUS\n' +
-                      'begin mrbayes;\n' +
-                      '\texe ' + infile + ';\n' +
-                      '\tprset aamodelpr=fixed(' + extra[0] + ');\n')
-            if len(extra) > 1:
-                if 'I' in extra and 'G' in extra:
-                    han.write('\tlset rates=Invgamma;\n')
-                    han.write('\tprset shapepr=fixed(' + model[k][0] + ');\n')
-                elif 'I' in extra:
-                    han.write('\tlset rates=Propinv;\n')
-                elif 'G' in extra:
-                    han.write('\tlset rates=Gamma;\n')
-                    han.write('\tprset shapepr=fixed(' + model[k][0] + ');\n')
+            with open(outfile, 'w') as han:
+                han.write('#NEXUS\n' +
+                          'begin mrbayes;\n' +
+                          f'\texe {infile};\n' +
+                          f'\tprset aamodelpr=fixed({extra[0]});\n')
+                if len(extra) > 1:
+                    if 'I' in extra and 'G' in extra:
+                        han.write('\tlset rates=Invgamma;\n')
+                        han.write(f'\tprset shapepr=fixed({model[k][0]});\n')
+                    elif 'I' in extra:
+                        han.write('\tlset rates=Propinv;\n')
+                    elif 'G' in extra:
+                        han.write('\tlset rates=Gamma;\n')
+                        han.write(f'\tprset shapepr=fixed({model[k][0]});\n')
 
-            han.write('\tmcmc ngen=50000 samplefreq=50 file=' + outfile + ';\n' +
-                      '\tsumt burnin=250;\n' +
-                      'end;\n\n')
-            han.close()
+                han.write(f'\tmcmc ngen=50000 samplefreq=50 file={outfile};\n' +
+                          '\tsumt burnin=250;\n' +
+                          'end;\n\n')
 
 
 def boot(infile, outfile, norep):
@@ -203,7 +184,7 @@ def boot(infile, outfile, norep):
         seqs = {}
         for i in range(num_seqs):
             lin = hand.readline().strip().split()
-            seqs.update({lin[0]: lin[1]})
+            seqs[lin[0]] = lin[1]
     with open(outfile, 'w') as hand2:
         for j in range(norep):
             hand2.write(str(num_seqs) + '   ' + str(length) + '\n')
@@ -211,10 +192,7 @@ def boot(infile, outfile, norep):
             for i in range(length):
                 rand_int = random.randint(0, length - 1)
                 for k in seqs:
-                    try:
-                        newseq[k] += seqs[k][rand_int]
-                    except KeyError:
-                        newseq.update({k: seqs[k][rand_int]})
+                    newseq[k] = newseq.get(k, '') + seqs[k][rand_int]
             for k in newseq:
                 hand2.write(k + '    ' + newseq[k] + '\n')
             hand2.write('\n\n')

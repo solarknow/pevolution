@@ -5,14 +5,12 @@ from Bio.Blast import NCBIXML
 
 import FetchUtil
 from helpers import commands
+from helpers.constants import XMLPath, DictsPath
 
-if not os.path.exists('XML'):
-    os.mkdir('XML')
-if not os.path.exists('dicts'):
-    os.mkdir('dicts')
+os.makedirs('dicts', exist_ok=True)
 
 
-def bestrecipblast(org, seed, thresh=5, queue=None):
+def best_reciprocal_blast(org, seed, thresh=5, queue=None):
     """Returns the best pairwise reciprocal BLAST using seed accession no. from against org organism"""
     seedorg = FetchUtil.fetch_organism(seed)[0]
     acclist = {}
@@ -21,7 +19,7 @@ def bestrecipblast(org, seed, thresh=5, queue=None):
     dum = str(int(int(seed.split('.')[0][-5:]) * random.random()))
 
     commands.run_blast(seed, thresh, dum, org)
-    with open('XML' + os.sep + dum + '.xml') as qoutput:
+    with open(str(XMLPath(dum + '.xml'))) as qoutput:
         parser = NCBIXML.parse(qoutput)
     for lin in parser:
         for align in lin.alignments:
@@ -35,7 +33,7 @@ def bestrecipblast(org, seed, thresh=5, queue=None):
         print(o)
         FetchUtil.fetch_fasta(o)
         commands.run_blast(o, thresh, dum, seedorg[0])
-        with open('XML' + os.sep + dum + '.xml') as q1output:
+        with open(str(XMLPath(dum + '.xml'))) as q1output:
             parse = NCBIXML.parse(q1output)
         acc = []
         print('blasted')
@@ -55,7 +53,7 @@ def bestrecipblast(org, seed, thresh=5, queue=None):
             name = FetchUtil.fetch_organism(o)[0]
             acclist[name] = [o, str(ac.index(o) + 1) + '/' + str(len(ac)),
                              str(acc.index(seed) + 1) + '/' + str(len(acc))]
-            with open('dicts' + os.sep + seed, 'a') as dicts:
+            with open(str(DictsPath(seed)), 'a') as dicts:
                 dicts.write(str(acclist) + '\n')
             break
     if queue is not None:
