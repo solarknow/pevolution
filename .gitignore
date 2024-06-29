@@ -72,4 +72,7 @@ Prot/
 Reports/
 inputer
 snapshot/
+
+# IDE
 .idea/
+venv/

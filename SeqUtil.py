@@ -1,23 +1,26 @@
+import ast
 import os
-import psutil
 import random
-import subprocess
+
+import psutil
+
+from helpers.commands import run_prottest, clustal_align
+from helpers.file_formats import nexus_fmt
 
 bayesmodels = ['poisson', 'jtt', 'mtrev', 'mtmam', 'wag', 'rtrev', 'cprev', 'vt', 'blosum', 'dayhoff']
 
 
-def find_longest_key(dicto: dict) -> int:
+def findlonglen(dicto):
     """finds the length of the longest key in dicto"""
-    keys = dicto.keys()
     pivot = ''
-    for k in keys:
+    for k in dicto:
         if len(k) > len(pivot):
             pivot = k
     return len(pivot)
 
 
 def clusttofasta(clust, out):
-    "converts a clustal alignment file to a fasta file out"
+    """converts a clustal alignment file to a fasta file out"""
     with open(clust) as hand:
         seqs = {}
         hand.readline()
@@ -33,155 +36,103 @@ def clusttofasta(clust, out):
                 hand.readline()
                 continue
             lin = line.split()
-            try:
-                seqs[lin[0]] += lin[1]
-            except KeyError:
-                seqs.update({lin[0]: lin[1]})
-        for j in seqs.keys():
+            seqs[lin[0]] = seqs.get(lin[0], '') + lin[1]
+        for j in seqs:
             with open(out, 'a') as outfile:
                 outfile.write('>' + j + '\n' + seqs[j] + '\n\n')
 
 
-def dicextract(fil):
-    "Extracts a dict object from a given file"
-    p = open(fil)
-    dic = {}
-    for i in p:
-        dicobjects = i.strip()[1:-1]
-        ar = dicobjects.split(',')
-        # print ar
-        for pair in ar:
-            pairs = pair.split(': ')
-            # print pairs
-            dic.update({str(pairs[0]): str(pairs[1])})
-    return dic
+def dict_extract(fil):
+    """Extracts a dict object from a given file"""
+    with open(fil) as p:
+        return ast.literal_eval(p.read())
 
 
-def rename(fas):
-    "Takes in a fasta file fas that has sequences and shortens the names, assigning to a new file"
-    infile = open(fas)
-    out = fas.split('.')[0]
-    outfile = open(out, 'w')
+def rename_seqs(fas, out=None):
+    """Takes in a fasta file fas that has sequences and shortens the names, assigning to a new file"""
+    if not out:
+        out = fas.split('.')[0]
     orgs = {}
-    while infile:
-        lin = infile.readline()
-        if lin == '':
-            break
-        elif lin.startswith('>'):
-            outfile.write('>')
-            linstr = lin[1:].split()
-            org = linstr[0][0] + linstr[1][0:3]
-            if org in orgs.keys():
-                org += repr(orgs[org] + 1)
-            else:
-                orgs.update({org: 1})
-            outfile.write(org + '\n')
-        else:
-            outfile.write(lin)
-
-
-def modseqs(fil):
-    "Modifies the file of aligned sequences to remove gapped positions"
-    arr = {}
-    filin = open(fil)
-    while filin:
-        title = filin.readline()
-        if title.startswith('matrix'):
-            while filin:
-                title = filin.readline()
-                if title.startswith('\n'):
-                    continue
-                elif title.startswith(';'):
+    with open(fas) as infile:
+        with open(out, 'w') as outfile:
+            while infile:
+                lin = infile.readline()
+                if lin == '':
                     break
-                spl = title.split()
-                try:
-                    arr[spl[0]] += spl[1].strip().split('-')
-                except KeyError:
-                    arr.update({spl[0]: spl[1].strip().split('-')})
-            break
-    for k in arr:
-        seq = ''
-        for i in arr[k]:
-            seq += i
-        arr[k] = seq
-    return arr
+                elif lin.startswith('>'):
+                    outfile.write('>')
+                    linstr = lin[1:].split()
+                    org = linstr[0][0] + linstr[1][0:3]
+                    if org in orgs.keys():
+                        org += repr(orgs[org] + 1)
+                    else:
+                        orgs.update({org: 1})
+                    outfile.write(org + '\n')
+                else:
+                    outfile.write(lin)
 
 
-def pamlseqfas(seqs, inpath):
-    "Converts aligned FASTA file seqs to a ProML input file, inpath, Plus 1 space"
-    seqstr = ''
-    seqsin = open(seqs)
-    seqstr += seqsin.readline()[1:].strip()
-    count = 1
-    length = 0
-    for i in range(11 - len(seqstr)):
-        seqstr += ' '
-    while seqsin:
-        line = seqsin.readline()
-        if line.startswith('>'):
-            count += 1
-            seqstr += '\n' + line[1:].strip()
-            for i in range(11 - len(line[1:].strip())):
-                seqstr += ' '
-        else:
-            seqstr += line.strip()
-            if count == 1:
-                length += len(line.strip())
-        if line == '':
-            break
-    seqsout = open(inpath, 'w')
-    seqsout.write(repr(count) + '  ' + repr(length) + '\n' +
-                  seqstr)
-    seqsin.close()
-    seqsout.close()
+def remove_gaps_nexus(fil):
+    """Modifies the file of nexus aligned sequences to remove gapped positions"""
+    arr = {}
+    with open(fil) as infile:
+        while infile:
+            title = infile.readline()
+            if title.startswith('matrix'):
+                while infile:
+                    title = infile.readline()
+                    if title.startswith('\n'):
+                        continue
+                    elif title.startswith(';'):
+                        break
+                    spl = title.split()
+                    arr[spl[0]] = arr.get(spl[0], []) + spl[1].strip().split('-')
+                break
+    return {k: ''.join(v) for k, v in arr.items()}
 
 
-def pamlseqnex(seqs, inpath):
-    "Converts aligned Nexus file seqs to a ProML input file, inpath"
-    seqsin = open(seqs)
-    count = 0
-    length = 0
-    while seqsin:
-        lin = seqsin.readline()
-        if lin.startswith('dimensions'):
-            count = int(lin.split()[1][5:])
-            length = int(lin.split()[2][6:len(lin.split()[2]) - 1])
-            break
-    out = open(inpath, 'w')
+def nexus_to_proml(seqs, inpath):
+    """Converts aligned Nexus file seqs to a ProML input file, inpath"""
+    with open(seqs) as seqsin:
+        count = 0
+        length = 0
+        while seqsin:
+            lin = seqsin.readline()
+            if lin.startswith('dimensions'):
+                count = int(lin.split()[1][5:])
+                length = int(lin.split()[2][6:len(lin.split()[2]) - 1])
+                break
 
-    while seqsin:
-        lin = seqsin.readline()
-        if lin.startswith('matrix'):
-            break
-    dicto = {}
-    while seqsin:
-        lin = seqsin.readline()
-        # print '\''+lin+'\''
-
-        if lin == '\n':
-            continue
-        elif lin == ';\n':
-            break
-        name = lin.split()[0]
-        seq = lin.split()[1].strip()
-        # print name, seq
-        try:
-            dicto[name] += seq
-        except:
-            dicto.update({name: seq})
+        while seqsin:
+            lin = seqsin.readline()
+            if lin.startswith('matrix'):
+                break
+        dicto = {}
+        while seqsin:
+            lin = seqsin.readline()
+            if lin == '\n':
+                continue
+            elif lin == ';\n':
+                break
+            name = lin.split()[0]
+            seq = lin.split()[1].strip()
+            dicto[name] = dicto.get(name, '') + seq
     if not length == len(list(dicto.values())[0]):
         length = len(list(dicto.values())[0])
-    out.write(repr(count) + '  ' + repr(length) + '\n')
-    for k in dicto.keys():
-        out.write(k)
-        for i in range(30 - len(k)):
-            out.write(' ')
-        out.write(dicto[k] + '\n')
+
+    with open(inpath, 'w') as out:
+        out.write(repr(count) + '  ' + repr(length) + '\n')
+        for k in dicto:
+            out.write(k)
+            for i in range(30 - len(k)):
+                out.write(' ')
+            out.write(dicto[k] + '\n')
 
 
-def bayesinNex(infile):
-    "Modifies a PRANK alignment file to be compatible with MrBayes"
-    lines = open(infile).readlines()
+def bayes_in_nex(infile):
+    """Modifies a PRANK alignment file to be compatible with MrBayes"""
+    with open(infile) as inf:
+        lines = inf.readlines()
 
     for i in range(len(lines)):
         if 'trees' in lines[i]:
@@ -189,90 +140,77 @@ def bayesinNex(infile):
             break
         else:
             lines[i] = lines[i].replace('\'', '')
-    fil = open(infile, 'w')
-    for j in lines:
-        fil.write(j)
-    fil.close()
+    with open(infile, 'w') as fil:
+        for j in lines:
+            fil.write(j)
 
 
 def bayesfile(infile, model, outfile):
-    "Writes a Nexus file for use as a MrBayes batch file"
-    if not os.path.exists('Bayes'):
-        subprocess.call(['mkdir', 'Bayes'])
-    for k in model.keys():
+    """Writes a Nexus file for use as a MrBayes batch file"""
+    os.makedirs('Bayes', exist_ok=True)
+    for k in model:
         extra = k.split('+')
         if extra[0].lower() == 'jtt':
             extra[0] = 'jones'
         elif extra[0].lower() == 'blosum62':
             extra[0] = 'blosum'
         if extra[0].lower() in bayesmodels:
-            han = open(outfile, 'w')
-            han.write('#NEXUS\n' +
-                      'begin mrbayes;\n' +
-                      '\texe ' + infile + ';\n' +
-                      '\tprset aamodelpr=fixed(' + extra[0] + ');\n')
-            if len(extra) > 1:
-                if 'I' in extra and 'G' in extra:
-                    han.write('\tlset rates=Invgamma;\n')
-                    han.write('\tprset shapepr=fixed(' + model[k][0] + ');\n')
-                elif 'I' in extra:
-                    han.write('\tlset rates=Propinv;\n')
-                elif 'G' in extra:
-                    han.write('\tlset rates=Gamma;\n')
-                    han.write('\tprset shapepr=fixed(' + model[k][0] + ');\n')
+            with open(outfile, 'w') as han:
+                han.write('#NEXUS\n' +
+                          'begin mrbayes;\n' +
+                          f'\texe {infile};\n' +
+                          f'\tprset aamodelpr=fixed({extra[0]});\n')
+                if len(extra) > 1:
+                    if 'I' in extra and 'G' in extra:
+                        han.write('\tlset rates=Invgamma;\n')
+                        han.write(f'\tprset shapepr=fixed({model[k][0]});\n')
+                    elif 'I' in extra:
+                        han.write('\tlset rates=Propinv;\n')
+                    elif 'G' in extra:
+                        han.write('\tlset rates=Gamma;\n')
+                        han.write(f'\tprset shapepr=fixed({model[k][0]});\n')
 
-            han.write('\tmcmc ngen=50000 samplefreq=50 file=' + outfile + ';\n' +
-                      '\tsumt burnin=250;\n' +
-                      'end;\n\n')
-            han.close()
+                han.write(f'\tmcmc ngen=50000 samplefreq=50 file={outfile};\n' +
+                          '\tsumt burnin=250;\n' +
+                          'end;\n\n')
 
 
 def boot(infile, outfile, norep):
-    "takes in an aligned phylip file and creates a file in phylip format with norep bootstrap datasets"
-    hand = open(infile)
-    lin = hand.readline()
-    noseqs = int(lin.split()[0])
-    length = int(lin.strip().split()[1])
-    seqs = {}
-    for i in range(noseqs):
-        lin = hand.readline().strip().split()
-        seqs.update({lin[0]: lin[1]})
-    # print 'seqs'+str(seqs)
-    hand2 = open(outfile, 'w')
-    for j in range(norep):
-        hand2.write(str(noseqs) + '   ' + str(length) + '\n')
-        newseqs = {}
-        for i in range(length):
-            randInt = random.randint(0, length - 1)
-            for j in seqs:
-                try:
-                    newseqs[j] += seqs[j][randInt]
-                except KeyError:
-                    newseqs.update({j: seqs[j][randInt]})
-        for k in newseqs:
-            hand2.write(k + '    ' + newseqs[k] + '\n')
-        hand2.write('\n\n')
-    hand2.close()
+    """takes in an aligned phylip file and creates a file in phylip format with norep bootstrap datasets"""
+    with open(infile) as hand:
+        lin = hand.readline()
+        num_seqs = int(lin.split()[0])
+        length = int(lin.strip().split()[1])
+        seqs = {}
+        for i in range(num_seqs):
+            lin = hand.readline().strip().split()
+            seqs[lin[0]] = lin[1]
+    with open(outfile, 'w') as hand2:
+        for j in range(norep):
+            hand2.write(str(num_seqs) + '   ' + str(length) + '\n')
+            newseq = {}
+            for i in range(length):
+                rand_int = random.randint(0, length - 1)
+                for k in seqs:
+                    newseq[k] = newseq.get(k, '') + seqs[k][rand_int]
+            for k in newseq:
+                hand2.write(k + '    ' + newseq[k] + '\n')
+            hand2.write('\n\n')
 
 
-def noseqs(fil):
-    "returns number of seqs in given fil fasta file"
+def count_fasta_seqs(fil):
+    """returns number of seqs in given fil fasta file"""
     try:
         p = open(fil)
-    except:
+    except FileNotFoundError:
         return 0
-    count = 0
-    while p:
-        lin = p.readline()
-        if lin == '':
-            break
-        elif lin.startswith('>'):
-            count += 1
-    return count
+    num_seqs = sum([1 for lin in p if lin.startswith('>')])
+    p.close()
+    return num_seqs
 
 
-def splicealign(inalign, outalign):
-    "Splices out evolutionarily uncertain areas in inalign, realigns the new sequence"
+def splice_align(inalign, outalign):
+    """Splices out evolutionarily uncertain areas in inalign, realigns the new sequence"""
     align = open(inalign)
     dicto = {}
     inalign = inalign.split('.')[0]
@@ -302,7 +240,7 @@ def splicealign(inalign, outalign):
                         dicto[lo[0]] += lo[1]
                     except KeyError:
                         dicto.update({lo[0]: lo[1]})
-    ##sequences have been read in; determining the positions to be removed
+    # sequences have been read in; determining the positions to be removed
     pos = {}
 
     for i in dicto.values():
@@ -310,7 +248,7 @@ def splicealign(inalign, outalign):
             if i[c] == '-':
                 try:
                     pos[c] += 1
-                except:
+                except KeyError:
                     pos.update({c: 1})
     # print pos
     # processing pos; eliminating key:value pairs whose values are less than half len(i)
@@ -321,20 +259,15 @@ def splicealign(inalign, outalign):
     post.sort()
     # initial condition to stop recursion
     if len(post) <= .05 * align_size:
-        han = open(outalign, 'w')
-        han.write('#NEXUS\n' +
-                  'begin data;\n' +
-                  'dimensions ntax=' + repr(noseq) + ' nchar=' + repr(align_size) + ';\n' +
-                  'format datatype=protein interleave=no gap=-;\n' +
-                  'matrix\n\n')
+        with open(outalign, 'w') as han:
+            han.write(nexus_fmt(repr(noseq), repr(align_size), 'protein'))
 
-        for k in dicto.keys():
-            han.write(k)
-            for i in range((find_longest_key(dicto) + 6) - len(k)):
-                han.write(' ')
-            han.write(dicto[k] + '\n')
-        han.write(';\nend;\n')
-        han.close()
+            for k in dicto.keys():
+                han.write(k)
+                for i in range((findlonglen(dicto) + 6) - len(k)):
+                    han.write(' ')
+                han.write(dicto[k] + '\n')
+            han.write(';\nend;\n')
         return
     # adds one residue on either side of the residues indicated in post
     for p in range(len(post)):
@@ -361,105 +294,94 @@ def splicealign(inalign, outalign):
         dicto.update({i: new_val})
     # creates the nex file containing the newly spliced data
     align_size = len(list(dicto.values())[0])
-    han = open(inalign + '.edit', 'w')
-    han.write('#NEXUS\n' +
-              'begin data;\n' +
-              'dimensions ntax=' + repr(len(dicto.keys())) + ' nchar=' + repr(align_size) + ';\n' +
-              'format datatype=protein interleave=no gap=-;\n' +
-              'matrix\n\n')
+    with open(inalign + '.edit', 'w') as han:
+        han.write(nexus_fmt(repr(len(dicto.keys())), repr(align_size), 'protein'))
 
-    for k in dicto.keys():
-        han.write(k)
-        for i in range((find_longest_key(dicto) + 6) - len(k)):
-            han.write(' ')
-        han.write(dicto[k])
-        # print dicto[k]
-        han.write('\n')
-    han.write(';\nend;\n')
-    han.close()
+        for k in dicto.keys():
+            han.write(k)
+            for i in range((findlonglen(dicto) + 6) - len(k)):
+                han.write(' ')
+            han.write(dicto[k])
+            # print dicto[k]
+            han.write('\n')
+        han.write(';\nend;\n')
     print('.edit written. aligning')
-    os.system('clustalw -align -infile=' + inalign + '.edit -outfile=' + inalign + '.ed -output=nexus -quiet')
-    print('.ed written splice aligning')
-    # splicealign(inalign+'.ed',outalign)
+    clustal_align(inalign + '.edit', inalign + '.ed', "nexus")
+    print('.ed written splice aligned')
 
 
 def bestmod(infile):
-    "Takes in alignment file runs protTest, and extracts best model(s)"
+    """Takes in alignment file runs protTest, and extracts best model(s)"""
     if not os.path.exists('Prot'):
         os.mkdir('Prot')
     procs = int(round(psutil.cpu_count() / 2.0))
-    # print procs
-    out = infile.split('/')[1].split('.')[0]
-    protCmd = 'java -jar prottest/prottest-3.4.jar -i ' + infile + ' -o Prot/' + out + '.pro -all-distributions -all -S 1 -threads ' + repr(
-        procs) + ' -BIC'
-    # print protCmd
-    os.system(protCmd)
-    prot_hand = open('Prot/' + out + '.pro')
-    models = {}
-    ret = {}
-    # reading and processing prottest output
-    while prot_hand:
-        lin = prot_hand.readline()
-        if lin.startswith('Model.'):
-            lsplit = lin.split()
-            mod = lsplit[2]
-            modmod = mod.split('+')
-            para = ['0', '0']  # index 0 is G index 1 is I
-            if len(modmod) > 1:
-                if 'G' in modmod:
-                    while 1:
-                        lin = prot_hand.readline()
-                        # print lin,'g'
-                        if lin.split()[0] == 'gamma':
-                            para[0] = lin.split()[6]
-                            break
-                if 'I' in modmod:
-                    while 1:
-                        lin = prot_hand.readline()
-                        # print lin.split(),'i'
-                        if lin.split()[0] == 'proportion':
-                            para[1] = lin.split()[5]
-                            break
-            models.update({mod: para})
-            # print models
-            continue
-        elif lin.startswith('Best model'):
-            lsplit = lin.split()
-            mod = lsplit[5]
-            ret.update({mod: models[mod]})
-            # print ret
-            if mod.lower().split('+')[0] not in bayesmodels:
-                while 1:
-                    lin = prot_hand.readline()
-                    # print lin,1
-                    if lin.endswith('-\n'):
-                        while 2:
-                            lin = prot_hand.readline().split()
-                            # print lin,2
-                            if lin[0].split('+')[0].lower() in bayesmodels:
-                                ret.update({lin[0]: models[lin[0]]})
-                                # print ret
+    out = infile.split(os.sep)[1].split('.')[0]
+    outfile = 'Prot' + os.sep + out + '.pro'
+    run_prottest(infile, outfile, repr(procs))
+    with open(outfile) as prot_hand:
+        models = {}
+        ret = {}
+        # reading and processing prottest output
+        while prot_hand:
+            lin = prot_hand.readline()
+            if lin.startswith('Model.'):
+                lsplit = lin.split()
+                mod = lsplit[2]
+                modmod = mod.split('+')
+                para = ['0', '0']  # index 0 is G index 1 is I
+                if len(modmod) > 1:
+                    if 'G' in modmod:
+                        while 1:
+                            lin = prot_hand.readline()
+                            # print lin,'g'
+                            if lin.split()[0] == 'gamma':
+                                para[0] = lin.split()[6]
                                 break
-                        break
+                    if 'I' in modmod:
+                        while 1:
+                            lin = prot_hand.readline()
+                            # print lin.split(),'i'
+                            if lin.split()[0] == 'proportion':
+                                para[1] = lin.split()[5]
+                                break
+                models.update({mod: para})
+                # print models
+                continue
+            elif lin.startswith('Best model'):
+                lsplit = lin.split()
+                mod = lsplit[5]
+                ret.update({mod: models[mod]})
+                # print ret
+                if mod.lower().split('+')[0] not in bayesmodels:
+                    while 1:
+                        lin = prot_hand.readline()
+                        # print lin,1
+                        if lin.endswith('-\n'):
+                            while 2:
+                                lin = prot_hand.readline().split()
+                                # print lin,2
+                                if lin[0].split('+')[0].lower() in bayesmodels:
+                                    ret.update({lin[0]: models[lin[0]]})
+                                    # print ret
+                                    break
+                            break
 
-            # elif lin.startswith('*') and :
-            #    print "Saving Tree"
-            #    tree=''
-            #   while 9:
-            #       lin=prot_hand.readline().strip()
-            #      tree+=lin
-            #      if lin.endswith(';'):
-            #         break
-            # open('Prot/'+out+'.tre','w').write(tree)
-            return ret
+                # elif lin.startswith('*') and :
+                #    print "Saving Tree"
+                #    tree=''
+                #   while 9:
+                #       lin=prot_hand.readline().strip()
+                #      tree+=lin
+                #      if lin.endswith(';'):
+                #         break
+                # open('Prot/'+out+'.tre','w').write(tree)
+                return ret
 
 
 def addseq(oldseq, newseq):
-    "Transfers the sequence from newseq to oldseq"
+    """Transfers the sequence from newseq to oldseq"""
     old = open(oldseq, 'a')
     new = open(newseq)
-    while new:
-        add = new.readline()
-        old.write(add)
-        if add == '':
-            return
+    old.write(new.read())
+    old.close()
+    new.close()
