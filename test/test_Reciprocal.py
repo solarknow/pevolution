@@ -5,7 +5,7 @@ from Bio import Entrez
 import Reciprocal
 
 
-class TestFetchUtil(unittest.TestCase):
+class TestReciprocal(unittest.TestCase):
     def setUp(self):
         Entrez.email = 'example@gmail.com'
         self.test_accession = '4557757'

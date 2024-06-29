@@ -6,9 +6,9 @@ from dataclasses import dataclass
 class PathDef:
     filename: str
     dir: str
-    os.makedirs(dir, exist_ok=True)
 
     def __str__(self):
+        os.makedirs(self.dir, exist_ok=True)
         return self.dir + os.sep + self.filename
 
 
