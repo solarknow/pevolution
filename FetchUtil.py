@@ -1,4 +1,4 @@
-from helpers.constants import OrthoPath
+from helpers.constants import OrthosPath
 
 from Bio import Entrez
 
@@ -21,9 +21,9 @@ def fetch_fasta(acc):
     for line in hand[1:]:
         string += line
         if line == '\n':
-            with open(str(OrthoPath(filename=acc + '.fasta')), 'w') as writ_file:
+            with open(str(OrthosPath(filename=acc + '.fasta')), 'w') as writ_file:
                 writ_file.write(string)
-            return OrthoPath(filename=acc + '.fasta')
+            return OrthosPath(filename=acc + '.fasta')
 
 
 def fetch_definition(acc):

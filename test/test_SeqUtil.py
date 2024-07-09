@@ -6,6 +6,7 @@ import unittest
 from Bio import Entrez
 
 import SeqUtil
+from helpers.constants import OrthosPath
 
 temp_dir = os.getcwd() + os.sep + 'Orthos'
 
@@ -18,7 +19,7 @@ class TestSeqUtil(unittest.TestCase):
         self.test_accession = 'AJA33470.1'
         self.test2_accession = 'WP_105493738.1'
         self.expected_organism = ['Vibrio sp. AN61', 'Bacteria']
-        self.expected_path = 'Orthos/AJA33470.1.fasta'
+        self.expected_path = OrthosPath('AJA33470.1.fasta')
         self.expected_definition = 'MreB, partial [Vibrio sp. AN61].'
         self.test_path = os.getcwd() + os.sep + 'test_files' + os.sep
 

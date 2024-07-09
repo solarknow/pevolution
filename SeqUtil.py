@@ -5,6 +5,7 @@ import random
 import psutil
 
 from helpers.commands import run_prottest, clustal_align
+from helpers.constants import ProtPath
 from helpers.file_formats import nexus_fmt
 
 bayesmodels = ['poisson', 'jtt', 'mtrev', 'mtmam', 'wag', 'rtrev', 'cprev', 'vt', 'blosum', 'dayhoff']
@@ -49,11 +50,11 @@ def read_dict(fil):
 
 
 def rename_seqs(fas, out=None):
-    """Takes in a fasta file fas that has sequences and shortens the names, assigning to a new file"""
+    """Takes in a fasta file path fas that has sequences and shortens the names, assigning to a new file"""
     if not out:
-        out = fas.split('.')[0]
+        out = str(fas).split('.')[0]
     orgs = {}
-    with open(fas) as infile:
+    with open(str(fas)) as infile:
         with open(out, 'w') as outfile:
             while infile:
                 lin = infile.readline()
@@ -93,7 +94,7 @@ def remove_gaps_nexus(fil):
 
 def nexus_to_proml(seqs, inpath):
     """Converts aligned Nexus file seqs to a ProML input file, inpath"""
-    with open(seqs) as seqsin:
+    with open(str(seqs)) as seqsin:
         count = 0
         length = 0
         while seqsin:
@@ -120,7 +121,7 @@ def nexus_to_proml(seqs, inpath):
     if not length == len(list(dicto.values())[0]):
         length = len(list(dicto.values())[0])
 
-    with open(inpath, 'w') as out:
+    with open(str(inpath), 'w') as out:
         out.write(repr(count) + '  ' + repr(length) + '\n')
         for k in dicto:
             out.write(k)
@@ -131,7 +132,7 @@ def nexus_to_proml(seqs, inpath):
 
 def bayes_in_nex(infile):
     """Modifies a PRANK alignment file to be compatible with MrBayes"""
-    with open(infile) as inf:
+    with open(str(infile)) as inf:
         lines = inf.readlines()
 
     for i in range(len(lines)):
@@ -140,14 +141,13 @@ def bayes_in_nex(infile):
             break
         else:
             lines[i] = lines[i].replace('\'', '')
-    with open(infile, 'w') as fil:
+    with open(str(infile), 'w') as fil:
         for j in lines:
             fil.write(j)
 
 
 def bayesfile(infile, model, outfile):
     """Writes a Nexus file for use as a MrBayes batch file"""
-    os.makedirs('Bayes', exist_ok=True)
     for k in model:
         extra = k.split('+')
         if extra[0].lower() == 'jtt':
@@ -155,10 +155,10 @@ def bayesfile(infile, model, outfile):
         elif extra[0].lower() == 'blosum62':
             extra[0] = 'blosum'
         if extra[0].lower() in bayesmodels:
-            with open(outfile, 'w') as han:
+            with open(str(outfile), 'w') as han:
                 han.write('#NEXUS\n' +
                           'begin mrbayes;\n' +
-                          f'\texe {infile};\n' +
+                          f'\texe {str(infile)};\n' +
                           f'\tprset aamodelpr=fixed({extra[0]});\n')
                 if len(extra) > 1:
                     if 'I' in extra and 'G' in extra:
@@ -170,7 +170,7 @@ def bayesfile(infile, model, outfile):
                         han.write('\tlset rates=Gamma;\n')
                         han.write(f'\tprset shapepr=fixed({model[k][0]});\n')
 
-                han.write(f'\tmcmc ngen=50000 samplefreq=50 file={outfile};\n' +
+                han.write(f'\tmcmc ngen=50000 samplefreq=50 file={str(outfile)};\n' +
                           '\tsumt burnin=250;\n' +
                           'end;\n\n')
 
@@ -310,15 +310,13 @@ def splice_align(inalign, outalign):
     print('.ed written splice aligned')
 
 
-def bestmod(infile):
+def best_model(infile):
     """Takes in alignment file runs protTest, and extracts best model(s)"""
-    if not os.path.exists('Prot'):
-        os.mkdir('Prot')
     procs = int(round(psutil.cpu_count() / 2.0))
-    out = infile.split(os.sep)[1].split('.')[0]
-    outfile = 'Prot' + os.sep + out + '.pro'
-    run_prottest(infile, outfile, repr(procs))
-    with open(outfile) as prot_hand:
+    out = str(infile).split(os.sep)[1].split('.')[0]
+    outfile = ProtPath(out + '.pro')
+    run_prottest(str(infile), outfile, repr(procs))
+    with open(str(outfile)) as prot_hand:
         models = {}
         ret = {}
         # reading and processing prottest output
@@ -380,8 +378,8 @@ def bestmod(infile):
 
 def addseq(oldseq, newseq):
     """Transfers the sequence from newseq to oldseq"""
-    old = open(oldseq, 'a')
-    new = open(newseq)
+    old = open(str(oldseq), 'a')
+    new = open(str(newseq))
     old.write(new.read())
     old.close()
     new.close()

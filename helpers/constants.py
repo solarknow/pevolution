@@ -13,7 +13,7 @@ class PathDef:
 
 
 @dataclass
-class OrthoPath(PathDef):
+class OrthosPath(PathDef):
     dir: str = 'Orthos'
 
 
@@ -27,6 +27,34 @@ class DictsPath(PathDef):
     dir: str = 'dicts'
 
 
+@dataclass
+class DataPath(PathDef):
+    dir: str = 'Data'
+
+
+@dataclass
+class AlignsPath(PathDef):
+    dir: str = 'aligns'
+
+
+@dataclass
+class ProtPath(PathDef):
+    dir: str = 'Prot'
+
+
+@dataclass
+class BayesPath(PathDef):
+    dir: str = 'Bayes'
+
+
+@dataclass
+class MLPath(PathDef):
+    dir: str = 'ML'
+
+
+@dataclass
+class ReportsPath(PathDef):
+    dir: str = 'Reports'
 def resolve_prottest_path():
     if 'prottest' in os.listdir():
         listdir = filter(lambda x: x[-3:] == 'jar', os.listdir('prottest'))
