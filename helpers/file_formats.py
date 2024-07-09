@@ -1,8 +1,7 @@
-NEXUS = '#NEXUS\n' + \
-        'begin data;\n' + \
-        'dimensions ntax={num_taxa} nchar={num_char};\n' + \
-        'format datatype={type} interleave=no gap=-;\n' + \
-        'matrix\n\n'
+NEXUS = '\n'.join(['#NEXUS', 'begin data;',
+                   'dimensions ntax={num_taxa} nchar={num_char};',
+                   'format datatype={type} interleave=no gap=-;',
+                   'matrix', '', ''])
 
 
 def nexus_fmt(num_seq, seq_len, data_type='protein'):

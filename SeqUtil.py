@@ -10,16 +10,16 @@ from helpers.file_formats import nexus_fmt
 bayesmodels = ['poisson', 'jtt', 'mtrev', 'mtmam', 'wag', 'rtrev', 'cprev', 'vt', 'blosum', 'dayhoff']
 
 
-def findlonglen(dicto):
+def find_longest_key_length(dicto):
     """finds the length of the longest key in dicto"""
     pivot = ''
     for k in dicto:
         if len(k) > len(pivot):
             pivot = k
-    return len(pivot)
+    return pivot, len(pivot)
 
 
-def clusttofasta(clust, out):
+def clustal_to_fasta(clust, out):
     """converts a clustal alignment file to a fasta file out"""
     with open(clust) as hand:
         seqs = {}
@@ -28,22 +28,22 @@ def clusttofasta(clust, out):
         hand.readline()
         while hand:
             line = hand.readline()
-            if line.split() == [] and len(line) > 0:
+            spl=line.split()
+            if spl == [] and len(line) > 0:
                 continue
             if line == '':
                 break
-            elif line.split()[0][0] in [':', '.', '*']:
+            elif spl[0][0] in [':', '.', '*']:
                 hand.readline()
                 continue
-            lin = line.split()
-            seqs[lin[0]] = seqs.get(lin[0], '') + lin[1]
+            seqs[spl[0]] = seqs.get(spl[0], '') + spl[1]
         for j in seqs:
             with open(out, 'a') as outfile:
                 outfile.write('>' + j + '\n' + seqs[j] + '\n\n')
 
 
-def dict_extract(fil):
-    """Extracts a dict object from a given file"""
+def read_dict(fil):
+    """Reads in a dict object from a given file"""
     with open(fil) as p:
         return ast.literal_eval(p.read())
 
@@ -59,14 +59,14 @@ def rename_seqs(fas, out=None):
                 lin = infile.readline()
                 if lin == '':
                     break
-                elif lin.startswith('>'):
+                elif lin[0] == '>':
                     outfile.write('>')
                     linstr = lin[1:].split()
                     org = linstr[0][0] + linstr[1][0:3]
-                    if org in orgs.keys():
+                    if org in orgs:
                         org += repr(orgs[org] + 1)
                     else:
-                        orgs.update({org: 1})
+                        orgs[org] = 1
                     outfile.write(org + '\n')
                 else:
                     outfile.write(lin)
@@ -81,9 +81,9 @@ def remove_gaps_nexus(fil):
             if title.startswith('matrix'):
                 while infile:
                     title = infile.readline()
-                    if title.startswith('\n'):
+                    if title[0] == '\n':
                         continue
-                    elif title.startswith(';'):
+                    elif title[0] == ';':
                         break
                     spl = title.split()
                     arr[spl[0]] = arr.get(spl[0], []) + spl[1].strip().split('-')
@@ -264,7 +264,7 @@ def splice_align(inalign, outalign):
 
             for k in dicto.keys():
                 han.write(k)
-                for i in range((findlonglen(dicto) + 6) - len(k)):
+                for i in range((find_longest_key_length(dicto) + 6) - len(k)):
                     han.write(' ')
                 han.write(dicto[k] + '\n')
             han.write(';\nend;\n')
@@ -299,7 +299,7 @@ def splice_align(inalign, outalign):
 
         for k in dicto.keys():
             han.write(k)
-            for i in range((findlonglen(dicto) + 6) - len(k)):
+            for i in range((find_longest_key_length(dicto) + 6) - len(k)):
                 han.write(' ')
             han.write(dicto[k])
             # print dicto[k]

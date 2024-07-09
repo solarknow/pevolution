@@ -25,3 +25,9 @@ class XMLPath(PathDef):
 @dataclass
 class DictsPath(PathDef):
     dir: str = 'dicts'
+
+
+def resolve_prottest_path():
+    if 'prottest' in os.listdir():
+        listdir = filter(lambda x: x[-3:] == 'jar', os.listdir('prottest'))
+        return PathDef(listdir[0], 'prottest')

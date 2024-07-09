@@ -31,13 +31,13 @@ class TestSeqUtil(unittest.TestCase):
             'length10': 150,
             'length100': 1,
         }
-        self.assertEqual(len('length100'), SeqUtil.findlonglen(test_dict))
+        self.assertEqual(('length100', len('length100')), SeqUtil.find_longest_key_length(test_dict))
 
     def test_clusttofasta_returns_fasta(self):
         sample_fasta = self.test_path + 'sample.fasta'
         sample_clust = self.test_path + 'sample.aln'
         calculated_fasta = temp_dir + os.sep + 'out'
-        SeqUtil.clusttofasta(sample_clust, calculated_fasta)
+        SeqUtil.clustal_to_fasta(sample_clust, calculated_fasta)
         self.assertEqual(SeqUtil.count_fasta_seqs(sample_fasta), SeqUtil.count_fasta_seqs(calculated_fasta))
 
     def test_dict_extract_parses_dictionary_from_file(self):
@@ -45,7 +45,7 @@ class TestSeqUtil(unittest.TestCase):
         file_path = temp_dir + os.sep + 'dict_obj'
         with open(file_path, 'w') as write_file:
             write_file.write(str(sample_dict))
-        extracted = SeqUtil.dict_extract(file_path)
+        extracted = SeqUtil.read_dict(file_path)
         self.assertDictEqual(sample_dict, extracted)
 
     def test_rename_fasta_renames_organism_correctly(self):
