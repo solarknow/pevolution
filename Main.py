@@ -1,7 +1,6 @@
 import getopt
 import os
 import sys
-from multiprocessing import Process, Queue
 
 import psutil
 
@@ -50,7 +49,7 @@ def main(argv):
         euk_list = ['Drosophila melanogaster', 'Homo sapiens', 'Oryza sativa', 'Trypanosoma brucei',
                     'Plasmodium falciparum', 'Saccharomyces cerevisiae', 'Neurospora crassa', 'Arabidopsis thaliana']
         # subject to change
-        # setting threshold values: thresh1-w/ arch ;thresh2-w/ bac;
+        # setting threshold values: arch_thresh-w/ arch ;bac_thresh-w/ bac;
         dom_query = FetchUtil.fetch_organism(query)[1]
         if dom_query == 'Archaea':
             thresh1 = 1e-10
@@ -70,32 +69,17 @@ def main(argv):
         euk_accs = {}
         print("Blasting")
         if dom == 'arch' or dom == 'all':
-            queue_arch = Queue()
             for a in arch_list:
-                p = Process(target=Reciprocal.best_reciprocal_blast, args=(a, query, thresh1,
-                                                                           queue_arch))
-                p.start()
-                p.join()
-            while not queue_arch.empty():
-                arch_accs.update(queue_arch.get())
+                p = Reciprocal.best_reciprocal_blast(a, query, thresh1)
+                arch_accs.update(p)
         if dom == 'bac' or dom == 'all':
-            queue_bac = Queue()
             for b in bac_list:
-                p = Process(target=Reciprocal.best_reciprocal_blast, args=(b, query, thresh2,
-                                                                           queue_bac))
-                p.start()
-                p.join()
-            while not queue_bac.empty():
-                bac_accs.update(queue_bac.get())
+                p = Reciprocal.best_reciprocal_blast(b, query, thresh2)
+                bac_accs.update(p)
         if dom == 'euk' or dom == 'all':
-            queue_euk = Queue()
             for e in euk_list:
-                p = Process(target=Reciprocal.best_reciprocal_blast, args=(e, query, thresh3,
-                                                                           queue_euk))
-                p.start()
-                p.join()
-            while not queue_euk.empty():
-                euk_accs.update(queue_euk.get())
+                p = Reciprocal.best_reciprocal_blast(e, query, thresh3)
+                euk_accs.update(p)
 
         all_accs = {}
         if dom == all:

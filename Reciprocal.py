@@ -1,5 +1,4 @@
 import random
-
 from Bio.Blast import NCBIXML
 
 import FetchUtil
@@ -14,7 +13,7 @@ def best_reciprocal_blast(org, seed, thresh=5):
     ac = []
     FetchUtil.fetch_fasta(seed)
     dum = str(int(int(seed.split('.')[0][-5:]) * random.random()))
-
+    print("Run: " + dum)
     commands.run_blast(seed, thresh, dum, org)
     with open(str(XMLPath(dum + '.xml'))) as qoutput:
         parser = NCBIXML.parse(qoutput)
@@ -28,8 +27,11 @@ def best_reciprocal_blast(org, seed, thresh=5):
 
     for o in ac:
         print(o)
+        if len(o) <= 4:
+            print('Skipping')
+            continue
         FetchUtil.fetch_fasta(o)
-        commands.run_blast(o, thresh, dum, seedorg[0])
+        commands.run_blast(o, thresh, dum, seedorg)
         with open(str(XMLPath(dum + '.xml'))) as q1output:
             parse = NCBIXML.parse(q1output)
             acc = []
@@ -53,5 +55,4 @@ def best_reciprocal_blast(org, seed, thresh=5):
             with open(str(DictsPath(seed)), 'a') as dicts:
                 dicts.write(str(acclist) + '\n')
             break
-    else:
-        return acclist
+    return acclist
