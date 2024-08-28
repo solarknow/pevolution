@@ -1,5 +1,8 @@
 import os
+import platform
 from dataclasses import dataclass
+
+import requests
 
 
 @dataclass

@@ -2,15 +2,10 @@ import getopt
 import os
 import sys
 
-import psutil
-
-import FetchUtil
 import Reciprocal
-import SeqUtil
-from helpers.commands import run_dom_file
-from helpers.constants import DataPath, OrthosPath
-
-PROCS = psutil.cpu_count()
+from Utils import SeqUtil, FetchUtil, FileUtil
+from helpers.commands import run_domain_file
+from helpers.constants import DataPath, BlastThresholds
 
 
 def main(argv):
@@ -21,15 +16,15 @@ def main(argv):
     phy = False
 
     try:
-        opts, args = getopt.getopt(argv, 'q:o:d:yh', ['query=', 'output=', 'domain=', 'with_phyml'])
+        opts, args = getopt.getopt(argv, 'q:o:d:e:yh', ['query=', 'output=', 'domain=', 'email=', 'with_phyml'])
     except getopt.GetoptError:
         print('Main.py -q|--query <query accession number> -o|--output <output name> -d|--domain <domain of life to '
-              'query> [-y | --with_phyml]')
+              'query> -e|--email <email of user> [-y | --with_phyml]')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print('Main.py -q|--query <query accession number> -o|--output <output name> -d|--domain <domain of life '
-                  'to query> [-y | --with_phyml]')
+                  'to query> -e|--email <email of user> [-y | --with_phyml]')
             sys.exit()
         elif opt in ('-q', '--query'):
             query = arg
@@ -39,6 +34,8 @@ def main(argv):
             dom = arg
         elif opt in ('-y', '--with_phyml'):
             phy = True
+        elif opt in ('-e', '--email'):
+            FetchUtil.set_email(arg)
     if not os.path.exists(str(DataPath(dom + '-' + out + '.fas'))):
         arch_list = ['Haloferax volcanii', 'Sulfolobus tokodaii', 'Methanococcus aeolicus',
                      'Methanobrevibacter smithii', 'Thermococcus sibiricus', 'Archaeoglobus fulgidus',
@@ -52,17 +49,11 @@ def main(argv):
         # setting threshold values: arch_thresh-w/ arch ;bac_thresh-w/ bac;
         dom_query = FetchUtil.fetch_organism(query)[1]
         if dom_query == 'Archaea':
-            thresh1 = 1e-10
-            thresh2 = 1e-5
-            thresh3 = 5
+            thresh = BlastThresholds(arch=1e-10, bac=1e-5, euk=5)
         elif dom_query == 'Eukaryota':
-            thresh1 = 5
-            thresh2 = 5
-            thresh3 = 1e-10
+            thresh = BlastThresholds(arch=5, bac=5, euk=1e-10)
         else:
-            thresh1 = 1e-5
-            thresh2 = 1e-10
-            thresh3 = 5
+            thresh = BlastThresholds(arch=1e-5, bac=1e-10, euk=5)
 
         arch_accs = {}
         bac_accs = {}
@@ -70,89 +61,31 @@ def main(argv):
         print("Blasting")
         if dom == 'arch' or dom == 'all':
             for a in arch_list:
-                p = Reciprocal.best_reciprocal_blast(a, query, thresh1)
-                arch_accs.update(p)
+                arch_accs.update(Reciprocal.best_reciprocal_blast(a, query, thresh.arch))
         if dom == 'bac' or dom == 'all':
             for b in bac_list:
-                p = Reciprocal.best_reciprocal_blast(b, query, thresh2)
-                bac_accs.update(p)
+                bac_accs.update(Reciprocal.best_reciprocal_blast(b, query, thresh.bac))
         if dom == 'euk' or dom == 'all':
             for e in euk_list:
-                p = Reciprocal.best_reciprocal_blast(e, query, thresh3)
-                euk_accs.update(p)
+                euk_accs.update(Reciprocal.best_reciprocal_blast(e, query, thresh.euk))
 
-        all_accs = {}
-        if dom == all:
-            all_accs.update(arch_accs)
-            all_accs.update(bac_accs)
-            all_accs.update(euk_accs)
-            num_seqs = 0
-            for j in all_accs:
-                num_seqs += len(all_accs[j])
+        all_accs = dict(list(arch_accs.items()) + list(bac_accs.items()) + list(euk_accs.items()))
+        if dom == 'all':
+            num_seqs = sum(len(v) for v in all_accs.values())
             print(f"Dictionary generated with {len(all_accs)} keys and {num_seqs} sequences.")
         # Fetching the sequences and writing them to file
         print("Writing seqs to file.")
-        for a in arch_accs:
-            FetchUtil.fetch_fasta(arch_accs[a][0])
-            with open(str(OrthosPath(arch_accs[a][0] + '.fasta'))) as fil:
-                fil_arr = fil.readlines()
+        if arch_accs:
+            FileUtil.merge_domain_fastas('arch-' + out + '.fas', arch_accs)
+            SeqUtil.addseq(DataPath('all-' + out + '.fas'), DataPath('arch-' + out + '.fas'))
+        if bac_accs:
+            FileUtil.merge_domain_fastas('bac-' + out + '.fas', bac_accs)
+            SeqUtil.addseq(DataPath('all-' + out + '.fas'), DataPath('bac-' + out + '.fas'))
+        if euk_accs:
+            FileUtil.merge_domain_fastas('euk-' + out + '.fas', euk_accs)
+            SeqUtil.addseq(DataPath('all-' + out + '.fas'), DataPath('euk-' + out + '.fas'))
 
-            with open(str(OrthosPath(arch_accs[a][0] + '.fasta')), 'w') as fil:
-                for i in range(len(fil_arr)):
-                    if i == 0:
-                        fil.write(fil_arr[i].strip() + ' ' + arch_accs[a][1] + '  ' + arch_accs[a][2] + '\n')
-                    else:
-                        fil.write(fil_arr[i])
-
-            SeqUtil.addseq(DataPath('arch-' + out + '.fas'), OrthosPath(arch_accs[a][0] + '.fasta'))
-            os.remove(str(OrthosPath(arch_accs[a][0] + '.fasta')))
-        for b in bac_accs:
-            FetchUtil.fetch_fasta(bac_accs[b][0])
-            with open(str(OrthosPath(bac_accs[b][0] + '.fasta'))) as fil:
-                fil_arr = fil.readlines()
-
-            with open(str(OrthosPath(bac_accs[b][0] + '.fasta')), 'w') as fil:
-                for i in range(len(fil_arr)):
-                    if i == 0:
-                        fil.write(fil_arr[i].strip() + ' ' + bac_accs[b][1] + '  ' + bac_accs[b][2] + '\n')
-                    else:
-                        fil.write(fil_arr[i])
-
-            SeqUtil.addseq(DataPath('bac-' + out + '.fas'), OrthosPath(bac_accs[b][0] + '.fasta'))
-            os.remove(str(OrthosPath(bac_accs[b][0] + '.fasta')))
-        for e in euk_accs:
-            FetchUtil.fetch_fasta(euk_accs[e][0])
-            with open(str(OrthosPath(euk_accs[e][0] + '.fasta'))) as fil:
-                fil_arr = fil.readlines()
-
-            with open(str(OrthosPath(euk_accs[e][0] + '.fasta')), 'w') as fil:
-                for i in range(len(fil_arr)):
-                    if i == 0:
-                        fil.write(fil_arr[i].strip() + ' ' + euk_accs[e][1] + '  ' + euk_accs[e][2] + '\n')
-                    else:
-                        fil.write(fil_arr[i])
-
-            SeqUtil.addseq(DataPath('euk-' + out + '.fas'), OrthosPath(euk_accs[e][0] + '.fasta'))
-            os.remove(str(OrthosPath(euk_accs[e][0] + '.fasta')))
-        SeqUtil.addseq(DataPath('all-' + out + '.fas'), DataPath('arch-' + out + '.fas'))
-        SeqUtil.addseq(DataPath('all-' + out + '.fas'), DataPath('bac-' + out + '.fas'))
-        SeqUtil.addseq(DataPath('all-' + out + '.fas'), DataPath('euk-' + out + '.fas'))
-        for c in all_accs:
-            FetchUtil.fetch_fasta(all_accs[c][0])
-            with open(str(OrthosPath(all_accs[c][0] + '.fasta'))) as fil:
-                fil_arr = fil.readlines()
-
-            with open(str(OrthosPath(all_accs[c][0] + '.fasta')), 'w') as fil:
-                for i in range(len(fil_arr)):
-                    if i == 0:
-                        fil.write(fil_arr[i].strip() + ' ' + all_accs[c][1] + '  ' + all_accs[c][2] + '\n')
-                    else:
-                        fil.write(fil_arr[i])
-
-            SeqUtil.addseq(DataPath('all-' + out + '.fas'), OrthosPath(all_accs[c][0] + '.fasta'))
-            os.remove(str(OrthosPath(all_accs[c][0] + '.fasta')))
-
-    run_dom_file(out, query, dom, phy)
+    run_domain_file(out, query, dom, phy)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 import os
 
-import FetchUtil
-import SeqUtil
+from Utils import SeqUtil, FetchUtil
 from helpers.constants import ReportsPath, DataPath, AlignsPath, ProtPath, MLPath, BayesPath
 
 
@@ -14,13 +13,13 @@ def generate_report(name, quer, models, dom):
         ret.write('-----------------------------\n')
         ret.write('Reciprocal Best BLAST Results\n')
         ret.write('-----------------------------\n\n')
-        ret.write(f'Query sequence Accension number: {quer} Query sequence organism: ' +
-                 f'{FetchUtil.fetch_organism(quer)[0]}\n')
+        ret.write(f'Query sequence\nAccension number: {quer}\nQuery sequence organism: ' +
+                 f'{FetchUtil.fetch_organism(quer)[0]}\n\n')
         ret.write(
-            'BLASTs are performed using expected value (E-value) thresholds based on the kingdom (Bacteria, Archaea, '
-            'and Eukaryota).\n These lists are then refined by picking only those sequences that are at least '
-            '50% similar and\n whose aligned portion is at least 25% that of the query, as recommended by '
-            'Moreno-Hagelsieb and Latimer (2008).\n')
+            'BLASTs are performed using expected value (E-value) thresholds based on the domain (Bacteria, Archaea, '
+            'and Eukaryota).\nThese lists are then refined by picking only those sequences that are at least '
+            '50% similar and\nwhose aligned portion is at least 25% that of the query, as recommended by '
+            'Moreno-Hagelsieb and Latimer (2008).\n\n')
         with open(str(DataPath(dom + '-' + name + '.fas'))) as import_file:
             info = {}
             while import_file:
@@ -30,56 +29,48 @@ def generate_report(name, quer, models, dom):
                 spl = lin.split(':')
 
                 if len(spl) >= 2:
-                    spl_data = spl[1].split()
+                    spl_data = spl[1].strip().split()
                     # print spl_data
-                    org = spl[0][1:]
+                    org = spl[0]
                     info.update({org: spl_data})
 
-        # print info
         for i in info:
             info[i].append(FetchUtil.fetch_definition(info[i][1]))
-        ret.write(
-            'Organism                       Kingdom     Accession No.(GI)      No. on list/length of list     No. on '
-            'list/length of list         ')
+        orgs = list(info.keys())
+        orgs.sort()
+        max_org_len = SeqUtil.find_longest_key_length(info)[1] + 3
+        columns = ['Organism', 'Domain', 'Accession No.(GI)',
+                   'No. on list/length of list', 'No. on list/length of list', 'Seq Definition']
+        rows = []
+        max_lens = [max(len(c), max_org_len) if c == 'Organism' else len(c) for c in columns]
+        for o in orgs:
+            row = []
+            for idx in range(len(columns)):
+                if columns[idx] == 'Organism':
+                    row.append(o)
+                else:
+                    max_lens[idx] = max(max_lens[idx], len(str(info[o][idx-1])))
+                    row.append(str(info[o][idx-1]))
+            rows.append(row)
 
-        ret.write('Seq Definition\n')
+        padding = 3*' '
+        header = padding.join([k+' '*(v-len(k)) for k,v in zip(columns, max_lens)]) + '\n'
+        header_spacer = padding.join(['-'*len(k)+' '*(v-len(k)) for k,v in zip(columns, max_lens)]) + '\n'
+        ret.write(header)
+        ret.write(header_spacer)
         # print info
-        keys = list(info.keys())
-        keys.sort()
-        length = SeqUtil.find_longest_key_length(info) + 6
-        for i in keys:
-            # print info[i]
-            # writing organism
-            ret.write(i)
-            for j in range(length - len(i)):
-                ret.write(' ')
-            # writing Kingdom
-            ret.write(info[i][0])
-            for j in range(20 - len(info[i][0])):
-                ret.write(' ')
-            # writing Accession No.
-            ret.write(info[i][1])
-            for j in range(25 - len(info[i][1])):
-                ret.write(' ')
-            # writing 1st list no
-            ret.write(info[i][2])
-            for j in range(20 - len(info[i][2])):
-                ret.write(' ')
-            # writing 2nd list no
-            ret.write(info[i][3])
-            for j in range(20 - len(info[i][3])):
-                ret.write(' ')
-            # writing Seq Def
-            ret.write(info[i][-1] + '\n')
+        for r in rows:
+            row = padding.join([k+' '*(v-len(k)) for k,v in zip(r, max_lens)]) + '\n'
+            ret.write(row)
 
         ret.write(
-            '\n\tThe higher up on the list of accession number garnered by the best BLAST protocol, '
-            'i.e. the smaller the ratio,\nthe more likely the chosen sequence is an ortholog of the query sequence. '
-            'Granted that several of the species may have \nseveral copies of the gene in question due to gene '
-            'duplication events, this function chooses only the one BEST match of the several copies it may '
+            '\nThe higher up on the list of accession number garnered by the best BLAST protocol, \n'
+            'i.e. the smaller the ratio, the more likely the chosen sequence is an ortholog of the query sequence. \n'
+            'Granted that several of the species may have several copies of the gene in question due to gene '
+            'duplication events, \nthis function chooses only the one BEST match of the several copies it may '
             'encounter.\n\n')
         # Draw initial alignment +length, final alignment +length
-        ret.write('\nAlignments:\nOriginal alignment: Length: ')
+        ret.write('\nAlignments:\nOriginal alignment length: ')
         with open(str(AlignsPath(dom + '-' + name + '.best.nex'))) as alig:
             length = ''
             while alig:
@@ -87,7 +78,7 @@ def generate_report(name, quer, models, dom):
                 if lin.startswith('dimensions'):
                     length = lin.split()[2][6:-1]
                     break
-        ret.write(length + '\n' + 'Final alignment: Length: ')
+        ret.write(length + '\n' + 'Final alignment length: ')
         with open(str(AlignsPath(dom + '-' + name + '.best.nex'))) as alig:
             print('alignment printing')
             while alig:
@@ -115,8 +106,8 @@ def generate_report(name, quer, models, dom):
                     prot_hand.readline()
                     prot_hand.readline()
                     prot_hand.readline()
-                    ret.write('\nModel          deltaBIC*    BIC          BICw       -lnL    \n' +
-                              '------------------------------------------------------------\n')
+                    ret.write('\nModel          deltaBIC*      BIC            BICw           -lnL\n' +
+                              '-------------------------------------------------------------------\n')
                     while prot_hand:
                         prot = prot_hand.readline()
                         if float(prot.split()[1]) <= 200:
@@ -133,14 +124,12 @@ def generate_report(name, quer, models, dom):
         #    trees+=tree
         #    ret.write(tree+'\n')
         #              PhyML1 + (PhyML2)
-        try:
+        if os.path.exists(str(MLPath(dom + '-' + name + i.split('+')[0] + '_phyml_boot_trees.txt'))):
             for i in models:
                 ret.write('\nTree found by PhyML using the ' + i.split('+')[0] + ' model:\n')
                 tree = consense(str(MLPath(dom + '-' + name + i.split('+')[0] + '_phyml_boot_trees.txt')))
                 trees += tree + '\n'
                 ret.write(tree + '\n')
-        except:
-            ret.write('Tree not found')
         #              Bayesian selected tree
         ret.write('\nTree found by MrBayes using the best model:\n')
         if os.path.exists(str(BayesPath(dom + '-' + name + '-bayes.nxs.con'))):
@@ -167,10 +156,10 @@ def generate_report(name, quer, models, dom):
                         tree_temp = tree_temp.replace(i + '[&prob', taxa[i] + '[&prob')
                     trees += tree_temp + '\n'
                     ret.write(trees + '\n')
+                    with open(str(ReportsPath(dom + '-' + name + '-trees.tre')), 'w') as tree_file:
+                        tree_file.write(trees)
                     break
         print('trees printed')
-    with open(str(ReportsPath(dom + '-' + name + '-trees.tre')), 'w') as tree_file:
-        tree_file.write(trees)
 
 
 def consense(fil):
@@ -183,8 +172,4 @@ def consense(fil):
     with open(str(ReportsPath(filename + '.tre'))) as treefil:
         for i in treefil:
             tree += i.strip()
-    try:
-        os.remove('inputer')
-    except OSError:
-        pass
     return tree

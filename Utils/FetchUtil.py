@@ -44,7 +44,9 @@ def fetch_definition(acc):
 
 
 def fetch_organism(acc):
-    """Fetches the organism from which acc accession number of a protein came from"""
+    """Fetches the organism from which acc accession number of a protein came from
+    @returns [Organism binomial name, Domain name]
+    """
     hand = fetch_protein(acc, 'gp')
     records = '  '.join([line.strip() for line in hand])
     filtered_records = [record for record in records.split('  ') if record]
@@ -69,7 +71,7 @@ def fetch_organism(acc):
                             else:
                                 retu[0] += ' ' + tab[k]
             else:
-                return [filtered_records[i + 11] + ' multispecies', filtered_records[i + 14].split(';')[0]]
+                return [filtered_records[i + 11] + ' multispecies', filtered_records[i + 12].split(';')[0]]
 
         if filtered_records[i] == 'ORGANISM':
             try:

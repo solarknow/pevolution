@@ -4,7 +4,7 @@ from os import sep
 
 from Bio import Entrez
 
-import FetchUtil
+from Utils import FetchUtil
 
 
 class TestFetchUtil(unittest.TestCase):

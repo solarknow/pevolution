@@ -1,5 +1,5 @@
 import sys
-import FetchUtil
+from Utils import FetchUtil
 import Reciprocal
 from helpers.constants import BlastThresholds
 
@@ -17,18 +17,17 @@ elif dom[1] == 'Eukaryota':
 else:
     thresh = BlastThresholds(arch=1e-5, bac=1e-10, euk=5)
 
-init_acc = [Reciprocal.best_reciprocal_blast('Homo sapiens', query, thresh.euk),
-            Reciprocal.best_reciprocal_blast('Escherichia coli', query, thresh.bac),
-            Reciprocal.best_reciprocal_blast('Haloferax volcanii', query, thresh.arch)]
+orgs = ['Homo sapiens', 'Bacteroidota bacterium', 'Haloferax volcanii']
+org_dict= zip(orgs, [thresh.euk, thresh.bac, thresh.arch])
+init_acc = [Reciprocal.best_reciprocal_blast(k, query, v) for k,v in org_dict.items()]
 print(init_acc)
+
 runs = []
-count = 0
-orgs = ['Homo sapiens', 'Escherichia coli', 'Haloferax volcanii']
-for e in init_acc:
-    count += 1
+for idx in range(len(init_acc)):
+    e = init_acc[idx]
     if not e:
         continue
-    print("Pass " + repr(count))
+    print("Pass " + repr(idx))
     for o in orgs:
         runs.append(Reciprocal.best_reciprocal_blast(o, list(e.values())[0][0], 5))
 
