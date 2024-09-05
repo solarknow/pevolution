@@ -8,8 +8,10 @@ from helpers.constants import XMLPath, DictsPath
 
 def best_reciprocal_blast(org, seed, thresh=5):
     """Returns the best pairwise reciprocal BLAST using seed accession no. from against org organism
-    @returns {Organism binomial name:
-    [Accession number, rank of search in target organism, rank of search in source organism]}
+    @returns {
+    Organism binomial name:
+    [Accession number, rank of search in target organism, rank of search in source organism]
+    }
     """
     seedorg = FetchUtil.fetch_organism(seed)[0]
     FetchUtil.fetch_fasta(seed)

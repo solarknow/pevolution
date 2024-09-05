@@ -60,6 +60,8 @@ prottest*/
 *.zip
 *.tgz
 phylip/
+consense
+consense*/
 
 # Generated data
 XML/
@@ -73,6 +75,7 @@ Prot/
 Reports/
 inputer
 snapshot/
+ML/
 
 # IDE
 .idea/

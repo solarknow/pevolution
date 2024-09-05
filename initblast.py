@@ -19,7 +19,7 @@ else:
 
 orgs = ['Homo sapiens', 'Bacteroidota bacterium', 'Haloferax volcanii']
 org_dict= zip(orgs, [thresh.euk, thresh.bac, thresh.arch])
-init_acc = [Reciprocal.best_reciprocal_blast(k, query, v) for k,v in org_dict.items()]
+init_acc = [Reciprocal.best_reciprocal_blast(k, query, v) for k,v in org_dict]
 print(init_acc)
 
 runs = []

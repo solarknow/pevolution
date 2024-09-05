@@ -1,13 +1,8 @@
 import ast
-import os
 import random
 
-import psutil
-from Bio.Blast import NCBIXML
-
-from helpers.commands import run_prottest, clustal_align
-from helpers.constants import ProtPath
-from helpers.file_formats import nexus_fmt
+from helpers.commands import clustal_align
+from helpers.constants import nexus_fmt
 
 bayesmodels = ['poisson', 'jtt', 'mtrev', 'mtmam', 'wag', 'rtrev', 'cprev', 'vt', 'blosum', 'dayhoff']
 
@@ -267,7 +262,7 @@ def splice_align(inalign, outalign):
 
             for k in dicto.keys():
                 han.write(k)
-                for i in range((find_longest_key_length(dicto) + 6) - len(k)):
+                for i in range((find_longest_key_length(dicto)[1] + 6) - len(k)):
                     han.write(' ')
                 han.write(dicto[k] + '\n')
             han.write(';\nend;\n')
@@ -302,7 +297,7 @@ def splice_align(inalign, outalign):
 
         for k in dicto.keys():
             han.write(k)
-            for i in range((find_longest_key_length(dicto) + 6) - len(k)):
+            for i in range((find_longest_key_length(dicto)[1] + 6) - len(k)):
                 han.write(' ')
             han.write(dicto[k])
             # print dicto[k]
@@ -315,7 +310,9 @@ def splice_align(inalign, outalign):
 
 def best_model(outfile):
     """Takes in alignment file, runs protTest, and extracts best model(s)
-    @returns {model: [gamma, proportion]}
+    @returns {
+    model: [gamma, proportion]
+    }
     """
     with open(str(outfile)) as prot_hand:
         models = {}

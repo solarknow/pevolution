@@ -1,5 +1,3 @@
-import os
-
 from Bio.Blast import NCBIXML
 
 from Utils import FetchUtil, SeqUtil

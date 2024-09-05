@@ -118,16 +118,11 @@ def generate_report(name, quer, models, dom):
         print('models printed')
 
         trees = ''
-        # print trees: ProtTest best tree
-        #    ret.write('\nTree found by ProtTest using the best model:\n')
-        #    tree=open('Prot' + os.sep +dom+'-'+name+'-mod.pro.tre').readline()
-        #    trees+=tree
-        #    ret.write(tree+'\n')
-        #              PhyML1 + (PhyML2)
-        if os.path.exists(str(MLPath(dom + '-' + name + i.split('+')[0] + '_phyml_boot_trees.txt'))):
-            for i in models:
+        for i in models:
+            prefix = f"{dom}-{name}-{i.split('+')[0]}-ori"
+            if os.path.exists(str(MLPath(prefix+'_phyml_boot_trees.txt'))):
                 ret.write('\nTree found by PhyML using the ' + i.split('+')[0] + ' model:\n')
-                tree = consense(str(MLPath(dom + '-' + name + i.split('+')[0] + '_phyml_boot_trees.txt')))
+                tree = consense(str(MLPath(prefix + '_phyml_boot_trees.txt')))
                 trees += tree + '\n'
                 ret.write(tree + '\n')
         #              Bayesian selected tree
@@ -167,9 +162,9 @@ def consense(fil):
     filename = str(fil).split('.')[0]
     with open('inputer', 'w') as dum:
         dum.write(str(fil) + '\nf\n' + filename + '_cons\ny\nf\n' + filename + '.tre')
-    os.system('./consense < inputer')
+    os.system('./consense-mac.app < inputer')
     tree = ''
-    with open(str(ReportsPath(filename + '.tre'))) as treefil:
+    with open(filename + '.tre') as treefil:
         for i in treefil:
             tree += i.strip()
     return tree
