@@ -276,9 +276,9 @@ def splice_align(inalign, outalign):
             for k in dicto.keys():
                 han.write(k)
                 for i in range((find_longest_key_length(dicto)[1] + 6) - len(k)):
-                    han.write(" ")
-                han.write(dicto[k] + "\n")
-            han.write(";\nend;\n")
+                    han.write(' ')
+                han.write(dicto[k] + '\n')
+            han.write(';\nend;\n')
         return
     # adds one residue on either side of the residues indicated in post
     for p in range(len(post)):
@@ -311,7 +311,7 @@ def splice_align(inalign, outalign):
         for k in dicto.keys():
             han.write(k)
             for i in range((find_longest_key_length(dicto)[1] + 6) - len(k)):
-                han.write(" ")
+                han.write(' ')
             han.write(dicto[k])
             # print dicto[k]
             han.write("\n")
