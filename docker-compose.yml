@@ -1,0 +1,16 @@
+version: '0.5'
+services:
+  prank:
+    image: ariloytynoja/prank:latest
+  ncbi-blast:
+    image: ncbi/blast:latest
+  super-app-dotnet:
+    build: ./dotnet
+    ports:
+    - "8080:80"
+  super-app-python:
+    build: ./python
+  super-app-php:
+    build: ./php
+    ports:
+    - "8000:80"

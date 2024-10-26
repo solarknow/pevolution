@@ -1,2 +1,5 @@
-bio
+bio~=1.7.0
 setuptools>=65.5.1
+flask
+fastapi~=0.115.0
+biopython~=1.83

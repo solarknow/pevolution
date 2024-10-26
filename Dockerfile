@@ -1,6 +1,8 @@
-FROM ubuntu
-Maintainer Omniscient Sun
+FROM ubuntu:latest
+MAINTAINER Omniscient Sun
 
-Run echo "0.5" > /version
+RUN echo "0.5" > /version
 
-ADD pevolution-install.sh /
+ADD . /
+
+RUN ./pevolution-install.sh

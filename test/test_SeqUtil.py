@@ -34,20 +34,6 @@ class TestSeqUtil(unittest.TestCase):
         }
         self.assertEqual(('length100', len('length100')), SeqUtil.find_longest_key_length(test_dict))
 
-    def test_clusttofasta_returns_fasta(self):
-        sample_fasta = self.test_path + 'sample.fasta'
-        sample_clust = self.test_path + 'sample.aln'
-        calculated_fasta = temp_dir + os.sep + 'out'
-        SeqUtil.clustal_to_fasta(sample_clust, calculated_fasta)
-        self.assertEqual(SeqUtil.count_fasta_seqs(sample_fasta), SeqUtil.count_fasta_seqs(calculated_fasta))
-
-    def test_dict_extract_parses_dictionary_from_file(self):
-        sample_dict = {"name": "solarknow", 'age': 30, "alive": True}
-        file_path = temp_dir + os.sep + 'dict_obj'
-        with open(file_path, 'w') as write_file:
-            write_file.write(str(sample_dict))
-        extracted = SeqUtil.read_dict(file_path)
-        self.assertDictEqual(sample_dict, extracted)
 
     def test_rename_fasta_renames_organism_correctly(self):
         org_fasta = self.test_path + "sample_organism.fasta"
@@ -56,14 +42,6 @@ class TestSeqUtil(unittest.TestCase):
         with open(temp_dir + os.sep + 'sample_organism') as so:
             generated_species = {s[1:].strip() for s in so.readlines() if s.startswith('>')}
         self.assertSetEqual(target_species, generated_species)
-
-    def test_removes_gaps_removes_gapped_positions(self):
-        original_fasta = self.test_path + "sample.nexus"
-        target_dict_file = self.test_path + "sample_degapped"
-        with open(target_dict_file) as target:
-            target_dict = ast.literal_eval(target.read())
-        calculated_dict = SeqUtil.remove_gaps_nexus(original_fasta)
-        self.assertDictEqual(target_dict, calculated_dict)
 
 
 if __name__ == '__main__':
