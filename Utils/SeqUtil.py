@@ -362,6 +362,7 @@ def best_model(outfile):
                                     break
                             break
                 return ret
+        return None
 
 
 def addseq(oldseq, newseq):

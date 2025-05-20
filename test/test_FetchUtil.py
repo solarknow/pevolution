@@ -1,3 +1,5 @@
+import os
+import shutil
 import unittest
 from glob import glob
 from os import sep
@@ -5,16 +7,23 @@ from os import sep
 from Bio import Entrez
 
 from Utils import FetchUtil
+from helpers.constants import OrthosPath
 
+ortho_dir = OrthosPath.dir
 
 class TestFetchUtil(unittest.TestCase):
     def setUp(self):
+        if not os.path.isdir(ortho_dir):
+            os.mkdir(ortho_dir)
         Entrez.email = 'example@gmail.com'
         self.test_accession = 'AJA33470.1'
         self.expected_organism = ['Vibrio sp. AN61', 'Bacteria']
         self.expected_path = 'Orthos' + sep + 'AJA33470.1.fasta'
         self.expected_definition = 'MreB, partial [Vibrio sp. AN61].'
-        
+
+    def tearDown(self):
+        shutil.rmtree(ortho_dir)
+
     def test_set_email_sets_email(self):
         FetchUtil.set_email('mdsarwade@gmail.com')
         self.assertEqual(Entrez.email, 'mdsarwade@gmail.com')

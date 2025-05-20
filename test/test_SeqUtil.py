@@ -8,7 +8,7 @@ from Bio import Entrez
 from Utils import SeqUtil
 from helpers.constants import OrthosPath
 
-temp_dir = os.getcwd() + os.sep + 'Orthos'
+temp_dir = OrthosPath.dir
 
 
 class TestSeqUtil(unittest.TestCase):

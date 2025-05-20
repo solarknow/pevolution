@@ -1,13 +1,22 @@
 import os
+import shutil
 import unittest
 
 from Bio import Entrez
 
 from Utils import FileUtil
-from helpers.constants import DataPath
+from helpers.constants import DataPath, OrthosPath, XMLPath
+
+data_dir = DataPath.dir
+ortho_dir = OrthosPath.dir
+xml_dir = XMLPath.dir
 
 class TestFileUtil(unittest.TestCase):
     def setUp(self):
+        if not os.path.isdir(data_dir):
+            os.mkdir(data_dir)
+        if not os.path.isdir(ortho_dir):
+            os.mkdir(ortho_dir)
         Entrez.email = 'example@gmail.com'
         self.accession_dict = {
             'Gemmata obscuriglobus': ['WP_109571177.1', '1/1', '11/18'],
@@ -19,9 +28,14 @@ class TestFileUtil(unittest.TestCase):
         self.expected_accessions = ['AAA17374.1', 'NP_000240.1','BAG35497.1','AAT44531.1','BAD96530.1']
         self.test_path = os.getcwd() + os.sep + 'test_files' + os.sep
 
+    def tearDown(self):
+        shutil.rmtree(data_dir)
+        shutil.rmtree(ortho_dir)
+        shutil.rmtree(xml_dir)
+
     def test_parse_accession_numbers_from_XML(self):
         xml_path=self.test_path + 'sample.xml'
-        self.assertEqual(FileUtil.XML_parse_and_extract_accession_numbers(xml_path), self.expected_accessions)
+        self.assertEqual(FileUtil.xml_parse_and_extract_accession_numbers(xml_path), self.expected_accessions)
 
     def test_merging_multiple_fastas(self):
         FileUtil.merge_domain_fastas('bac_test.fas', self.accession_dict)

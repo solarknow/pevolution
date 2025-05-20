@@ -24,6 +24,7 @@ def fetch_fasta(acc):
             with open(str(OrthosPath(filename=acc + '.fasta')), 'w') as writ_file:
                 writ_file.write(string)
             return OrthosPath(filename=acc + '.fasta')
+    return None
 
 
 def fetch_definition(acc):
@@ -41,6 +42,7 @@ def fetch_definition(acc):
                     return ' '.join(name)
                 name.append(filtered_records[i])
         i += 1
+    return None
 
 
 def fetch_organism(acc):
@@ -84,3 +86,4 @@ def fetch_organism(acc):
             return ret
 
         i += 1
+    return None

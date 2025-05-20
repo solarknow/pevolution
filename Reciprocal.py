@@ -1,7 +1,7 @@
 import os.path
 
 from Utils import FetchUtil
-from Utils.FileUtil import XML_parse_and_extract_accession_numbers
+from Utils.FileUtil import xml_parse_and_extract_accession_numbers
 from helpers import commands
 from helpers.constants import XMLPath, DictsPath
 
@@ -20,7 +20,7 @@ def best_reciprocal_blast(org, seed, thresh=5):
     if not os.path.isfile(str(XMLPath(dum + '.xml'))) or not os.path.getsize(str(XMLPath(dum + '.xml'))):
         print('blasting')
         commands.run_blast(seed, thresh, dum, org)
-    ac = XML_parse_and_extract_accession_numbers(str(XMLPath(dum + '.xml')))
+    ac = xml_parse_and_extract_accession_numbers(str(XMLPath(dum + '.xml')))
     print("Done. Number of sequences found: " + repr(len(ac)))
     acclist = {}
     for o in ac:
@@ -33,7 +33,7 @@ def best_reciprocal_blast(org, seed, thresh=5):
         if not os.path.isfile(str(XMLPath(dum2 + '.xml'))) or not os.path.getsize(str(XMLPath(dum2 + '.xml'))):
             print('blasting back')
             commands.run_blast(o, thresh, dum2, seedorg)
-        acc = XML_parse_and_extract_accession_numbers(str(XMLPath(dum2 + '.xml')))
+        acc = xml_parse_and_extract_accession_numbers(str(XMLPath(dum2 + '.xml')))
         print("Done. Number of sequences found: " + repr(len(acc)))
 
         if seed in acc:
