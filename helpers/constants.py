@@ -70,6 +70,46 @@ class BlastThresholds:
     bac: float
     euk: float
 
+class EVals:
+    CLOSE = 1e-10
+    SIMILAR = 1e-5
+    DISTANT = 5
+
+class Domains:
+    EUKARYOTA="Eukaryota"
+    BACTERIA = "Bacteria"
+    ARCHAEA = "Archaea"
+
+def organism_list(domain):
+    arch_list = ['Haloferax volcanii', 'Sulfolobus tokodaii', 'Methanococcus aeolicus',
+                 'Methanobrevibacter smithii', 'Thermococcus sibiricus', 'Archaeoglobus fulgidus',
+                 'Nanoarchaeum equitans', 'Thermoplasma acidophilum']
+    bac_list = ['Bacillus subtilis', 'Escherichia coli', 'Gemmata obscuriglobus',
+                'Rickettsia prowazekii', 'Agrobacterium tumefaciens', 'Prosthecobacter dejongeii',
+                'Anabaena variabilis', 'Thermotoga maritima', 'Verrucomicrobium spinosum']
+    euk_list = ['Homo sapiens', 'Drosophila melanogaster', 'Oryza sativa',
+                'Trypanosoma brucei', 'Plasmodium falciparum', 'Saccharomyces cerevisiae',
+                'Neurospora crassa', 'Arabidopsis thaliana']
+    if domain == Domains.EUKARYOTA:
+        return euk_list
+    elif domain == Domains.BACTERIA:
+        return bac_list
+    elif domain == Domains.ARCHAEA:
+        return arch_list
+    else:
+        return arch_list + bac_list + euk_list
+
+def domain_thresholds(domain):
+    if domain == Domains.EUKARYOTA:
+        return BlastThresholds(arch=EVals.DISTANT, bac=EVals.DISTANT, euk=EVals.CLOSE)
+    elif domain == Domains.ARCHAEA:
+        return BlastThresholds(arch=EVals.CLOSE, bac=EVals.SIMILAR, euk=EVals.DISTANT)
+    elif domain == Domains.BACTERIA:
+        return BlastThresholds(arch=EVals.SIMILAR, bac=EVals.CLOSE, euk=EVals.DISTANT)
+    else:
+        return BlastThresholds(arch=EVals.DISTANT, bac=EVals.DISTANT, euk=EVals.DISTANT)
+
+
 NEXUS = '\n'.join(['#NEXUS', 'begin data;',
                    'dimensions ntax={num_taxa} nchar={num_char};',
                    'format datatype={type} interleave=no gap=-;',

@@ -4,7 +4,7 @@ import unittest
 
 from Bio import Entrez
 
-import Reciprocal
+from Utils import Reciprocal
 from helpers.constants import XMLPath, OrthosPath
 
 ortho_dir = OrthosPath.dir
@@ -25,7 +25,7 @@ class TestReciprocal(unittest.TestCase):
         shutil.rmtree(xml_dir)
 
     def test_best_reciprocal_blast_returns_expected_results(self):
-        results = Reciprocal.best_reciprocal_blast(self.expected_organism,self.test_accession)
+        results = Reciprocal.best_reciprocal_blast(self.expected_organism, self.test_accession)
         self.assertEqual(1, len(results))
 
 

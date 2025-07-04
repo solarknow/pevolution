@@ -1,5 +1,7 @@
 import ast
 import random
+from dataclasses import dataclass
+from typing import Optional
 
 from helpers.commands import clustal_align
 from helpers.constants import nexus_fmt
@@ -25,7 +27,7 @@ def clustal_to_fasta(clust, out):
         hand.readline()
         while hand:
             line = hand.readline()
-            spl=line.split()
+            spl = line.split()
             if spl == [] and len(line) > 0:
                 continue
             if line == '':
@@ -128,7 +130,7 @@ def nexus_to_proml(seqs, inpath):
             out.write(dicto[k] + '\n')
 
 
-def bayes_in_nex(infile):
+def make_bayes_compatible(infile):
     """Modifies a PRANK alignment file to be compatible with MrBayes"""
     with open(str(infile)) as inf:
         lines = inf.readlines()
@@ -140,14 +142,13 @@ def bayes_in_nex(infile):
         else:
             lines[i] = lines[i].replace('\'', '')
     with open(str(infile), 'w') as fil:
-        for j in lines:
-            fil.write(j)
+        fil.write(''.join(lines))
 
 
-def bayesfile(infile, model, outfile):
-    """Writes a Nexus file for use as a MrBayes batch file"""
+def create_mrbayes_cmd_file(infile, model, outfile):
+    """Writes a MrBayes command file"""
     for k in model:
-        extra = k.split('+')
+        extra = k.name.split('+')
         if extra[0].lower() == 'jtt':
             extra[0] = 'jones'
         elif extra[0].lower() == 'blosum62':
@@ -161,20 +162,20 @@ def bayesfile(infile, model, outfile):
                 if len(extra) > 1:
                     if 'I' in extra and 'G' in extra:
                         han.write('\tlset rates=Invgamma;\n')
-                        han.write(f'\tprset shapepr=fixed({model[k][0]});\n')
+                        han.write(f'\tprset shapepr=fixed({k.gamma});\n')
                     elif 'I' in extra:
                         han.write('\tlset rates=Propinv;\n')
                     elif 'G' in extra:
                         han.write('\tlset rates=Gamma;\n')
-                        han.write(f'\tprset shapepr=fixed({model[k][0]});\n')
+                        han.write(f'\tprset shapepr=fixed({k.gamma});\n')
 
                 han.write(f'\tmcmc ngen=50000 samplefreq=50 file={str(outfile)};\n' +
                           '\tsumt burnin=250;\n' +
                           'end;\n\n')
 
 
-def boot(infile, outfile, norep):
-    """takes in an aligned phylip file and creates a file in phylip format with norep bootstrap datasets"""
+def bootstrap_datasets(infile, outfile, num_rep):
+    """takes in an aligned phylip file and creates a file in phylip format with num_rep bootstrap datasets"""
     with open(infile) as hand:
         lin = hand.readline()
         num_seqs = int(lin.split()[0])
@@ -184,7 +185,7 @@ def boot(infile, outfile, norep):
             lin = hand.readline().strip().split()
             seqs[lin[0]] = lin[1]
     with open(outfile, 'w') as hand2:
-        for j in range(norep):
+        for j in range(num_rep):
             hand2.write(str(num_seqs) + '   ' + str(length) + '\n')
             newseq = {}
             for i in range(length):
@@ -307,16 +308,22 @@ def splice_align(inalign, outalign):
     clustal_align(inalign + '.edit', inalign + '.ed', "nexus")
     print('.ed written splice aligned')
 
+@dataclass(frozen=True)
+class ProteinModel:
+    name: str
+    gamma: str
+    proportion: str
 
-def best_model(outfile):
-    """Takes in alignment file, runs protTest, and extracts best model(s)
+
+def best_protein_model(outfile) -> Optional[set[ProteinModel]]:
+    """Takes in protTest output file and extracts best model(s)
     @returns {
     model: [gamma, proportion]
     }
     """
     with open(str(outfile)) as prot_hand:
         models = {}
-        ret = {}
+        ret = set()
         # reading and processing prottest output
         while prot_hand:
             lin = prot_hand.readline()
@@ -346,7 +353,7 @@ def best_model(outfile):
             elif lin.startswith('Best model'):
                 lsplit = lin.split()
                 mod = lsplit[5]
-                ret.update({mod: models[mod]})
+                ret.add(ProteinModel(name=mod, gamma=models[mod][0], proportion=models[mod][1]))
                 # print ret
                 if mod.lower().split('+')[0] not in bayesmodels:
                     while 1:
@@ -357,7 +364,7 @@ def best_model(outfile):
                                 lin = prot_hand.readline().split()
                                 # print lin,2
                                 if lin[0].split('+')[0].lower() in bayesmodels:
-                                    ret.update({lin[0]: models[lin[0]]})
+                                    ret.add(ProteinModel(name=lin[0],gamma=models[lin[0]][0],proportion=models[lin[0]][1]))
                                     # print ret
                                     break
                             break
@@ -365,7 +372,7 @@ def best_model(outfile):
         return None
 
 
-def addseq(oldseq, newseq):
+def append_sequences(oldseq, newseq):
     """Transfers the sequence from newseq to oldseq"""
     old = open(str(oldseq), 'a')
     new = open(str(newseq))

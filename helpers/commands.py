@@ -10,10 +10,9 @@ BLAST = ['blastp', '-db', 'nr', '-query', str(OrthosPath('{seed}.fasta')), '-eva
          '-out', str(XMLPath('{xml_file}.xml')), '-outfmt', 5, '-entrez_query', '\"{org}[ORGN]\"',
          '-remote']
 BAYES = ['mb', '{cmdfile}']
-PRANK = ['prank-msa' + os.sep + 'prank', '-d={infile}', '-o={outfile}', '-f=nexus', '-showall','-quiet']
-PHYML = ['phyml' + os.sep + 'src'+ os.sep + 'phyml', '-i', '{infile}', '-d', 'aa', '-b', '100', '-m', '{model}',
+PRANK = ['prank', '-d={infile}', '-o={outfile}', '-f=nexus', '-showall','-quiet']
+PHYML = ['./phyml', '-i', '{infile}', '-d', 'aa', '-b', '100', '-m', '{model}',
          '-f', 'e', '-u', '{outfile}', '-o', 'tl']
-DOM = ['python3', 'dom.py', '{out}', '{query}', '{dom}', '{phyml}']
 
 
 def format_run(cmd, **kwargs):
@@ -45,10 +44,6 @@ def run_phyml(infile, model, outfile, v=None, a=None):
     if a:
         cmd += ['-a', a]
     format_run(cmd, infile=infile, outfile=outfile, model=model)
-
-
-def run_domain_file(out, query, dom, phyml=False):
-    format_run(DOM, out=out, query=query, dom=dom, phyml=phyml)
 
 
 def run_bayes(cmdfile):

@@ -60,6 +60,7 @@ prottest*/
 *.zip
 *.tgz
 phylip/
+phyml
 consense
 consense*/
 

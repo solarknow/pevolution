@@ -2,10 +2,9 @@ import getopt
 import os
 import sys
 
-import Reciprocal
-from Utils import SeqUtil, FetchUtil, FileUtil
-from helpers.commands import run_domain_file
-from helpers.constants import DataPath, BlastThresholds
+from Utils import SeqUtil, FetchUtil, FileUtil, Reciprocal
+from Utils.dom import DomainRun
+from helpers.constants import DataPath, domain_thresholds, organism_list, Domains
 
 
 def main(argv):
@@ -37,36 +36,22 @@ def main(argv):
         elif opt in ('-e', '--email'):
             FetchUtil.set_email(arg)
     if not os.path.exists(str(DataPath(dom + '-' + out + '.fas'))):
-        arch_list = ['Haloferax volcanii', 'Sulfolobus tokodaii', 'Methanococcus aeolicus',
-                     'Methanobrevibacter smithii', 'Thermococcus sibiricus', 'Archaeoglobus fulgidus',
-                     'Nanoarchaeum equitans', 'Thermoplasma acidophilum']
-        bac_list = ['Gemmata obscuriglobus', 'Prosthecobacter dejongeii', 'Verrucomicrobium spinosum',
-                    'Rickettsia prowazekii', 'Agrobacterium tumefaciens', 'Escherichia coli', 'Bacillus subtilis',
-                    'Anabaena variabilis', 'Thermotoga maritima']
-        euk_list = ['Drosophila melanogaster', 'Homo sapiens', 'Oryza sativa', 'Trypanosoma brucei',
-                    'Plasmodium falciparum', 'Saccharomyces cerevisiae', 'Neurospora crassa', 'Arabidopsis thaliana']
-        # subject to change
-        # setting threshold values: arch_thresh-w/ arch ;bac_thresh-w/ bac;
         dom_query = FetchUtil.fetch_organism(query)[1]
-        if dom_query == 'Archaea':
-            thresh = BlastThresholds(arch=1e-10, bac=1e-5, euk=5)
-        elif dom_query == 'Eukaryota':
-            thresh = BlastThresholds(arch=5, bac=5, euk=1e-10)
-        else:
-            thresh = BlastThresholds(arch=1e-5, bac=1e-10, euk=5)
+        thresh = domain_thresholds(dom_query)
 
         arch_accs = {}
         bac_accs = {}
         euk_accs = {}
+
         print("Blasting")
         if dom == 'arch' or dom == 'all':
-            for a in arch_list:
+            for a in organism_list(Domains.ARCHAEA):
                 arch_accs.update(Reciprocal.best_reciprocal_blast(a, query, thresh.arch))
         if dom == 'bac' or dom == 'all':
-            for b in bac_list:
+            for b in organism_list(Domains.BACTERIA):
                 bac_accs.update(Reciprocal.best_reciprocal_blast(b, query, thresh.bac))
         if dom == 'euk' or dom == 'all':
-            for e in euk_list:
+            for e in organism_list(Domains.EUKARYOTA):
                 euk_accs.update(Reciprocal.best_reciprocal_blast(e, query, thresh.euk))
 
         all_accs = dict(list(arch_accs.items()) + list(bac_accs.items()) + list(euk_accs.items()))
@@ -77,15 +62,15 @@ def main(argv):
         print("Writing seqs to file.")
         if arch_accs:
             FileUtil.merge_domain_fastas('arch-' + out + '.fas', arch_accs)
-            SeqUtil.addseq(DataPath('all-' + out + '.fas'), DataPath('arch-' + out + '.fas'))
+            SeqUtil.append_sequences(DataPath('all-' + out + '.fas'), DataPath('arch-' + out + '.fas'))
         if bac_accs:
             FileUtil.merge_domain_fastas('bac-' + out + '.fas', bac_accs)
-            SeqUtil.addseq(DataPath('all-' + out + '.fas'), DataPath('bac-' + out + '.fas'))
+            SeqUtil.append_sequences(DataPath('all-' + out + '.fas'), DataPath('bac-' + out + '.fas'))
         if euk_accs:
             FileUtil.merge_domain_fastas('euk-' + out + '.fas', euk_accs)
-            SeqUtil.addseq(DataPath('all-' + out + '.fas'), DataPath('euk-' + out + '.fas'))
+            SeqUtil.append_sequences(DataPath('all-' + out + '.fas'), DataPath('euk-' + out + '.fas'))
 
-    run_domain_file(out, query, dom, phy)
+    DomainRun(out, query, dom, phy).run_report()
 
 
 if __name__ == "__main__":
