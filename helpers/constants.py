@@ -14,48 +14,51 @@ class PathDef:
 
 @dataclass
 class OrthosPath(PathDef):
-    dir: str = 'Orthos'
+    dir: str = "Orthos"
 
 
 @dataclass
 class XMLPath(PathDef):
-    dir: str = 'XML'
+    dir: str = "XML"
 
 
 @dataclass
 class DictsPath(PathDef):
-    dir: str = 'dicts'
+    dir: str = "dicts"
 
 
 @dataclass
 class DataPath(PathDef):
-    dir: str = 'Data'
+    dir: str = "Data"
 
 
 @dataclass
 class AlignsPath(PathDef):
-    dir: str = 'aligns'
+    dir: str = "aligns"
 
 
 @dataclass
 class ProtPath(PathDef):
-    dir: str = 'Prot'
+    dir: str = "Prot"
 
 
 @dataclass
 class BayesPath(PathDef):
-    dir: str = 'Bayes'
+    dir: str = "Bayes"
 
 
 @dataclass
 class MLPath(PathDef):
-    dir: str = 'ML'
+    dir: str = "ML"
 
 
 @dataclass
 class ReportsPath(PathDef):
-    dir: str = 'Reports'
+    dir: str = "Reports"
+
+
 def resolve_prottest_path():
-    if 'prottest' in os.listdir():
-        listdir = filter(lambda x: x[-3:] == 'jar', os.listdir('prottest'))
-        return PathDef(listdir[0], 'prottest')
+    if "prottest" in os.listdir():
+        listdir = list(filter(lambda x: x[-3:] == "jar", os.listdir("prottest")))
+        return PathDef(listdir[0], "prottest")
+    return None

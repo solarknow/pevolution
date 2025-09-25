@@ -7,13 +7,13 @@ import Reciprocal
 if len(sys.argv) > 1:
     query = sys.argv[1]
 else:
-    query = input('Query: ')
+    query = input("Query: ")
 dom = FetchUtil.fetch_organism(query)
-if dom == 'Archaea':
+if dom == "Archaea":
     thresh1 = 1e-10
     thresh2 = 1e-5
     thresh3 = 5
-elif dom == 'Eukaryota':
+elif dom == "Eukaryota":
     thresh1 = 5
     thresh2 = 5
     thresh3 = 1e-10
@@ -22,12 +22,14 @@ else:
     thresh2 = 1e-10
     thresh3 = 5
 
-init_acc = [Reciprocal.best_reciprocal_blast('Homo sapiens', query, thresh3),
-            Reciprocal.best_reciprocal_blast('Escherichia coli', query, thresh2),
-            Reciprocal.best_reciprocal_blast('Haloferax volcanii', query, thresh1)]
+init_acc = [
+    Reciprocal.best_reciprocal_blast("Homo sapiens", query, thresh3),
+    Reciprocal.best_reciprocal_blast("Escherichia coli", query, thresh2),
+    Reciprocal.best_reciprocal_blast("Haloferax volcanii", query, thresh1),
+]
 runs = []
 count = 0
-orgs = ['Homo sapiens', 'Escherichia coli', 'Haloferax volcanii']
+orgs = ["Homo sapiens", "Escherichia coli", "Haloferax volcanii"]
 for e in init_acc:
     count += 1
     if e == {}:
