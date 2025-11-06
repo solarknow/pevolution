@@ -4,7 +4,14 @@ import subprocess
 from helpers.constants import OrthosPath, XMLPath, resolve_prottest_path
 
 # command constants
-ALIGN = ["clustalw", "-align", "-infile={input}.edit", "-outfile={output}.ed", "-output={fmt}", "-quiet"]
+ALIGN = [
+    "clustalw",
+    "-align",
+    "-infile={input}.edit",
+    "-outfile={output}.ed",
+    "-output={fmt}",
+    "-quiet",
+]
 PROTTEST = [
     "java",
     "-jar",

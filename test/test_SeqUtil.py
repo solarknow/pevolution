@@ -39,7 +39,10 @@ class TestSeqUtil(unittest.TestCase):
         sample_clust = self.test_path + "sample.aln"
         calculated_fasta = temp_dir + os.sep + "out"
         SeqUtil.clustal_to_fasta(sample_clust, calculated_fasta)
-        self.assertEqual(SeqUtil.count_fasta_seqs(sample_fasta), SeqUtil.count_fasta_seqs(calculated_fasta))
+        self.assertEqual(
+            SeqUtil.count_fasta_seqs(sample_fasta),
+            SeqUtil.count_fasta_seqs(calculated_fasta),
+        )
 
     def test_dict_extract_parses_dictionary_from_file(self):
         sample_dict = {"name": "solarknow", "age": 30, "alive": True}
