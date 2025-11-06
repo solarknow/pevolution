@@ -15,33 +15,36 @@ def best_reciprocal_blast(org, seed, thresh=5):
     """
     seedorg = FetchUtil.fetch_organism(seed)[0]
     FetchUtil.fetch_fasta(seed)
-    dum = '_'.join((seed+seedorg+org).split())
+    dum = "_".join((seed + seedorg + org).split())
     print("Run: " + dum)
-    if not os.path.isfile(str(XMLPath(dum + '.xml'))) or not os.path.getsize(str(XMLPath(dum + '.xml'))):
-        print('blasting')
+    if not os.path.isfile(str(XMLPath(dum + ".xml"))) or not os.path.getsize(str(XMLPath(dum + ".xml"))):
+        print("blasting")
         commands.run_blast(seed, thresh, dum, org)
-    ac = XML_parse_and_extract_accession_numbers(str(XMLPath(dum + '.xml')))
+    ac = XML_parse_and_extract_accession_numbers(str(XMLPath(dum + ".xml")))
     print("Done. Number of sequences found: " + repr(len(ac)))
     acclist = {}
     for o in ac:
         print(o)
         if len(o) <= 4:
-            print('Skipping')
+            print("Skipping")
             continue
         FetchUtil.fetch_fasta(o)
-        dum2 = '_'.join((o+org+seedorg).split())
-        if not os.path.isfile(str(XMLPath(dum2 + '.xml'))) or not os.path.getsize(str(XMLPath(dum2 + '.xml'))):
-            print('blasting back')
+        dum2 = "_".join((o + org + seedorg).split())
+        if not os.path.isfile(str(XMLPath(dum2 + ".xml"))) or not os.path.getsize(str(XMLPath(dum2 + ".xml"))):
+            print("blasting back")
             commands.run_blast(o, thresh, dum2, seedorg)
-        acc = XML_parse_and_extract_accession_numbers(str(XMLPath(dum2 + '.xml')))
+        acc = XML_parse_and_extract_accession_numbers(str(XMLPath(dum2 + ".xml")))
         print("Done. Number of sequences found: " + repr(len(acc)))
 
         if seed in acc:
             print("it's twue!")
             name = FetchUtil.fetch_organism(o)[0]
-            acclist[name] = [o, str(ac.index(o) + 1) + '/' + str(len(ac)),
-                             str(acc.index(seed) + 1) + '/' + str(len(acc))]
-            with open(str(DictsPath(seed)), 'a') as dicts:
-                dicts.write(str(acclist) + '\n')
+            acclist[name] = [
+                o,
+                str(ac.index(o) + 1) + "/" + str(len(ac)),
+                str(acc.index(seed) + 1) + "/" + str(len(acc)),
+            ]
+            with open(str(DictsPath(seed)), "a") as dicts:
+                dicts.write(str(acclist) + "\n")
             break
     return acclist
