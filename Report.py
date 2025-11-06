@@ -2,7 +2,14 @@ import os
 
 import FetchUtil
 import SeqUtil
-from helpers.constants import ReportsPath, DataPath, AlignsPath, ProtPath, MLPath, BayesPath
+from helpers.constants import (
+    ReportsPath,
+    DataPath,
+    AlignsPath,
+    ProtPath,
+    MLPath,
+    BayesPath,
+)
 
 
 def generate_report(name, quer, models, dom):

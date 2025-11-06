@@ -99,7 +99,10 @@ def main(argv):
         if dom == "arch" or dom == "all":
             queue_arch = Queue()
             for a in arch_list:
-                p = Process(target=Reciprocal.best_reciprocal_blast, args=(a, query, thresh1, queue_arch))
+                p = Process(
+                    target=Reciprocal.best_reciprocal_blast,
+                    args=(a, query, thresh1, queue_arch),
+                )
                 p.start()
                 p.join()
             while not queue_arch.empty():
@@ -107,7 +110,10 @@ def main(argv):
         if dom == "bac" or dom == "all":
             queue_bac = Queue()
             for b in bac_list:
-                p = Process(target=Reciprocal.best_reciprocal_blast, args=(b, query, thresh2, queue_bac))
+                p = Process(
+                    target=Reciprocal.best_reciprocal_blast,
+                    args=(b, query, thresh2, queue_bac),
+                )
                 p.start()
                 p.join()
             while not queue_bac.empty():
@@ -115,7 +121,10 @@ def main(argv):
         if dom == "euk" or dom == "all":
             queue_euk = Queue()
             for e in euk_list:
-                p = Process(target=Reciprocal.best_reciprocal_blast, args=(e, query, thresh3, queue_euk))
+                p = Process(
+                    target=Reciprocal.best_reciprocal_blast,
+                    args=(e, query, thresh3, queue_euk),
+                )
                 p.start()
                 p.join()
             while not queue_euk.empty():

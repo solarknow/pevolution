@@ -25,10 +25,15 @@ models_ori = SeqUtil.best_model(AlignsPath(f"{dom}-{out}.best.nex"))
 models = SeqUtil.best_model(BayesPath(f"{dom}-{out}-mod.nxs"))
 if paml:
     for mod, params in models.items():
-        SeqUtil.nexus_to_proml(BayesPath(f"{dom}-{out}-mod.nxs"), MLPath(f"{dom}-" + out + mod.split("+")[0]))
+        SeqUtil.nexus_to_proml(
+            BayesPath(f"{dom}-{out}-mod.nxs"),
+            MLPath(f"{dom}-" + out + mod.split("+")[0]),
+        )
         if params[0] == "0" and params[1] == "0":
             run_phyml(
-                MLPath(f"{dom}-{out}" + mod.split("+")[0]), mod.split("+")[0], AlignsPath(f"{dom}-{out}.ed.2.dnd")
+                MLPath(f"{dom}-{out}" + mod.split("+")[0]),
+                mod.split("+")[0],
+                AlignsPath(f"{dom}-{out}.ed.2.dnd"),
             )
         elif params[0] == "0":
             run_phyml(
@@ -54,7 +59,10 @@ if paml:
             )
 
     for mod, params in models_ori.items():
-        SeqUtil.nexus_to_proml(AlignsPath(f"{dom}-{out}.3.nex"), MLPath(f"{dom}-{out}{mod.split('+')[0]}-ori"))
+        SeqUtil.nexus_to_proml(
+            AlignsPath(f"{dom}-{out}.3.nex"),
+            MLPath(f"{dom}-{out}{mod.split('+')[0]}-ori"),
+        )
         if params[0] == "0" and params[1] == "0":
             run_phyml(
                 MLPath(f"{dom}-{out}" + mod.split("+")[0]),
@@ -89,6 +97,10 @@ if paml:
             )
 
 if not os.path.exists(str(BayesPath(f"{dom}-{out}-bayes.nxs"))):
-    SeqUtil.bayesfile(AlignsPath(f"{dom}-{out}.best.nex"), models_ori, BayesPath(f"{dom}-{out}-bayes.nxs"))
+    SeqUtil.bayesfile(
+        AlignsPath(f"{dom}-{out}.best.nex"),
+        models_ori,
+        BayesPath(f"{dom}-{out}-bayes.nxs"),
+    )
 run_bayes(BayesPath(f"{dom}-{out}-bayes.nxs"))
 Report.generate_report(out, query, models_ori, dom)

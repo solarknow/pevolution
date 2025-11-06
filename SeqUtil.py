@@ -8,7 +8,18 @@ from helpers.commands import run_prottest, clustal_align
 from helpers.constants import ProtPath
 from helpers.file_formats import nexus_fmt
 
-bayesmodels = ["poisson", "jtt", "mtrev", "mtmam", "wag", "rtrev", "cprev", "vt", "blosum", "dayhoff"]
+bayes_models = [
+    "poisson",
+    "jtt",
+    "mtrev",
+    "mtmam",
+    "wag",
+    "rtrev",
+    "cprev",
+    "vt",
+    "blosum",
+    "dayhoff",
+]
 
 
 def find_longest_key_length(dicto):
@@ -154,7 +165,7 @@ def bayesfile(infile, model, outfile):
             extra[0] = "jones"
         elif extra[0].lower() == "blosum62":
             extra[0] = "blosum"
-        if extra[0].lower() in bayesmodels:
+        if extra[0].lower() in bayes_models:
             with open(str(outfile), "w") as han:
                 han.write(
                     "#NEXUS\n"
@@ -352,7 +363,7 @@ def best_model(infile):
                 mod = lsplit[5]
                 ret.update({mod: models[mod]})
                 # print ret
-                if mod.lower().split("+")[0] not in bayesmodels:
+                if mod.lower().split("+")[0] not in bayes_models:
                     while 1:
                         lin = prot_hand.readline()
                         # print lin,1
@@ -360,7 +371,7 @@ def best_model(infile):
                             while 2:
                                 lin = prot_hand.readline().split()
                                 # print lin,2
-                                if lin[0].split("+")[0].lower() in bayesmodels:
+                                if lin[0].split("+")[0].lower() in bayes_models:
                                     ret.update({lin[0]: models[lin[0]]})
                                     # print ret
                                     break

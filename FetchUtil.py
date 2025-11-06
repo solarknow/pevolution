@@ -71,7 +71,10 @@ def fetch_organism(acc):
                             else:
                                 retu[0] += " " + tab[k]
             else:
-                return [filtered_records[i + 11] + " multispecies", filtered_records[i + 14].split(";")[0]]
+                return [
+                    filtered_records[i + 11] + " multispecies",
+                    filtered_records[i + 14].split(";")[0],
+                ]
 
         if filtered_records[i] == "ORGANISM":
             try:
