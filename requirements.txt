@@ -1,4 +1,5 @@
-bio
+biopython
 psutil
 setuptools>=65.5.1
 pytest
+ruff
