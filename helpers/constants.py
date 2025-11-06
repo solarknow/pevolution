@@ -14,7 +14,7 @@ class PathDef:
 
 @dataclass
 class OrthosPath(PathDef):
-    dir: str = 'Orthos'
+    dir: str = "Orthos"
 
 
 @dataclass
