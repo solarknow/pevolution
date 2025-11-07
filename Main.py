@@ -73,7 +73,7 @@ def main(argv):
             "Arabidopsis thaliana",
         ]
         # subject to change
-        # setting threshold values: arch_thresh-w/ arch ;bac_thresh-w/ bac;
+        # setting threshold values: thresh1-w/ arch ;thresh2-w/ bac;
         dom_query = FetchUtil.fetch_organism(query)[1]
         if dom_query == "Archaea":
             thresh = BlastThresholds(arch=1e-10, bac=1e-5, euk=5)

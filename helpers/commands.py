@@ -1,5 +1,4 @@
 import os
-import os
 import subprocess
 from helpers.constants import OrthosPath, XMLPath, resolve_prottest_path
 
