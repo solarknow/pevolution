@@ -5,7 +5,7 @@ import unittest
 
 from Bio import Entrez
 
-import SeqUtil
+from Utils import SeqUtil
 from helpers.constants import OrthosPath
 
 temp_dir = os.getcwd() + os.sep + "Orthos"

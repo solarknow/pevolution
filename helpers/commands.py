@@ -1,3 +1,4 @@
+import os
 import subprocess
 from helpers.constants import OrthosPath, XMLPath, resolve_prottest_path
 
@@ -21,9 +22,7 @@ PROTTEST = [
     "-all-distributions",
     "-all",
     "-S",
-    1,
-    "-threads",
-    "{num_procs}",
+    "1",
     "-BIC",
 ]
 BLAST = [
@@ -37,30 +36,27 @@ BLAST = [
     "-out",
     str(XMLPath("{xml_file}.xml")),
     "-outfmt",
-    "5",
+    5,
     "-entrez_query",
     '"{org}[ORGN]"',
-    "-use_sw_tback",
     "-remote",
 ]
-BAYES = ["mb", "{str(cmdfile)}"]
-PRANK = ["prank", "-d={infile}", "-o={outfile}", "-f=nexus", "-quiet"]
+BAYES = ["mb", "{cmdfile}"]
+PRANK = ["prank-msa" + os.sep + "prank", "-d={infile}", "-o={outfile}", "-f=nexus", "-showall", "-quiet"]
 PHYML = [
-    "phyml",
+    "phyml" + os.sep + "src" + os.sep + "phyml",
     "-i",
-    "{str(infile)}",
+    "{infile}",
     "-d",
     "aa",
     "-b",
-    100,
+    "100",
     "-m",
     "{model}",
     "-f",
     "e",
-    "-s",
-    "BEST",
     "-u",
-    "{str(outfile)}",
+    "{outfile}",
     "-o",
     "tl",
 ]
@@ -68,15 +64,17 @@ DOM = ["python3", "dom.py", "{out}", "{query}", "{dom}", "{phyml}"]
 
 
 def format_run(cmd, **kwargs):
-    subprocess.call([c.format(**kwargs) for c in cmd])
+    fmt = [str(c).format(**kwargs) for c in cmd]
+    subprocess.run(fmt)
+    os.system(" ".join(fmt))
 
 
 def clustal_align(infile, outfile, fmt="nexus"):
     format_run(ALIGN, input=infile, output=outfile, fmt=fmt)
 
 
-def run_prottest(infile, outfile, procs):
-    format_run(PROTTEST, infile=infile, outfile=outfile, num_procs=procs)
+def run_prottest(infile, outfile):
+    format_run(PROTTEST, infile=infile, outfile=outfile)
 
 
 def run_blast(seed, thresh, dum, org):
@@ -87,20 +85,18 @@ def run_prank(infile, outfile):
     format_run(PRANK, infile=infile, outfile=outfile)
 
 
-def run_phyml(infile, model, outfile, v=None, a=None, ori=None):
+def run_phyml(infile, model, outfile, v=None, a=None):
     cmd = PHYML
     if v:
         cmd += ["-v", v]
     if a:
         cmd += ["-a", a]
-    if ori:
-        cmd.append("-ori")
     format_run(cmd, infile=infile, outfile=outfile, model=model)
 
 
-def run_dom_file(out, query, dom, phyml=False):
+def run_domain_file(out, query, dom, phyml=False):
     format_run(DOM, out=out, query=query, dom=dom, phyml=phyml)
 
 
-def run_bayes(infile):
-    format_run(BAYES, cmdfile=infile)
+def run_bayes(cmdfile):
+    format_run(BAYES, cmdfile=cmdfile)

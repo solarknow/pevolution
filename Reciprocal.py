@@ -1,50 +1,39 @@
-import random
+import os.path
 
-from Bio.Blast import NCBIXML
-
-import FetchUtil
+from Utils import FetchUtil
+from Utils.FileUtil import XML_parse_and_extract_accession_numbers
 from helpers import commands
 from helpers.constants import XMLPath, DictsPath
 
 
 def best_reciprocal_blast(org, seed, thresh=5):
-    """Returns the best pairwise reciprocal BLAST using seed accession no. from against org organism"""
+    """Returns the best pairwise reciprocal BLAST using seed accession no. from against org organism
+    @returns {
+    Organism binomial name:
+    [Accession number, rank of search in target organism, rank of search in source organism]
+    }
+    """
     seedorg = FetchUtil.fetch_organism(seed)[0]
-    acclist = {}
-    ac = []
     FetchUtil.fetch_fasta(seed)
-    dum = str(int(int(seed.split(".")[0][-5:]) * random.random()))
-
-    commands.run_blast(seed, thresh, dum, org)
-    with open(str(XMLPath(dum + ".xml"))) as qoutput:
-        parser = NCBIXML.parse(qoutput)
-        for lin in parser:
-            for align in lin.alignments:
-                for hsp in align.hsps:
-                    if (hsp.positives / float(hsp.align_length)) >= 0.4 and (
-                        float(hsp.align_length) / len(hsp.query)
-                    ) >= 0.25:
-                        ac.append(align.title.split("|")[1])
+    dum = "_".join((seed + seedorg + org).split())
+    print("Run: " + dum)
+    if not os.path.isfile(str(XMLPath(dum + ".xml"))) or not os.path.getsize(str(XMLPath(dum + ".xml"))):
+        print("blasting")
+        commands.run_blast(seed, thresh, dum, org)
+    ac = XML_parse_and_extract_accession_numbers(str(XMLPath(dum + ".xml")))
     print("Done. Number of sequences found: " + repr(len(ac)))
-
+    acclist = {}
     for o in ac:
         print(o)
+        if len(o) <= 4:
+            print("Skipping")
+            continue
         FetchUtil.fetch_fasta(o)
-        commands.run_blast(o, thresh, dum, seedorg[0])
-        with open(str(XMLPath(dum + ".xml"))) as q1output:
-            parse = NCBIXML.parse(q1output)
-            acc = []
-            print("blasted")
-            for lin in parse:
-                for align in lin.alignments:
-                    for hsp in align.hsps:
-                        if (hsp.positives / float(hsp.align_length)) >= 0.4 and (
-                            float(hsp.align_length) / len(hsp.query)
-                        ) > 0.25:
-                            acc.append(align.title.split("|")[1])
-                        else:
-                            continue
-
+        dum2 = "_".join((o + org + seedorg).split())
+        if not os.path.isfile(str(XMLPath(dum2 + ".xml"))) or not os.path.getsize(str(XMLPath(dum2 + ".xml"))):
+            print("blasting back")
+            commands.run_blast(o, thresh, dum2, seedorg)
+        acc = XML_parse_and_extract_accession_numbers(str(XMLPath(dum2 + ".xml")))
         print("Done. Number of sequences found: " + repr(len(acc)))
 
         if seed in acc:
@@ -58,5 +47,4 @@ def best_reciprocal_blast(org, seed, thresh=5):
             with open(str(DictsPath(seed)), "a") as dicts:
                 dicts.write(str(acclist) + "\n")
             break
-    else:
-        return acclist
+    return acclist

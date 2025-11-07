@@ -59,6 +59,29 @@ class ReportsPath(PathDef):
 
 def resolve_prottest_path():
     if "prottest" in os.listdir():
-        listdir = list(filter(lambda x: x[-3:] == "jar", os.listdir("prottest")))
-        return PathDef(listdir[0], "prottest")
-    return None
+        listdir = filter(lambda x: x[-3:] == "jar", os.listdir("prottest"))
+        return PathDef(list(listdir)[0], "prottest")
+
+
+@dataclass
+class BlastThresholds:
+    arch: float
+    bac: float
+    euk: float
+
+
+NEXUS = "\n".join(
+    [
+        "#NEXUS",
+        "begin data;",
+        "dimensions ntax={num_taxa} nchar={num_char};",
+        "format datatype={type} interleave=no gap=-;",
+        "matrix",
+        "",
+        "",
+    ]
+)
+
+
+def nexus_fmt(num_seq, seq_len, data_type="protein"):
+    return NEXUS.format(num_taxa=num_seq, num_char=seq_len, type=data_type)

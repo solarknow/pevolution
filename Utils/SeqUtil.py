@@ -1,12 +1,8 @@
 import ast
-import os
 import random
 
-import psutil
-
-from helpers.commands import run_prottest, clustal_align
-from helpers.constants import ProtPath
-from helpers.file_formats import nexus_fmt
+from helpers.commands import clustal_align
+from helpers.constants import nexus_fmt
 
 bayes_models = [
     "poisson",
@@ -111,8 +107,9 @@ def nexus_to_proml(seqs, inpath):
         while seqsin:
             lin = seqsin.readline()
             if lin.startswith("dimensions"):
-                count = int(lin.split()[1][5:])
-                length = int(lin.split()[2][6 : len(lin.split()[2]) - 1])
+                dims = lin.split()
+                count = int(dims[1].split("=")[1])
+                length = int(dims[2].split("=")[1][:-1])
                 break
 
         while seqsin:
@@ -126,8 +123,9 @@ def nexus_to_proml(seqs, inpath):
                 continue
             elif lin == ";\n":
                 break
-            name = lin.split()[0]
-            seq = lin.split()[1].strip()
+            line_split = lin.split()
+            name = line_split[0]
+            seq = line_split[1].strip()
             dicto[name] = dicto.get(name, "") + seq
     if not length == len(list(dicto.values())[0]):
         length = len(list(dicto.values())[0])
@@ -323,12 +321,12 @@ def splice_align(inalign, outalign):
     print(".ed written splice aligned")
 
 
-def best_model(infile):
-    """Takes in alignment file runs protTest, and extracts best model(s)"""
-    procs = int(round(psutil.cpu_count() / 2.0))
-    out = str(infile).split(os.sep)[1].split(".")[0]
-    outfile = ProtPath(out + ".pro")
-    run_prottest(str(infile), outfile, repr(procs))
+def best_model(outfile):
+    """Takes in alignment file, runs protTest, and extracts best model(s)
+    @returns {
+    model: [gamma, proportion]
+    }
+    """
     with open(str(outfile)) as prot_hand:
         models = {}
         ret = {}
@@ -371,21 +369,11 @@ def best_model(infile):
                             while 2:
                                 lin = prot_hand.readline().split()
                                 # print lin,2
-                                if lin[0].split("+")[0].lower() in bayes_models:
+                                if lin[0].split("+")[0].lower() in bayesmodels:
                                     ret.update({lin[0]: models[lin[0]]})
                                     # print ret
                                     break
                             break
-
-                # elif lin.startswith('*') and :
-                #    print "Saving Tree"
-                #    tree=''
-                #   while 9:
-                #       lin=prot_hand.readline().strip()
-                #      tree+=lin
-                #      if lin.endswith(';'):
-                #         break
-                # open('Prot/'+out+'.tre','w').write(tree)
                 return ret
         return None
 

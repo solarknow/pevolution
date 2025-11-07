@@ -1,5 +1,4 @@
-biopython
-psutil
+bio
 setuptools>=65.5.1
 pytest
 ruff
