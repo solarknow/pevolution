@@ -44,7 +44,7 @@ BLAST = [
 BAYES = ["mb", "{cmdfile}"]
 PRANK = ["prank-msa" + os.sep + "prank", "-d={infile}", "-o={outfile}", "-f=nexus", "-showall", "-quiet"]
 PHYML = [
-    "phyml" + os.sep + "src" + os.sep + "phyml",
+    os.sep.join(["phyml", "src", "phyml"]),
     "-i",
     "{infile}",
     "-d",

@@ -17,10 +17,11 @@ def best_reciprocal_blast(org, seed, thresh=5):
     FetchUtil.fetch_fasta(seed)
     dum = "_".join((seed + seedorg + org).split())
     print("Run: " + dum)
-    if not os.path.isfile(str(XMLPath(dum + ".xml"))) or not os.path.getsize(str(XMLPath(dum + ".xml"))):
+    dum_xml = str(XMLPath(dum + ".xml"))
+    if not os.path.isfile(dum_xml) or not os.path.getsize(dum_xml):
         print("blasting")
         commands.run_blast(seed, thresh, dum, org)
-    ac = XML_parse_and_extract_accession_numbers(str(XMLPath(dum + ".xml")))
+    ac = XML_parse_and_extract_accession_numbers(dum_xml)
     print("Done. Number of sequences found: " + repr(len(ac)))
     acclist = {}
     for o in ac:
@@ -30,10 +31,11 @@ def best_reciprocal_blast(org, seed, thresh=5):
             continue
         FetchUtil.fetch_fasta(o)
         dum2 = "_".join((o + org + seedorg).split())
-        if not os.path.isfile(str(XMLPath(dum2 + ".xml"))) or not os.path.getsize(str(XMLPath(dum2 + ".xml"))):
+        dum2_xml = str(XMLPath(dum2 + ".xml"))
+        if not os.path.isfile(dum2_xml) or not os.path.getsize(dum2_xml):
             print("blasting back")
             commands.run_blast(o, thresh, dum2, seedorg)
-        acc = XML_parse_and_extract_accession_numbers(str(XMLPath(dum2 + ".xml")))
+        acc = XML_parse_and_extract_accession_numbers(dum2_xml)
         print("Done. Number of sequences found: " + repr(len(acc)))
 
         if seed in acc:

@@ -6,7 +6,8 @@ from helpers.constants import ReportsPath, DataPath, AlignsPath, ProtPath, MLPat
 
 def generate_report(name, quer, models, dom):
     """Generates a report summarizing the analysis done"""
-    with open(str(ReportsPath(f"Report-{dom}-{name}.txt")), "w") as ret:
+    dom_name = f"{dom}-{name}"
+    with open(str(ReportsPath(f"Report-{dom_name}.txt")), "w") as ret:
         ret.write("Orthologous sequence Search and Alignment\n" + "Python Scripts Written by Mihir Sarwade\n\n")
         # List accession numbers, names of genes and their respective organisms
         ret.write("-----------------------------\n")
@@ -22,7 +23,7 @@ def generate_report(name, quer, models, dom):
             "50% similar and\nwhose aligned portion is at least 25% that of the query, as recommended by "
             "Moreno-Hagelsieb and Latimer (2008).\n\n"
         )
-        with open(str(DataPath(dom + "-" + name + ".fas"))) as import_file:
+        with open(str(DataPath(dom_name + ".fas"))) as import_file:
             info = {}
             while import_file:
                 lin = import_file.readline()
@@ -80,7 +81,7 @@ def generate_report(name, quer, models, dom):
         )
         # Draw initial alignment +length, final alignment +length
         ret.write("\nAlignments:\nOriginal alignment length: ")
-        with open(str(AlignsPath(dom + "-" + name + ".best.nex"))) as alig:
+        with open(str(AlignsPath(dom_name + ".best.nex"))) as alig:
             length = ""
             while alig:
                 lin = alig.readline()
@@ -88,7 +89,7 @@ def generate_report(name, quer, models, dom):
                     length = lin.split()[2][6:-1]
                     break
         ret.write(length + "\n" + "Final alignment length: ")
-        with open(str(AlignsPath(dom + "-" + name + ".best.nex"))) as alig:
+        with open(str(AlignsPath(dom_name + ".best.nex"))) as alig:
             print("alignment printing")
             while alig:
                 lin = alig.readline()
@@ -107,7 +108,7 @@ def generate_report(name, quer, models, dom):
                     break
             print("alignment printing done")
 
-        with open(str(ProtPath(dom + "-" + name + ".pro"))) as prot_hand:
+        with open(str(ProtPath(dom_name + ".pro"))) as prot_hand:
             while prot_hand:
                 prot = prot_hand.readline()
                 if prot.startswith("Best model"):
@@ -130,7 +131,7 @@ def generate_report(name, quer, models, dom):
 
         trees = ""
         for i in models:
-            prefix = f"{dom}-{name}-{i.split('+')[0]}-ori"
+            prefix = f"{dom_name}-{i.split('+')[0]}-ori"
             if os.path.exists(str(MLPath(prefix + "_phyml_boot_trees.txt"))):
                 ret.write("\nTree found by PhyML using the " + i.split("+")[0] + " model:\n")
                 tree = consense(str(MLPath(prefix + "_phyml_boot_trees.txt")))
@@ -138,10 +139,10 @@ def generate_report(name, quer, models, dom):
                 ret.write(tree + "\n")
         #              Bayesian selected tree
         ret.write("\nTree found by MrBayes using the best model:\n")
-        if os.path.exists(str(BayesPath(dom + "-" + name + "-bayes.nxs.con"))):
-            path = BayesPath(dom + "-" + name + "-bayes.nxs.con")
+        if os.path.exists(str(BayesPath(dom_name + "-bayes.nxs.con"))):
+            path = BayesPath(dom_name + "-bayes.nxs.con")
         else:
-            path = BayesPath(dom + "-" + name + "-bayes.nxs.con.tre")
+            path = BayesPath(dom_name + "-bayes.nxs.con.tre")
         taxa = {}
         with open(str(path)) as read:
             while read:
@@ -162,7 +163,7 @@ def generate_report(name, quer, models, dom):
                         tree_temp = tree_temp.replace(i + "[&prob", taxa[i] + "[&prob")
                     trees += tree_temp + "\n"
                     ret.write(trees + "\n")
-                    with open(str(ReportsPath(dom + "-" + name + "-trees.tre")), "w") as tree_file:
+                    with open(str(ReportsPath(dom_name + "-trees.tre")), "w") as tree_file:
                         tree_file.write(trees)
                     break
         print("trees printed")

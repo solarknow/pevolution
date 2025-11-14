@@ -369,7 +369,7 @@ def best_model(outfile):
                             while 2:
                                 lin = prot_hand.readline().split()
                                 # print lin,2
-                                if lin[0].split("+")[0].lower() in bayesmodels:
+                                if lin[0].split("+")[0].lower() in bayes_models:
                                     ret.update({lin[0]: models[lin[0]]})
                                     # print ret
                                     break
@@ -378,7 +378,7 @@ def best_model(outfile):
         return None
 
 
-def addseq(oldseq, newseq):
+def append_sequences(oldseq, newseq):
     """Transfers the sequence from newseq to oldseq"""
     old = open(str(oldseq), "a")
     new = open(str(newseq))
