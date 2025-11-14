@@ -34,4 +34,4 @@ def merge_domain_fastas(outfile, acc_dict):
                 else:
                     fil.write(fil_arr[i])
 
-        SeqUtil.addseq(DataPath(outfile), OrthosPath(a[0] + ".fasta"))
+        SeqUtil.append_sequences(DataPath(outfile), OrthosPath(a[0] + ".fasta"))

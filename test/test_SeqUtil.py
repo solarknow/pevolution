@@ -6,9 +6,9 @@ import unittest
 from Bio import Entrez
 
 from Utils import SeqUtil
-from helpers.constants import OrthosPath
+from helpers.constants import OrthosPath, XMLPath
 
-temp_dir = os.getcwd() + os.sep + "Orthos"
+temp_dir = str(OrthosPath(""))
 
 
 class TestSeqUtil(unittest.TestCase):
@@ -25,6 +25,7 @@ class TestSeqUtil(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(temp_dir)
+        shutil.rmtree(str(XMLPath("")))
 
     def test_findlonglen_returns_longest_length(self):
         test_dict = {

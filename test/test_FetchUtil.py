@@ -1,3 +1,4 @@
+import shutil
 import unittest
 from glob import glob
 from os import sep
@@ -5,6 +6,7 @@ from os import sep
 from Bio import Entrez
 
 from Utils import FetchUtil
+from helpers.constants import OrthosPath
 
 
 class TestFetchUtil(unittest.TestCase):
@@ -12,8 +14,11 @@ class TestFetchUtil(unittest.TestCase):
         Entrez.email = "example@gmail.com"
         self.test_accession = "AJA33470.1"
         self.expected_organism = ["Vibrio sp. AN61", "Bacteria"]
-        self.expected_path = "Orthos" + sep + "AJA33470.1.fasta"
+        self.expected_path = str(OrthosPath("AJA33470.1.fasta"))
         self.expected_definition = "MreB, partial [Vibrio sp. AN61]."
+
+    def tearDown(self):
+        shutil.rmtree(str(OrthosPath("")))
 
     def test_set_email_sets_email(self):
         FetchUtil.set_email("mdsarwade@gmail.com")
@@ -29,7 +34,7 @@ class TestFetchUtil(unittest.TestCase):
 
     def test_fetch_fasta_writes_file(self):
         FetchUtil.fetch_fasta(self.test_accession)
-        self.assertIn(self.expected_path, glob("Orthos" + sep + "*"))
+        self.assertIn(self.expected_path, glob(str(OrthosPath("*"))))
 
     def test_fetch_definition_returns_definition(self):
         test_definition = FetchUtil.fetch_definition(self.test_accession)

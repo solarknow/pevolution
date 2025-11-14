@@ -61,6 +61,7 @@ def resolve_prottest_path():
     if "prottest" in os.listdir():
         listdir = filter(lambda x: x[-3:] == "jar", os.listdir("prottest"))
         return PathDef(list(listdir)[0], "prottest")
+    return None
 
 
 @dataclass

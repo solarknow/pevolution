@@ -104,13 +104,13 @@ def main(argv):
         print("Writing seqs to file.")
         if arch_accs:
             FileUtil.merge_domain_fastas("arch-" + out + ".fas", arch_accs)
-            SeqUtil.addseq(DataPath("all-" + out + ".fas"), DataPath("arch-" + out + ".fas"))
+            SeqUtil.append_sequences(DataPath("all-" + out + ".fas"), DataPath("arch-" + out + ".fas"))
         if bac_accs:
             FileUtil.merge_domain_fastas("bac-" + out + ".fas", bac_accs)
-            SeqUtil.addseq(DataPath("all-" + out + ".fas"), DataPath("bac-" + out + ".fas"))
+            SeqUtil.append_sequences(DataPath("all-" + out + ".fas"), DataPath("bac-" + out + ".fas"))
         if euk_accs:
             FileUtil.merge_domain_fastas("euk-" + out + ".fas", euk_accs)
-            SeqUtil.addseq(DataPath("all-" + out + ".fas"), DataPath("euk-" + out + ".fas"))
+            SeqUtil.append_sequences(DataPath("all-" + out + ".fas"), DataPath("euk-" + out + ".fas"))
 
     run_domain_file(out, query, dom, phy)
 

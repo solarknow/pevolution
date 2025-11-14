@@ -1,4 +1,6 @@
-bio
-setuptools>=65.5.1
+biopython==1.86
+setuptools>=78.1.1
 pytest
 ruff
+requests
+certifi
