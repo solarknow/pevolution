@@ -2,9 +2,9 @@ import os
 import sys
 
 import Report
+from helpers.commands import run_bayes, run_phyml, run_prank, run_prottest
+from helpers.constants import AlignsPath, BayesPath, DataPath, MLPath, ProtPath
 from Utils import SeqUtil
-from helpers.commands import run_prank, run_bayes, run_phyml, run_prottest
-from helpers.constants import DataPath, AlignsPath, BayesPath, MLPath, ProtPath
 
 out = sys.argv[1]
 query = sys.argv[2]

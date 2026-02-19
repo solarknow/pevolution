@@ -10,9 +10,10 @@ class TestReciprocal(unittest.TestCase):
         Entrez.email = "example@gmail.com"
         self.test_accession = "4557757"
         self.expected_organism = "Homo sapiens"
+        self.mock_db_name = 'test_files/mock_db'
 
     def test_best_reciprocal_blast_returns_expected_results(self):
-        results = Reciprocal.best_reciprocal_blast(self.expected_organism, self.test_accession)
+        results = Reciprocal.best_reciprocal_blast(self.expected_organism, self.test_accession, db=self.mock_db_name)
         self.assertEqual(1, len(results))
 
 

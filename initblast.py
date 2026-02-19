@@ -1,7 +1,8 @@
 import sys
-from Utils import FetchUtil
+
 import Reciprocal
 from helpers.constants import BlastThresholds
+from Utils import FetchUtil
 
 if len(sys.argv) > 1:
     query = sys.argv[1]
@@ -18,7 +19,7 @@ else:
     thresh = BlastThresholds(arch=1e-5, bac=1e-10, euk=5)
 
 orgs = ["Homo sapiens", "Bacteroidota bacterium", "Haloferax volcanii"]
-org_dict = zip(orgs, [thresh.euk, thresh.bac, thresh.arch])
+org_dict = zip(orgs, [thresh.euk, thresh.bac, thresh.arch], strict=True)
 init_acc = [Reciprocal.best_reciprocal_blast(k, query, v) for k, v in org_dict]
 print(init_acc)
 

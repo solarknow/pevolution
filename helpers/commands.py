@@ -1,5 +1,6 @@
 import os
 import subprocess
+
 from helpers.constants import OrthosPath, XMLPath, resolve_prottest_path
 
 # command constants
@@ -28,7 +29,7 @@ PROTTEST = [
 BLAST = [
     "blastp",
     "-db",
-    "nr",
+    "{db}",
     "-query",
     str(OrthosPath("{seed}.fasta")),
     "-evalue",
@@ -37,10 +38,8 @@ BLAST = [
     str(XMLPath("{xml_file}.xml")),
     "-outfmt",
     5,
-    "-entrez_query",
-    '"{org}[ORGN]"',
-    "-remote",
 ]
+CREATE_DB = ["makeblastdb", "-in", "{infile}", "-dbtype", "prot", "-out", "{db}", "-parse_seqids"]
 BAYES = ["mb", "{cmdfile}"]
 PRANK = ["prank-msa" + os.sep + "prank", "-d={infile}", "-o={outfile}", "-f=nexus", "-showall", "-quiet"]
 PHYML = [
@@ -65,8 +64,10 @@ DOM = ["python3", "dom.py", "{out}", "{query}", "{dom}", "{phyml}"]
 
 def format_run(cmd, **kwargs):
     fmt = [str(c).format(**kwargs) for c in cmd]
-    subprocess.run(fmt)
-    os.system(" ".join(fmt))
+    try:
+        subprocess.run(fmt)
+    except:
+        os.system(" ".join(fmt))
 
 
 def clustal_align(infile, outfile, fmt="nexus"):
@@ -77,8 +78,12 @@ def run_prottest(infile, outfile):
     format_run(PROTTEST, infile=infile, outfile=outfile)
 
 
-def run_blast(seed, thresh, dum, org):
-    format_run(BLAST, seed=seed, threshold=thresh, xml_file=dum, org=org)
+def run_blast(seed, thresh, dum, org, db="nr"):
+    if db == "nr":
+        BLAST.append("-remote")
+        BLAST.append("-entrez_query")
+        BLAST.append('"{org}[ORGN]"')
+    format_run(BLAST, seed=seed, threshold=thresh, xml_file=dum, org=org, db=db)
 
 
 def run_prank(infile, outfile):

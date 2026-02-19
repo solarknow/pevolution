@@ -3,9 +3,9 @@ import os
 import sys
 
 import Reciprocal
-from Utils import SeqUtil, FetchUtil, FileUtil
 from helpers.commands import run_domain_file
-from helpers.constants import DataPath, BlastThresholds
+from helpers.constants import BlastThresholds, DataPath
+from Utils import FetchUtil, FileUtil, SeqUtil
 
 
 def main(argv):

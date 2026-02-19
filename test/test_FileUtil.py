@@ -4,8 +4,8 @@ import unittest
 
 from Bio import Entrez
 
-from Utils import FileUtil
 from helpers.constants import DataPath, OrthosPath, XMLPath
+from Utils import FileUtil
 
 
 class TestFileUtil(unittest.TestCase):
@@ -19,7 +19,8 @@ class TestFileUtil(unittest.TestCase):
             "Klebsiella multispecies": ["WP_032692722.1", "1/500", "11/18"],
         }
         self.expected_accessions = ["AAA17374.1", "NP_000240.1", "BAG35497.1", "AAT44531.1", "BAD96530.1"]
-        self.test_path = os.sep.join([os.getcwd(), "test_files", ""])
+        self.test_path = os.sep.join([os.getcwd(), "test", "test_files", ""])
+        self.bac_file = DataPath(os.sep.join([os.getcwd(), "test", "test_files", ""]))
 
     def tearDown(self):
         test_fasta = DataPath("bac_test.fas")

@@ -1,12 +1,12 @@
 import os.path
 
+from helpers import commands
+from helpers.constants import DictsPath, XMLPath
 from Utils import FetchUtil
 from Utils.FileUtil import XML_parse_and_extract_accession_numbers
-from helpers import commands
-from helpers.constants import XMLPath, DictsPath
 
 
-def best_reciprocal_blast(org, seed, thresh=5):
+def best_reciprocal_blast(org, seed, thresh=5, db='nr') -> dict[str, list[str]]:
     """Returns the best pairwise reciprocal BLAST using seed accession no. from against org organism
     @returns {
     Organism binomial name:
@@ -20,7 +20,7 @@ def best_reciprocal_blast(org, seed, thresh=5):
     dum_xml = str(XMLPath(dum + ".xml"))
     if not os.path.isfile(dum_xml) or not os.path.getsize(dum_xml):
         print("blasting")
-        commands.run_blast(seed, thresh, dum, org)
+        commands.run_blast(seed, thresh, dum, org, db)
     ac = XML_parse_and_extract_accession_numbers(dum_xml)
     print("Done. Number of sequences found: " + repr(len(ac)))
     acclist = {}
@@ -34,7 +34,7 @@ def best_reciprocal_blast(org, seed, thresh=5):
         dum2_xml = str(XMLPath(dum2 + ".xml"))
         if not os.path.isfile(dum2_xml) or not os.path.getsize(dum2_xml):
             print("blasting back")
-            commands.run_blast(o, thresh, dum2, seedorg)
+            commands.run_blast(o, thresh, dum2, seedorg, db)
         acc = XML_parse_and_extract_accession_numbers(dum2_xml)
         print("Done. Number of sequences found: " + repr(len(acc)))
 

@@ -1,6 +1,6 @@
-from helpers.constants import OrthosPath
-
 from Bio import Entrez
+
+from helpers.constants import OrthosPath
 
 
 def set_email(email):

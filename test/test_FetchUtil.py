@@ -1,12 +1,11 @@
 import shutil
 import unittest
 from glob import glob
-from os import sep
 
 from Bio import Entrez
 
-from Utils import FetchUtil
 from helpers.constants import OrthosPath
+from Utils import FetchUtil
 
 
 class TestFetchUtil(unittest.TestCase):

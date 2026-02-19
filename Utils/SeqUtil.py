@@ -134,7 +134,7 @@ def nexus_to_proml(seqs, inpath):
         out.write(repr(count) + "  " + repr(length) + "\n")
         for k in dicto:
             out.write(k)
-            for i in range(30 - len(k)):
+            for _ in range(30 - len(k)):
                 out.write(" ")
             out.write(dicto[k] + "\n")
 
@@ -193,19 +193,19 @@ def boot(infile, outfile, norep):
         num_seqs = int(lin.split()[0])
         length = int(lin.strip().split()[1])
         seqs = {}
-        for i in range(num_seqs):
+        for _ in range(num_seqs):
             lin = hand.readline().strip().split()
             seqs[lin[0]] = lin[1]
     with open(outfile, "w") as hand2:
-        for j in range(norep):
+        for _ in range(norep):
             hand2.write(str(num_seqs) + "   " + str(length) + "\n")
             newseq = {}
-            for i in range(length):
+            for _ in range(length):
                 rand_int = random.randint(0, length - 1)
                 for k in seqs:
                     newseq[k] = newseq.get(k, "") + seqs[k][rand_int]
-            for k in newseq:
-                hand2.write(k + "    " + newseq[k] + "\n")
+            for i in newseq:
+                hand2.write(i + "    " + newseq[i] + "\n")
             hand2.write("\n\n")
 
 
@@ -275,7 +275,7 @@ def splice_align(inalign, outalign):
 
             for k in dicto.keys():
                 han.write(k)
-                for i in range((find_longest_key_length(dicto)[1] + 6) - len(k)):
+                for _ in range((find_longest_key_length(dicto)[1] + 6) - len(k)):
                     han.write(" ")
                 han.write(dicto[k] + "\n")
             han.write(";\nend;\n")
@@ -300,7 +300,7 @@ def splice_align(inalign, outalign):
         new_val = ""
         for j in range(len(post) - 1):
             new_val += val[post[j + 1] + 1 : post[j]]
-        for k in range(align_size - len(new_val)):
+        for _ in range(align_size - len(new_val)):
             new_val += "-"
         dicto.update({i: new_val})
     # creates the nex file containing the newly spliced data
@@ -310,7 +310,7 @@ def splice_align(inalign, outalign):
 
         for k in dicto.keys():
             han.write(k)
-            for i in range((find_longest_key_length(dicto)[1] + 6) - len(k)):
+            for _ in range((find_longest_key_length(dicto)[1] + 6) - len(k)):
                 han.write(" ")
             han.write(dicto[k])
             # print dicto[k]

@@ -1,27 +1,50 @@
 #!/usr/bin/env python
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-# from urllib import urlretrieve
-# import tarfile, zipfile
+from pathlib import Path
+from setuptools import setup, find_packages
 
+# Read the README for the long description if available
+here = Path(__file__).parent
+long_description = ""
+readme = here / "README.md"
+if readme.exists():
+    long_description = readme.read_text(encoding="utf-8")
+
+# Top-level modules (single-file scripts) that live in the project root
+# These are included so users can import them after installation.
+py_modules = [
+    "Main",
+    "start",
+    "Reciprocal",
+    "Report",
+    "dom",
+    "initblast",
+]
 
 setup(
     name="pevolution",
-    version="1.1",
-    description="This is a pipeline to find, align, and find trees for putatively related proteins.",
+    version="1.1.0",
+    description=(
+        "Pipeline to find, align, and build trees for putatively related proteins."
+    ),
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Mihir Sarwade",
     author_email="mihir.sarwade@gmail.com",
-    #      packages=['pevolution'],
-    install_requires=["psutil >= 5.6.3", "biopython >= 1.74", "Bio"],
+    packages=find_packages(exclude=["test", "venv1"]),
+    py_modules=py_modules,
+    include_package_data=True,
+    package_data={"": ["Data/*", "Data/**/*"]},
+    install_requires=["psutil>=5.6.3", "biopython>=1.86"],
+    python_requires=">=3.10",
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    # Intentionally not creating a console_scripts entry point because
+    # existing top-level modules expose `main(argv)` (not a zero-arg callable).
+    # If you'd like a CLI entry point, I can add a small wrapper module
+    # (for example `cli.py`) which invokes `Main.main(sys.argv[1:])` and
+    # then add `entry_points={'console_scripts': ['pevolution=cli:main']}`.
 )
-
-# urlretrieve("https://prank-msa.googlecode.com/files/prank.linux64.140110.tgz",'/tmp/prank.tgz')
-# urlretrieve("http://www.atgc-montpellier.fr/download/binaries/phyml/PhyML-3.1.zip",'/tmp/PhyML.zip')
-# urlretrieve("http://www.clustal.org/download/current/clustalw-2.1-linux-x86_64-libcppstatic.tar.gz",'/tmp/clustalw.tar.gz')
-# tarfile.open('/tmp/prank.tgz').extractall(path='/usr/local/bin/')
-# zipfile.ZipFile('/tmp/PhyML.zip').extractall(path='/usr/local/bin/')
-# tarfile.open('/tmp/clustalw.tar.gz').extractall(path='.')
-# tarfile.open('prottest-3.4-20140123.tar.gz').extractall(path='/usr/local/bin/')

@@ -1,7 +1,7 @@
 from Bio.Blast import NCBIXML
 
+from helpers.constants import DataPath, OrthosPath
 from Utils import FetchUtil, SeqUtil
-from helpers.constants import OrthosPath, DataPath
 
 
 def XML_parse_and_extract_accession_numbers(xml_path: str) -> list[str]:

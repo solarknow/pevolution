@@ -1,7 +1,7 @@
 import os
 
-from Utils import SeqUtil, FetchUtil
-from helpers.constants import ReportsPath, DataPath, AlignsPath, ProtPath, MLPath, BayesPath
+from helpers.constants import AlignsPath, BayesPath, DataPath, MLPath, ProtPath, ReportsPath
+from Utils import FetchUtil, SeqUtil
 
 
 def generate_report(name, quer, models, dom):
@@ -63,13 +63,14 @@ def generate_report(name, quer, models, dom):
             rows.append(row)
 
         padding = 3 * " "
-        header = padding.join([k + " " * (v - len(k)) for k, v in zip(columns, max_lens)]) + "\n"
-        header_spacer = padding.join(["-" * len(k) + " " * (v - len(k)) for k, v in zip(columns, max_lens)]) + "\n"
+        column_max_length_dict = zip(columns, max_lens, strict=True)
+        header = padding.join([k + " " * (v - len(k)) for k, v in column_max_length_dict]) + "\n"
+        header_spacer = padding.join(["-" * len(k) + " " * (v - len(k)) for k, v in column_max_length_dict]) + "\n"
         ret.write(header)
         ret.write(header_spacer)
         # print info
         for r in rows:
-            row = padding.join([k + " " * (v - len(k)) for k, v in zip(r, max_lens)]) + "\n"
+            row = padding.join([k + " " * (v - len(k)) for k, v in zip(r, max_lens, strict=True)]) + "\n"
             ret.write(row)
 
         ret.write(

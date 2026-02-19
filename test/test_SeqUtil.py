@@ -5,8 +5,8 @@ import unittest
 
 from Bio import Entrez
 
-from Utils import SeqUtil
 from helpers.constants import OrthosPath, XMLPath
+from Utils import SeqUtil
 
 temp_dir = str(OrthosPath(""))
 
