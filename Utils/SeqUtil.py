@@ -28,7 +28,10 @@ def find_longest_key_length(dicto):
 
 
 def clustal_to_fasta(clust, out):
-    """converts a clustal alignment file to a fasta file out"""
+    """converts a clustal alignment file to a fasta file
+    @param clust: path to clustal alignment file
+    @param out: path to output fasta file
+    """
     with open(clust) as hand:
         seqs = {}
         hand.readline()
