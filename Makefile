@@ -34,7 +34,7 @@ type-check:
 	pipenv run mypy Utils/ helpers/ || mypy Utils/ helpers/
 
 test:
-	pipenv run pytest test/ -v || pytest test/ -v
+	pipenv run pytest test/ -v
 
 test-cov:
 	pipenv run pytest test/ -v --cov=Utils --cov=helpers --cov-report=html --cov-report=term || pytest test/ -v --cov=Utils --cov=helpers --cov-report=html --cov-report=term
