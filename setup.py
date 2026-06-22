@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 # Read the README for the long description if available
 here = Path(__file__).parent
@@ -24,9 +25,7 @@ py_modules = [
 setup(
     name="pevolution",
     version="1.1.0",
-    description=(
-        "Pipeline to find, align, and build trees for putatively related proteins."
-    ),
+    description=("Pipeline to find, align, and build trees for putatively related proteins."),
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Mihir Sarwade",

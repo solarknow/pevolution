@@ -6,7 +6,7 @@ from Utils import FetchUtil
 from Utils.FileUtil import XML_parse_and_extract_accession_numbers
 
 
-def best_reciprocal_blast(org, seed, thresh=5, db='nr') -> dict[str, list[str]]:
+def best_reciprocal_blast(org, seed, thresh=5, db="nr") -> dict[str, list[str]]:
     """Returns the best pairwise reciprocal BLAST using seed accession no. from against org organism
     @returns {
     Organism binomial name:

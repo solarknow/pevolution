@@ -1,6 +1,6 @@
 from Bio.Blast import NCBIXML
 
-from helpers.constants import DataPath, OrthosPath
+from helpers.constants import OrthosPath
 from Utils import FetchUtil, SeqUtil
 
 
@@ -34,4 +34,4 @@ def merge_domain_fastas(outfile, acc_dict):
                 else:
                     fil.write(fil_arr[i])
 
-        SeqUtil.append_sequences(DataPath(outfile), OrthosPath(a[0] + ".fasta"))
+        SeqUtil.append_sequences(outfile, OrthosPath(a[0] + ".fasta"))

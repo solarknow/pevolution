@@ -21,7 +21,11 @@ class TestSeqUtil(unittest.TestCase):
         self.expected_organism = ["Vibrio sp. AN61", "Bacteria"]
         self.expected_path = OrthosPath("AJA33470.1.fasta")
         self.expected_definition = "MreB, partial [Vibrio sp. AN61]."
-        self.test_path = os.getcwd() + os.sep + "test_files" + os.sep
+        self.test_path = (
+            os.sep.join([os.getcwd(), "test_files", ""])
+            if os.getcwd().split(os.sep)[-1] == "test"
+            else os.sep.join([os.getcwd(), "test", "test_files", ""])
+        )
 
     def tearDown(self):
         shutil.rmtree(temp_dir)

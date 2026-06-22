@@ -42,13 +42,6 @@ coverage.xml
 .project
 .pydevproject
 
-# Rope
-.ropeproject
-
-# Django stuff:
-*.log
-*.pot
-
 # Sphinx documentation
 docs/_build/
 
