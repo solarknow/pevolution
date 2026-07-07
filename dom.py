@@ -2,6 +2,7 @@ import os
 import sys
 
 import Report
+from helpers.cli import parse_bool_arg
 from helpers.commands import run_bayes, run_phyml, run_prank, run_prottest
 from helpers.constants import AlignsPath, BayesPath, DataPath, MLPath, ProtPath
 from Utils import SeqUtil
@@ -9,7 +10,7 @@ from Utils import SeqUtil
 out = sys.argv[1]
 query = sys.argv[2]
 dom = sys.argv[3]
-paml = sys.argv[4].strip().lower() in {"1", "true", "yes", "y"}
+paml = parse_bool_arg(sys.argv[4])
 
 print("Beginning alignment")
 dom_out = f"{dom}-{out}"
