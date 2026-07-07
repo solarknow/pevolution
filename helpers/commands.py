@@ -64,10 +64,8 @@ DOM = ["python3", "dom.py", "{out}", "{query}", "{dom}", "{phyml}"]
 
 def format_run(cmd, **kwargs):
     fmt = [str(c).format(**kwargs) for c in cmd]
-    try:
-        subprocess.run(fmt)
-    except:
-        os.system(" ".join(fmt))
+    print(" ".join(fmt))
+    subprocess.run(fmt, check=True)
 
 
 def clustal_align(infile, outfile, fmt="nexus"):
@@ -80,10 +78,10 @@ def run_prottest(infile, outfile):
 
 def run_blast(seed, thresh, dum, org, db="nr"):
     if db == "nr":
-        BLAST.append("-remote")
-        BLAST.append("-entrez_query")
-        BLAST.append('"{org}[ORGN]"')
-    format_run(BLAST, seed=seed, threshold=thresh, xml_file=dum, org=org, db=db)
+        new_blast = BLAST + ["-remote", "-entrez_query", f'"{org}[ORGN]"']
+    else:
+        new_blast = BLAST
+    format_run(new_blast, seed=seed, threshold=thresh, xml_file=dum, org=org, db=db)
 
 
 def run_prank(infile, outfile):
@@ -91,7 +89,7 @@ def run_prank(infile, outfile):
 
 
 def run_phyml(infile, model, outfile, v=None, a=None):
-    cmd = PHYML
+    cmd = list(PHYML)
     if v:
         cmd += ["-v", v]
     if a:

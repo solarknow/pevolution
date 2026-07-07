@@ -9,7 +9,7 @@ from Utils import SeqUtil
 out = sys.argv[1]
 query = sys.argv[2]
 dom = sys.argv[3]
-paml = sys.argv[4]
+paml = sys.argv[4].strip().lower() in {"1", "true", "yes", "y"}
 
 print("Beginning alignment")
 dom_out = f"{dom}-{out}"
