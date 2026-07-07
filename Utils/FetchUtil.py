@@ -56,15 +56,17 @@ def fetch_organism(acc):
     retu = [""]
     while i < len(filtered_records):
         if filtered_records[i] == "DEFINITION":
+            if i + 1 >= len(filtered_records):
+                return retu
             multispecies = filtered_records[i + 1].startswith("MULTISPECIES:")
             if not multispecies:
                 tab = filtered_records[i + 1].strip().split()
-                if not filtered_records[i + 2] == "ACCESSION":
+                if i + 2 < len(filtered_records) and not filtered_records[i + 2] == "ACCESSION":
                     tab += filtered_records[i + 2].strip().split()
                 for k in range(len(tab)):
                     if tab[k].startswith("[") and len(tab[k]) > 5:
                         retu = [tab[k][1:]]
-                        while k < len(tab):
+                        while k + 1 < len(tab):
                             k += 1
                             if tab[k].endswith("]."):
                                 retu[0] += " " + tab[k][0 : tab[k].index("]")]
@@ -73,7 +75,9 @@ def fetch_organism(acc):
                             else:
                                 retu[0] += " " + tab[k]
             else:
-                return [filtered_records[i + 11] + " multispecies", filtered_records[i + 12].split(";")[0]]
+                if i + 12 < len(filtered_records):
+                    return [filtered_records[i + 11] + " multispecies", filtered_records[i + 12].split(";")[0]]
+                return retu
 
         if filtered_records[i] == "ORGANISM":
             try:
