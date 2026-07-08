@@ -266,7 +266,7 @@ def splice_align(inalign, outalign):
                     pos.update({c: 1})
     # print pos
     # processing pos; eliminating key:value pairs whose values are less than half len(i)
-    for k in pos.keys():
+    for k in list(pos.keys()):
         if pos[k] < (0.5 * noseq):
             pos.pop(k)
     post = list(pos.keys())

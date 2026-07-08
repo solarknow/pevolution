@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from helpers.constants import AlignsPath, BayesPath, DataPath, MLPath, ProtPath, ReportsPath
 from Utils import FetchUtil, SeqUtil
@@ -173,9 +174,8 @@ def generate_report(name, quer, models, dom):
 def consense(fil):
     """Returns a newick consensus tree of the trees in fil"""
     filename = str(fil).split(".")[0]
-    with open("inputer", "w") as dum:
-        dum.write(str(fil) + "\nf\n" + filename + "_cons\ny\nf\n" + filename + ".tre")
-    os.system("./consense-mac.app < inputer")
+    consense_input = str(fil) + "\nf\n" + filename + "_cons\ny\nf\n" + filename + ".tre"
+    subprocess.run(["./consense-mac.app"], input=consense_input, text=True, check=True)
     tree = ""
     with open(filename + ".tre") as treefil:
         for i in treefil:
